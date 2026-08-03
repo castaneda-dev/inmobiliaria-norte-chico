@@ -983,64 +983,73 @@
         }
 
         async function cargarPropiedades() {
-            // 1. Intentar cargar desde Supabase Cloud DB
+            let listaBase = getSeedData();
+            let listaNube = [];
+            let listaLocal = [];
+
+            // 1. Cargar desde Supabase Cloud DB
             if (typeof supabaseClient !== 'undefined' && supabaseClient) {
                 try {
                     const { data, error } = await supabaseClient.from('propiedades').select('*');
-                    if (!error && data) {
-                        console.log("✅ Propiedades consultadas en Supabase Cloud DB:", data.length);
-                        if (data.length > 0) {
-                            return data
-                                .filter(p => p.estado !== 'Vendido')
-                                .map(p => ({
-                                    id: p.id,
-                                    categoria: mapCategoria(p.tipo_activo),
-                                    estado: mapEstado(p.estado),
-                                    titulo: p.titulo,
-                                    precio: typeof p.precio === 'number' ? '$' + parseFloat(p.precio).toLocaleString() : p.precio,
-                                    imagen: p.imagen_url || p.imagen || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80',
-                                    area: typeof p.area_m2 === 'number' ? p.area_m2 + ' m²' : (p.area || '500 m²'),
-                                    habitaciones: p.habitaciones || '3',
-                                    banos: p.banos || '2',
-                                    zonificacion: p.zonificacion || 'Residencial',
-                                    parametros: p.parametros || '2 Pisos',
-                                    descripcion: p.descripcion || 'Propiedad disponible. Contáctenos para más información.'
-                                }));
-                        }
+                    if (!error && data && data.length > 0) {
+                        listaNube = data.map(p => ({
+                            id: p.id,
+                            categoria: mapCategoria(p.tipo_activo),
+                            estado: mapEstado(p.estado),
+                            titulo: p.titulo,
+                            precio: typeof p.precio === 'number' ? '$' + parseFloat(p.precio).toLocaleString() : (p.precio || '$0'),
+                            imagen: p.imagen_url || p.imagen || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80',
+                            area: typeof p.area_m2 === 'number' ? p.area_m2 + ' m²' : (p.area || '500 m²'),
+                            habitaciones: p.habitaciones || '3',
+                            banos: p.banos || '2',
+                            zonificacion: p.zonificacion || 'Residencial',
+                            parametros: p.parametros || '2 Pisos',
+                            descripcion: p.descripcion || 'Propiedad disponible. Contáctenos para más información.'
+                        }));
                     }
                 } catch (err) {
-                    console.warn("Error consultando Supabase DB:", err);
+                    console.warn("Error leyendo Supabase DB:", err);
                 }
             }
 
-            // 2. Intentar cargar desde localStorage local
+            // 2. Cargar desde localStorage local
             const raw = localStorage.getItem('crm_propiedades');
             if (raw) {
                 try {
-                    const propiedades = JSON.parse(raw);
-                    if (propiedades && propiedades.length > 0) {
-                        return propiedades
-                            .filter(p => p.estado !== 'Vendido')
-                            .map(p => ({
-                                id: p.id,
-                                categoria: mapCategoria(p.tipo_activo),
-                                estado: mapEstado(p.estado),
-                                titulo: p.titulo,
-                                precio: typeof p.precio === 'number' ? '$' + parseFloat(p.precio).toLocaleString() : p.precio,
-                                imagen: p.imagen || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80',
-                                area: typeof p.area_m2 === 'number' ? p.area_m2 + ' m²' : (p.area || '500 m²'),
-                                habitaciones: p.habitaciones || '3',
-                                banos: p.banos || '2',
-                                zonificacion: p.zonificacion || 'Residencial',
-                                parametros: p.parametros || '2 Pisos',
-                                descripcion: p.descripcion || 'Propiedad disponible. Contáctenos para más información.'
-                            }));
+                    const propsLocal = JSON.parse(raw);
+                    if (propsLocal && propsLocal.length > 0) {
+                        listaLocal = propsLocal.map(p => ({
+                            id: p.id,
+                            categoria: mapCategoria(p.tipo_activo),
+                            estado: mapEstado(p.estado),
+                            titulo: p.titulo,
+                            precio: typeof p.precio === 'number' ? '$' + parseFloat(p.precio).toLocaleString() : (p.precio || '$0'),
+                            imagen: p.imagen || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80',
+                            area: typeof p.area_m2 === 'number' ? p.area_m2 + ' m²' : (p.area || '500 m²'),
+                            habitaciones: p.habitaciones || '3',
+                            banos: p.banos || '2',
+                            zonificacion: p.zonificacion || 'Residencial',
+                            parametros: p.parametros || '2 Pisos',
+                            descripcion: p.descripcion || 'Propiedad disponible. Contáctenos para más información.'
+                        }));
                     }
                 } catch (e) { }
             }
 
-            // 3. Fallback inteligente: Mostrar catálogo destacado por defecto para que la web nunca quede vacía
-            return getSeedData();
+            // 3. Combinar todo: Base + Local + Supabase DB (Deduplicando por título)
+            const mapaCombinado = new Map();
+
+            // Agregar primero la base por defecto
+            listaBase.forEach(p => mapaCombinado.set(p.titulo, p));
+
+            // Superponer las locales (agrega nuevas del Admin)
+            listaLocal.forEach(p => mapaCombinado.set(p.titulo, p));
+
+            // Superponer las de Supabase Cloud DB (máxima prioridad)
+            listaNube.forEach(p => mapaCombinado.set(p.titulo, p));
+
+            const combinada = Array.from(mapaCombinado.values());
+            return combinada.filter(p => p.estado !== 'Vendido');
         }
 
         let coleccion = [];
