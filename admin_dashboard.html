@@ -1605,26 +1605,39 @@
             }
         }
 
-        function populateSelectors() {
-            let agents = getAgents() || [];
-            if (!agents || agents.length === 0) {
-                agents = [
-                    { id: 1, nombre: 'Brayan Murillo', email: 'sincorreo@hotmail.com', telefono: '+51978654041' },
-                    { id: 2, nombre: 'Juan Castañeda', email: 'alonsocastaneda538@gmail.com', telefono: '+56982816844' }
-                ];
-            }
+        async function populateSelectors() {
             const selectAgent = document.getElementById('propAgent');
-            if (selectAgent) {
-                selectAgent.innerHTML = agents.map(a => `<option value="${a.id}">${a.nombre} (${a.telefono})</option>`).join('');
+            if (!selectAgent) return;
+
+            selectAgent.innerHTML = '<option value="">Cargando asesores desde Supabase...</option>';
+
+            if (typeof supabaseClient !== 'undefined' && supabaseClient) {
+                try {
+                    const { data: dbAgents, error } = await supabaseClient.from('agentes').select('*');
+                    if (!error && dbAgents && dbAgents.length > 0) {
+                        selectAgent.innerHTML = dbAgents.map(a => `<option value="${a.id}">${a.nombre} (${a.telefono || a.email || ''})</option>`).join('');
+                        setAgents(dbAgents);
+                        return;
+                    }
+                } catch (e) {
+                    console.warn("Error leyendo agentes de Supabase DB:", e);
+                }
+            }
+
+            const localAgents = getAgents() || [];
+            if (localAgents.length > 0) {
+                selectAgent.innerHTML = localAgents.map(a => `<option value="${a.id}">${a.nombre} (${a.telefono || a.email || ''})</option>`).join('');
+            } else {
+                selectAgent.innerHTML = '<option value="">No hay asesores registrados en Supabase</option>';
             }
         }
 
-        function openAddPropertyModal() {
+        async function openAddPropertyModal() {
             document.getElementById('formProperty').reset();
             document.getElementById('propId').value = '';
             document.getElementById('imagePreviewBox').style.display = 'none';
             document.getElementById('imagePreviewImg').src = '';
-            populateSelectors();
+            await populateSelectors();
             toggleSpecFields();
             document.getElementById('propModalTitle').innerText = 'Publicar Nuevo Inmueble';
             openModal('modalProperty');
@@ -1660,8 +1673,8 @@
             if (document.getElementById('propParametros')) document.getElementById('propParametros').value = p.parametros || '';
             if (document.getElementById('propStatus')) document.getElementById('propStatus').value = p.estado || 'Disponible';
 
-            populateSelectors();
-            if (document.getElementById('propAgent')) document.getElementById('propAgent').value = p.id_agente || 1;
+            await populateSelectors();
+            if (document.getElementById('propAgent')) document.getElementById('propAgent').value = p.id_agente || '';
             toggleSpecFields();
             document.getElementById('propModalTitle').innerText = 'Editar Propiedad';
             openModal('modalProperty');
