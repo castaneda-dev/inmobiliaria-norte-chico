@@ -707,25 +707,25 @@
             </div>
             <ul class="nav-menu">
                 <li>
-                    <a href="#" class="active" onclick="switchView('dashboard', this)">
+                    <a href="javascript:void(0)" class="active" onclick="switchView('dashboard', this)">
                         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                         Métricas Generales
                     </a>
                 </li>
                 <li>
-                    <a href="#" onclick="switchView('inventario', this)">
+                    <a href="javascript:void(0)" onclick="switchView('inventario', this)">
                         <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                         Inventario Activos
                     </a>
                 </li>
                 <li>
-                    <a href="#" onclick="switchView('crm', this)">
+                    <a href="javascript:void(0)" onclick="switchView('crm', this)">
                         <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                         Gestión Leads (CRM)
                     </a>
                 </li>
                 <li>
-                    <a href="#" onclick="switchView('agentes', this)">
+                    <a href="javascript:void(0)" onclick="switchView('agentes', this)">
                         <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
                         Agentes y Staff
                     </a>
@@ -1215,33 +1215,40 @@
             renderAgents();
         }
 
-        // Switch Active View Panels
+        // Switch Active View Panels (Safe & Bulletproof)
         function switchView(viewId, element) {
-            // Remove active classes
-            document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
-            document.querySelectorAll('.nav-menu li a').forEach(a => a.classList.remove('active'));
+            try {
+                // Remove active classes
+                document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+                document.querySelectorAll('.nav-menu li a').forEach(a => a.classList.remove('active'));
 
-            // Set active
-            document.getElementById('view-' + viewId).classList.add('active');
-            if (element) element.classList.add('active');
+                // Set active
+                const targetView = document.getElementById('view-' + viewId);
+                if (targetView) targetView.classList.add('active');
+                if (element) element.classList.add('active');
 
-            // Update Topbar Title
-            const titles = {
-                dashboard: 'Métricas Generales & Resumen',
-                inventario: 'Inventario Unificado de Activos',
-                crm: 'Gestión Integral CRM & Leads',
-                agentes: 'Administración de Agentes'
-            };
-            document.getElementById('pageTitle').innerText = titles[viewId];
+                // Update Topbar Title
+                const titles = {
+                    dashboard: 'Métricas Generales & Resumen',
+                    inventario: 'Inventario Unificado de Activos',
+                    crm: 'Gestión Integral CRM & Leads',
+                    agentes: 'Administración de Agentes'
+                };
+                const titleEl = document.getElementById('pageTitle');
+                if (titleEl && titles[viewId]) titleEl.innerText = titles[viewId];
 
-            // Trigger re-renders
-            if (viewId === 'dashboard') renderDashboard();
-            if (viewId === 'inventario') renderProperties();
-            if (viewId === 'crm') renderClients();
-            if (viewId === 'agentes') renderAgents();
+                // Trigger re-renders
+                if (viewId === 'dashboard') renderDashboard();
+                if (viewId === 'inventario') renderProperties();
+                if (viewId === 'crm') renderClients();
+                if (viewId === 'agentes') renderAgents();
 
-            // Auto-close mobile sidebar if open
-            document.getElementById('appSidebar').classList.remove('active');
+                // Auto-close mobile sidebar if open
+                const sidebar = document.getElementById('appSidebar');
+                if (sidebar) sidebar.classList.remove('active');
+            } catch (err) {
+                console.error("Error en switchView:", err);
+            }
         }
 
         function toggleSidebarMenu() {
@@ -1391,15 +1398,19 @@
 
         // Render Properties List/Grid
         function renderProperties() {
-            const props = getProperties();
-            const agents = getAgents();
-            const query = document.getElementById('propSearch').value.toLowerCase();
+            const props = getProperties() || [];
+            const agents = getAgents() || [];
+            const propSearchEl = document.getElementById('propSearch');
+            const query = propSearchEl ? propSearchEl.value.toLowerCase() : '';
 
             const grid = document.getElementById('inventoryDisplay');
+            if (!grid) return;
             grid.innerHTML = '';
 
             const filtered = props.filter(p => {
-                return p.titulo.toLowerCase().includes(query) || p.ubicacion.toLowerCase().includes(query);
+                const title = p.titulo ? p.titulo.toLowerCase() : '';
+                const loc = p.ubicacion ? p.ubicacion.toLowerCase() : '';
+                return title.includes(query) || loc.includes(query);
             });
 
             filtered.forEach(p => {
