@@ -666,6 +666,13 @@
             }
         }
 
+        /* Módulos siempre 100% visibles */
+        .fade-module {
+            opacity: 1 !important;
+            transform: none !important;
+            transition: none !important;
+        }
+
         @keyframes toastOut {
             from {
                 opacity: 1;
@@ -1016,8 +1023,8 @@
                 } catch (e) { }
             }
 
-            // 3. Si no hay propiedades creadas desde el Admin Dashboard, retornar arreglo vacío (Cero datos simulados)
-            return [];
+            // 3. Fallback inteligente: Mostrar catálogo destacado por defecto para que la web nunca quede vacía
+            return getSeedData();
         }
 
         let coleccion = [];
