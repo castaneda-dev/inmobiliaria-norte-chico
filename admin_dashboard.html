@@ -1178,11 +1178,10 @@
 
     <!-- ================= DATOS Y CONTROLADORES JS ================= -->
     <script>
-        // Seed Database
+        // Seed Database - Agentes Autorizados Oficiales
         const defaultAgents = [
-            { id: 1, nombre: 'Alejandro Toledo', email: 'a.toledo@grupocentral.pe', telefono: '+51 987 654 321' },
-            { id: 2, nombre: 'Mariana Pineda', email: 'm.pineda@remax.pe', telefono: '+51 912 345 678' },
-            { id: 3, nombre: 'Eduardo Valdivia', email: 'e.valdivia@gcncorp.com', telefono: '+51 955 411 222' }
+            { id: 1, nombre: 'Brayan Murillo', email: 'sincorreo@hotmail.com', telefono: '+51978654041' },
+            { id: 2, nombre: 'Juan Castañeda', email: 'alonsocastaneda538@gmail.com', telefono: '+56982816844' }
         ];
 
         const defaultProperties = [
@@ -1205,7 +1204,7 @@
 
         // Init LocalStorage if empty
         function initializeDatabase() {
-            if (!localStorage.getItem('crm_agentes')) localStorage.setItem('crm_agentes', JSON.stringify(defaultAgents));
+            localStorage.setItem('crm_agentes', JSON.stringify(defaultAgents));
             if (!localStorage.getItem('crm_propiedades')) localStorage.setItem('crm_propiedades', JSON.stringify(defaultProperties));
             if (!localStorage.getItem('crm_clientes')) localStorage.setItem('crm_clientes', JSON.stringify(defaultClients));
             if (!localStorage.getItem('crm_interacciones')) localStorage.setItem('crm_interacciones', JSON.stringify(defaultInteractions));
@@ -1623,11 +1622,20 @@
             }
         }
 
+        function populateSelectors() {
+            const agents = getAgents() || defaultAgents;
+            const selectAgent = document.getElementById('propAgent');
+            if (selectAgent) {
+                selectAgent.innerHTML = agents.map(a => `<option value="${a.id}">${a.nombre} (${a.telefono})</option>`).join('');
+            }
+        }
+
         function openAddPropertyModal() {
             document.getElementById('formProperty').reset();
             document.getElementById('propId').value = '';
             document.getElementById('imagePreviewBox').style.display = 'none';
             document.getElementById('imagePreviewImg').src = '';
+            populateSelectors();
             toggleSpecFields();
             document.getElementById('propModalTitle').innerText = 'Publicar Nuevo Inmueble';
             openModal('modalProperty');
@@ -1663,6 +1671,8 @@
             if (document.getElementById('propParametros')) document.getElementById('propParametros').value = p.parametros || '';
             if (document.getElementById('propStatus')) document.getElementById('propStatus').value = p.estado || 'Disponible';
 
+            populateSelectors();
+            if (document.getElementById('propAgent')) document.getElementById('propAgent').value = p.id_agente || 1;
             toggleSpecFields();
             document.getElementById('propModalTitle').innerText = 'Editar Propiedad';
             openModal('modalProperty');
@@ -1686,6 +1696,8 @@
             const propParamEl = document.getElementById('propParametros');
             const propStatusEl = document.getElementById('propStatus');
 
+            const propAgentEl = document.getElementById('propAgent');
+
             const pData = {
                 id: idVal ? parseInt(idVal) : Date.now(),
                 brand: 'gcn',
@@ -1701,7 +1713,7 @@
                 zonificacion: propZoniEl ? propZoniEl.value : undefined,
                 parametros: propParamEl ? propParamEl.value : undefined,
                 estado: propStatusEl ? propStatusEl.value : 'Disponible',
-                id_agente: 1
+                id_agente: propAgentEl ? parseInt(propAgentEl.value) : 1
             };
 
             // Supabase Sync
