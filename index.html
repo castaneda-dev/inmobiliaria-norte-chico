@@ -12,27 +12,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase_config.js"></script>
 
-    <!-- Meta Pixel Code -->
-    <script>
-        !function (f, b, e, v, n, t, s) {
-            if (f.fbq) return; n = f.fbq = function () {
-                n.callMethod ?
-                    n.callMethod.apply(n, arguments) : n.queue.push(arguments)
-            };
-            if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
-            n.queue = []; t = b.createElement(e); t.async = !0;
-            t.src = v; s = b.getElementsByTagName(e)[0];
-            s.parentNode.insertBefore(t, s)
-        }(window, document, 'script',
-            'https://connect.facebook.net/en_US/fbevents.js');
-        fbq('init', 'TU_ID_DE_PIXEL_AQUI'); // REEMPLAZAR CON TU ID DE META ADS
-        fbq('track', 'PageView');
-    </script>
-    <noscript><img height="1" width="1" style="display:none"
-            src="https://www.facebook.com/tr?id=TU_ID_DE_PIXEL_AQUI&ev=PageView&noscript=1" /></noscript>
-    <!-- End Meta Pixel Code -->
-
-    <link rel="stylesheet" href="assets/css/index.css" />
+    <link rel="stylesheet" href="assets/css/index.min.css" />
 </head>
 
 <body>
@@ -65,10 +45,22 @@
             <!-- CARRUSEL DE FOTOS -->
             <div class="hero-video">
                 <div class="carousel-track" id="carouselTrack">
-                    <img src="PR_PLAZA_HUARAL.png" alt="Plaza de Armas de Huaral" class="carousel-img">
-                    <img src="PR_PLAZA_CHANCAY.png" alt="Plaza de Armas de Chancay" class="carousel-img">
-                    <img src="PR_ECOTRULY_PARK.png" alt="EcoTruly Park" class="carousel-img">
-                    <img src="PR_CHANCAY.png" alt="Chancay" class="carousel-img">
+                    <img src="PR_PLAZA_HUARAL_desktop.webp" 
+                         srcset="PR_PLAZA_HUARAL_mobile.webp 800w, PR_PLAZA_HUARAL_desktop.webp 1920w" 
+                         sizes="(max-width: 800px) 100vw, 100vw" 
+                         alt="Plaza de Armas de Huaral" class="carousel-img" fetchpriority="high">
+                    <img src="PR_PLAZA_CHANCAY_desktop.webp" 
+                         srcset="PR_PLAZA_CHANCAY_mobile.webp 800w, PR_PLAZA_CHANCAY_desktop.webp 1920w" 
+                         sizes="(max-width: 800px) 100vw, 100vw" 
+                         alt="Plaza de Armas de Chancay" class="carousel-img" loading="lazy">
+                    <img src="PR_ECOTRULY_PARK_desktop.webp" 
+                         srcset="PR_ECOTRULY_PARK_mobile.webp 800w, PR_ECOTRULY_PARK_desktop.webp 1920w" 
+                         sizes="(max-width: 800px) 100vw, 100vw" 
+                         alt="EcoTruly Park" class="carousel-img" loading="lazy">
+                    <img src="PR_CHANCAY_desktop.webp" 
+                         srcset="PR_CHANCAY_mobile.webp 800w, PR_CHANCAY_desktop.webp 1920w" 
+                         sizes="(max-width: 800px) 100vw, 100vw" 
+                         alt="Chancay" class="carousel-img" loading="lazy">
                 </div>
                 <button class="carousel-btn prev-btn" onclick="moveCarousel(-1)">&#10094;</button>
                 <button class="carousel-btn next-btn" onclick="moveCarousel(1)">&#10095;</button>
@@ -162,8 +154,28 @@
     </div>
 
     <!-- ================= LÓGICA JAVASCRIPT UNIFICADA ================= -->
-    <script src="assets/js/api.js"></script>
-    <script src="assets/js/index-app.js" defer></script>
+    <script src="assets/js/api.min.js"></script>
+    <script src="assets/js/index-app.min.js" defer></script>
+
+    <!-- Meta Pixel Code (Deferred) -->
+    <script>
+        !function (f, b, e, v, n, t, s) {
+            if (f.fbq) return; n = f.fbq = function () {
+                n.callMethod ?
+                    n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+            };
+            if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
+            n.queue = []; t = b.createElement(e); t.async = !0;
+            t.src = v; s = b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t, s)
+        }(window, document, 'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', 'TU_ID_DE_PIXEL_AQUI'); // REEMPLAZAR CON TU ID DE META ADS
+        fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+            src="https://www.facebook.com/tr?id=TU_ID_DE_PIXEL_AQUI&ev=PageView&noscript=1" /></noscript>
+    <!-- End Meta Pixel Code -->
 </body>
 
 </html>
