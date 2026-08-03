@@ -1178,11 +1178,8 @@
 
     <!-- ================= DATOS Y CONTROLADORES JS ================= -->
     <script>
-        // Seed Database - Agentes Autorizados Oficiales
-        const defaultAgents = [
-            { id: 1, nombre: 'Brayan Murillo', email: 'sincorreo@hotmail.com', telefono: '+51978654041' },
-            { id: 2, nombre: 'Juan Castañeda', email: 'alonsocastaneda538@gmail.com', telefono: '+56982816844' }
-        ];
+        // Base de Datos de Agentes - Carga dinámica desde Supabase Cloud DB
+        const defaultAgents = [];
 
         const defaultProperties = [];
 
@@ -1197,9 +1194,9 @@
             { id: 2, id_cliente: 2, id_propiedad: 4, tipo_contacto: 'Llamada', notas: 'Primer contacto. Solicitó parámetros urbanísticos del terreno.', fecha_interaccion: '2026-07-24' }
         ];
 
-        // Init LocalStorage if empty
+        // Init LocalStorage si está vacío
         function initializeDatabase() {
-            localStorage.setItem('crm_agentes', JSON.stringify(defaultAgents));
+            if (!localStorage.getItem('crm_agentes')) localStorage.setItem('crm_agentes', JSON.stringify([]));
             if (!localStorage.getItem('crm_propiedades')) localStorage.setItem('crm_propiedades', JSON.stringify([]));
             if (!localStorage.getItem('crm_clientes')) localStorage.setItem('crm_clientes', JSON.stringify(defaultClients));
             if (!localStorage.getItem('crm_interacciones')) localStorage.setItem('crm_interacciones', JSON.stringify(defaultInteractions));
@@ -1850,9 +1847,9 @@
             openModal('modalAgent');
         }
 
-        function saveAgent(e) {
+        async function saveAgent(e) {
             e.preventDefault();
-            const agents = getAgents();
+            const agents = getAgents() || [];
             const newAgent = {
                 id: agents.length ? Math.max(...agents.map(a => a.id)) + 1 : 1,
                 nombre: document.getElementById('ageName').value,
@@ -1860,10 +1857,26 @@
                 telefono: document.getElementById('agePhone').value
             };
 
+            if (typeof supabaseClient !== 'undefined' && supabaseClient) {
+                try {
+                    await supabaseClient.from('agentes').insert([{
+                        nombre: newAgent.nombre,
+                        email: newAgent.email,
+                        telefono: newAgent.telefono
+                    }]);
+                    console.log("✅ Asesor guardado exitosamente en Supabase Cloud DB.");
+                } catch (err) {
+                    console.error("Error al guardar asesor en Supabase:", err);
+                }
+            }
+
             agents.push(newAgent);
             setAgents(agents);
             closeModal('modalAgent');
             renderAgents();
+            populateSelectors();
+            renderDashboard();
+            alert('✅ Asesor registrado con éxito.');
         }
 
         // ================= SUPABASE AUTH HANDLERS =================
