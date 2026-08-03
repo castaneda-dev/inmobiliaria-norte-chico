@@ -1,0 +1,1910 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dashboard Inmobiliario | Control Dual</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,700&family=Montserrat:wght@300;400;500;600;700;900&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Supabase SDK & Config -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase_config.js"></script>
+    <style>
+        /* ================= GCN PREMIUM DARK & GOLD THEME ================= */
+        :root {
+            --bg-main: #080808;
+            --bg-card: #121212;
+            --text-main: #FFFFFF;
+            --text-muted: #AAAAAA;
+            --accent: #cb9f74;
+            --accent-hover: #957051;
+            --accent-rgb: 203, 159, 116;
+            --border: rgba(203, 159, 116, 0.2);
+            --font-heading: 'Playfair Display', serif;
+            --font-body: 'Montserrat', sans-serif;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* General Resets */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-body);
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        /* ================= SIDEBAR STYLING ================= */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: var(--transition);
+            z-index: 99;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 30px 25px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .brand-logo {
+            font-family: var(--font-heading);
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #FFF;
+        }
+
+        .brand-logo span {
+            color: var(--accent);
+        }
+
+        /* Sidebar Navigation */
+        .nav-menu {
+            list-style: none;
+            padding: 20px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex-grow: 1;
+        }
+
+        .nav-menu li a {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 14px 20px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            border-radius: 12px;
+            transition: var(--transition);
+        }
+
+        .nav-menu li a:hover,
+        .nav-menu li a.active {
+            background: rgba(var(--accent-rgb), 0.1);
+            color: var(--accent);
+        }
+
+        .nav-menu li a svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .sidebar-footer {
+            padding: 20px 25px;
+            border-top: 1px solid var(--border);
+            font-size: 11px;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ================= MAIN CONTENT AREA ================= */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .topbar {
+            height: 80px;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            transition: var(--transition);
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-main);
+        }
+
+        .topbar-title {
+            font-family: var(--font-heading);
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFF;
+            font-weight: 700;
+            font-size: 14px;
+            border: 2px solid var(--border);
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* ================= DASHBOARD PANELS ================= */
+        .dashboard-container {
+            padding: 40px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .view-section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* KPIs grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .kpi-card {
+            background: var(--bg-card);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: var(--transition);
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .kpi-data h3 {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .kpi-data .value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .kpi-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: rgba(var(--accent-rgb), 0.1);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .kpi-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        /* Charts & Lists layout */
+        .dashboard-charts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .chart-card {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .chart-card h3 {
+            font-size: 16px;
+            font-weight: 700;
+            border-left: 4px solid var(--accent);
+            padding-left: 10px;
+        }
+
+        /* SVG Chart visual styling */
+        .chart-placeholder {
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Data Section/Tables */
+        .table-section {
+            background: var(--bg-card);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .table-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .table-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .search-bar {
+            position: relative;
+        }
+
+        .search-bar input {
+            background: rgba(var(--accent-rgb), 0.05);
+            border: 1px solid var(--border);
+            padding: 10px 15px 10px 40px;
+            border-radius: 8px;
+            color: var(--text-main);
+            outline: none;
+            width: 240px;
+            transition: var(--transition);
+        }
+
+        .search-bar input:focus {
+            border-color: var(--accent);
+            width: 300px;
+        }
+
+        .search-bar svg {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            stroke: var(--text-muted);
+            fill: none;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #FFF;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            padding: 15px 20px;
+            color: var(--text-muted);
+            font-weight: 600;
+            border-bottom: 2px solid var(--border);
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-block;
+            text-transform: uppercase;
+        }
+
+        /* Dynamic Status badging */
+        .badge-disponible { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+        .badge-reservado { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+        .badge-vendido { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+
+        .badge-nuevo { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+        .badge-contacto { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+        .badge-negociacion { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+        .badge-cerrado { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+
+        .brand-pill {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .brand-gcn { background: #000; color: #cb9f74; border: 1px solid #cb9f74; }
+        .brand-remax { background: #003DA5; color: #FFF; }
+
+        .btn-icon-table {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            margin-right: 8px;
+            transition: var(--transition);
+        }
+
+        .btn-icon-table:hover {
+            color: var(--accent);
+        }
+
+        /* Property Cards Grid */
+        .property-grid-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .dashboard-prop-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .dashboard-prop-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-img-wrap {
+            height: 180px;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .card-price-tag {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background: var(--accent);
+            color: #FFF;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .card-body-content {
+            padding: 20px;
+        }
+
+        .card-title-text {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-specs-row {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 15px;
+            border-top: 1px solid var(--border);
+            padding-top: 12px;
+        }
+
+        /* ================= MODALS ================= */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            transition: var(--transition);
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 640px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            transform: scale(0.95);
+            transition: var(--transition);
+            margin: auto;
+        }
+
+        /* Scrollbar interna elegante para modales */
+        .modal-box::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-box::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+
+        .modal-box::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 8px;
+        }
+
+        .modal-overlay.active .modal-box {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-header h3 {
+            font-family: var(--font-heading);
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .btn-close-modal {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            background: rgba(var(--accent-rgb), 0.05);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 8px;
+            color: var(--text-main);
+            outline: none;
+            font-family: var(--font-body);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--accent);
+        }
+
+        .modal-footer-btns {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(var(--accent-rgb), 0.1);
+        }
+
+        /* ================= MOBILE ADAPTATION ================= */
+        @media (max-width: 992px) {
+            .dashboard-charts {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                height: 100%;
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .topbar {
+                padding: 0 20px;
+            }
+
+            .dashboard-container {
+                padding: 20px;
+            }
+
+            .search-bar input {
+                width: 150px;
+            }
+
+            .search-bar input:focus {
+                width: 180px;
+            }
+        }
+    </style>
+</head>
+
+<body class="theme-gcn">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="appSidebar">
+        <div>
+            <div class="sidebar-header">
+                <div class="brand-logo">
+                    GCN <span>ADMIN</span>
+                </div>
+            </div>
+            <ul class="nav-menu">
+                <li>
+                    <a href="#" class="active" onclick="switchView('dashboard', this)">
+                        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                        Métricas Generales
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="switchView('inventario', this)">
+                        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                        Inventario Activos
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="switchView('crm', this)">
+                        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        Gestión Leads (CRM)
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="switchView('agentes', this)">
+                        <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                        Agentes y Staff
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="sidebar-footer">
+            © 2026 Grupo Inmobiliario.
+        </div>
+    </aside>
+
+    <!-- MAIN BODY -->
+    <main class="main-content">
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="menu-toggle" onclick="toggleSidebarMenu()">☰</button>
+                <div class="topbar-title" id="pageTitle">Panel de Operaciones</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <a href="BORRADOR.HTML" target="_blank" class="btn-primary" style="background: rgba(var(--accent-rgb), 0.15); color: var(--accent); border: 1px solid var(--border); text-decoration: none;">
+                    🌐 Ver Landing Norte Chico
+                </a>
+                <div class="user-profile">
+                    <div class="user-name" id="displayUserName">Administrador General</div>
+                    <div class="user-avatar" id="brandAvatar">GCN</div>
+                </div>
+                <button onclick="handleSupabaseLogout()" class="btn-secondary" style="padding: 8px 12px; font-size: 12px; color: #ef4444; border-color: rgba(239, 68, 68, 0.3);" title="Cerrar Sesión">
+                    🚪 Salir
+                </button>
+            </div>
+        </header>
+
+        <!-- VIEW WRAPPER -->
+        <div class="dashboard-container">
+
+            <!-- SECTION: METRICAS -->
+            <section id="view-dashboard" class="view-section active">
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-data">
+                            <h3>Leads CRM</h3>
+                            <div class="value" id="kpiLeads">0</div>
+                        </div>
+                        <div class="kpi-icon">
+                            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-data">
+                            <h3>Leads Landing</h3>
+                            <div class="value" id="kpiLandingLeads" style="color: var(--accent);">0</div>
+                        </div>
+                        <div class="kpi-icon">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-data">
+                            <h3>Propiedades Dispo.</h3>
+                            <div class="value" id="kpiDispo">0</div>
+                        </div>
+                        <div class="kpi-icon">
+                            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-data">
+                            <h3>Cierres del Mes</h3>
+                            <div class="value" id="kpiCierres">0</div>
+                        </div>
+                        <div class="kpi-icon">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-data">
+                            <h3>Comisión Proyectada</h3>
+                            <div class="value" id="kpiComision">$0</div>
+                        </div>
+                        <div class="kpi-icon">
+                            <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-charts">
+                    <div class="chart-card">
+                        <h3>Distribución de Leads</h3>
+                        <div class="chart-placeholder" id="chartLeads">
+                            <!-- SVG Donut Chart dynamically rendered -->
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Precios Promedio por Tipo</h3>
+                        <div class="chart-placeholder" id="chartPrice">
+                            <!-- SVG Bar Chart dynamically rendered -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recientes del CRM -->
+                <div class="table-section">
+                    <div class="table-header">
+                        <h3>Interacciones Recientes</h3>
+                        <button class="btn-primary" onclick="openInteractionModal()">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                            Registrar Contacto
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>Activo Interés</th>
+                                    <th>Contacto</th>
+                                    <th>Fecha</th>
+                                    <th>Notas</th>
+                                </tr>
+                            </thead>
+                            <tbody id="interactionTableBody">
+                                <!-- JS Populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: INVENTARIO -->
+            <section id="view-inventario" class="view-section">
+                <div class="table-section">
+                    <div class="table-header">
+                        <h3>Listado de Activos</h3>
+                        <div class="table-controls">
+                            <div class="search-bar">
+                                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                <input type="text" id="propSearch" placeholder="Buscar por título, ubicación..." onkeyup="filterProperties()">
+                            </div>
+                            <button class="btn-primary" onclick="openAddPropertyModal()">+ Agregar Propiedad</button>
+                        </div>
+                    </div>
+                    <div class="property-grid-display" id="inventoryDisplay">
+                        <!-- Dynamic Cards -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: CRM LEADS -->
+            <section id="view-crm" class="view-section">
+                <div class="table-section">
+                    <div class="table-header">
+                        <h3>Clientes y Leads Registrados</h3>
+                        <div class="table-controls">
+                            <button class="btn-primary" onclick="openAddClientModal()">+ Nuevo Lead</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Teléfono</th>
+                                    <th>Email</th>
+                                    <th>Origen / Marca</th>
+                                    <th>Interés</th>
+                                    <th>Estado Lead</th>
+                                    <th>Ingreso</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="clientsTableBody">
+                                <!-- JS Populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: AGENTES -->
+            <section id="view-agentes" class="view-section">
+                <div class="table-section">
+                    <div class="table-header">
+                        <h3>Asesores de Venta Autorizados</h3>
+                        <button class="btn-primary" onclick="openAddAgentModal()">+ Nuevo Agente</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Teléfono</th>
+                                    <th>Operación</th>
+                                </tr>
+                            </thead>
+                            <tbody id="agentsTableBody">
+                                <!-- JS Populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- ================= MODALES DE GESTIÓN ================= -->
+
+    <!-- MODAL REGISTRAR INTERACCION -->
+    <div class="modal-overlay" id="modalInteraction">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Registrar Interacción CRM</h3>
+                <button class="btn-close-modal" onclick="closeModal('modalInteraction')">×</button>
+            </div>
+            <form id="formInteraction" onsubmit="saveInteraction(event)">
+                <div class="form-group">
+                    <label>Cliente</label>
+                    <select id="intCliente" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Propiedad de Interés</label>
+                    <select id="intPropiedad" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Tipo de Contacto</label>
+                    <select id="intTipo" required>
+                        <option value="Llamada">Llamada</option>
+                        <option value="Email">Correo Electrónico</option>
+                        <option value="Visita Presencial">Visita Presencial</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Notas de la Reunión / Estado</label>
+                    <textarea id="intNotas" rows="4" placeholder="Ej. El cliente solicita cotización final y facilidades de pago..." required></textarea>
+                </div>
+                <div class="modal-footer-btns">
+                    <button type="button" class="btn-secondary" onclick="closeModal('modalInteraction')">Cancelar</button>
+                    <button type="submit" class="btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL AGREGAR PROPIEDAD -->
+    <div class="modal-overlay" id="modalProperty">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="propModalTitle">Agregar Propiedad</h3>
+                <button class="btn-close-modal" onclick="closeModal('modalProperty')">×</button>
+            </div>
+            <form id="formProperty" onsubmit="saveProperty(event)">
+                <input type="hidden" id="propId">
+                <input type="hidden" id="propBrand" value="gcn">
+                
+                <div class="form-group">
+                    <label>Título del Inmueble</label>
+                    <input type="text" id="propTitle" placeholder="Ej. Lote Residencial en Huaral" required>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>Tipo Activo</label>
+                        <select id="propType" onchange="toggleSpecFields()" required>
+                            <option value="Departamento">Departamento</option>
+                            <option value="Casa">Casa</option>
+                            <option value="Terreno">Terreno</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <select id="propStatus" required>
+                            <option value="Disponible">Disponible</option>
+                            <option value="Reservado">Reservado</option>
+                            <option value="Vendido">Vendido</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>Precio (USD)</label>
+                        <input type="number" id="propPrice" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Área M²</label>
+                        <input type="number" id="propArea" required>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>Ubicación</label>
+                        <input type="text" id="propLocation" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Agente Responsable</label>
+                        <select id="propAgent" required></select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Imagen del Inmueble (Subir desde tu equipo)</label>
+                    <input type="file" id="propFileInput" accept="image/*" onchange="previewUploadedImage(event)" style="padding: 10px; width: 100%; border: 1px dashed var(--border); border-radius: 8px; background: rgba(var(--accent-rgb), 0.05); cursor: pointer;">
+                    
+                    <div id="imagePreviewBox" style="margin-top: 10px; display: none; text-align: center; border: 1px solid var(--border); padding: 10px; border-radius: 12px; background: rgba(0,0,0,0.3);">
+                        <img id="imagePreviewImg" src="" style="max-height: 140px; max-width: 100%; border-radius: 8px; object-fit: cover; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+                        <p style="font-size: 11px; color: var(--text-muted); margin-top: 5px;">Imagen lista para guardar</p>
+                    </div>
+                    
+                    <input type="hidden" id="propImage">
+                    
+                    <details style="margin-top: 6px; font-size: 12px; color: var(--text-muted);">
+                        <summary style="cursor: pointer; font-weight: 600;">O ingresar URL externa de imagen</summary>
+                        <input type="text" id="propImageUrl" placeholder="https://..." oninput="handleUrlImageInput(this.value)" style="margin-top: 6px;">
+                    </details>
+                </div>
+
+                <div class="form-group">
+                    <label>Descripción / Detalle</label>
+                    <textarea id="propDesc" rows="3" placeholder="Descripción atractiva para la landing page..."></textarea>
+                </div>
+
+                <!-- Campos específicos para Vivienda -->
+                <div id="specsVivienda">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label>Habitaciones</label>
+                            <input type="number" id="propHabitaciones" placeholder="3">
+                        </div>
+                        <div class="form-group">
+                            <label>Baños</label>
+                            <input type="number" step="0.5" id="propBanos" placeholder="2">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Campos específicos para Terreno -->
+                <div id="specsTerreno" style="display: none;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label>Zonificación</label>
+                            <input type="text" id="propZonificacion" placeholder="Ej. Residencial / Industrial">
+                        </div>
+                        <div class="form-group">
+                            <label>Parámetros</label>
+                            <input type="text" id="propParametros" placeholder="Ej. 2 Pisos / Naves">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer-btns">
+                    <button type="button" class="btn-secondary" onclick="closeModal('modalProperty')">Cancelar</button>
+                    <button type="submit" class="btn-primary">Guardar Propiedad</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL NUEVO CLIENTE/LEAD -->
+    <div class="modal-overlay" id="modalClient">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Nuevo Prospecto / Lead</h3>
+                <button class="btn-close-modal" onclick="closeModal('modalClient')">×</button>
+            </div>
+            <form id="formClient" onsubmit="saveClient(event)">
+                <div class="form-group">
+                    <label>Nombre Completo</label>
+                    <input type="text" id="cliName" required>
+                </div>
+                <div class="form-group">
+                    <label>Teléfono</label>
+                    <input type="text" id="cliPhone" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="cliEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Estado Inicial Lead</label>
+                    <select id="cliStatus" required>
+                        <option value="Nuevo">Nuevo</option>
+                        <option value="En Contacto">En Contacto</option>
+                        <option value="Negociacion">En Negociación</option>
+                        <option value="Cerrado">Cerrado</option>
+                    </select>
+                </div>
+                <div class="modal-footer-btns">
+                    <button type="button" class="btn-secondary" onclick="closeModal('modalClient')">Cancelar</button>
+                    <button type="submit" class="btn-primary">Registrar Lead</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DE AUTENTICACIÓN / LOGIN SUPABASE -->
+    <div class="modal-overlay" id="modalAuth" style="z-index: 99999; background: rgba(8,8,8,0.95);">
+        <div class="modal-box" style="max-width: 420px; text-align: center; border: 1px solid var(--accent);">
+            <h2 style="font-family: var(--font-heading); font-size: 24px; margin-bottom: 8px;">GCN <span style="color: var(--accent);">ADMIN</span></h2>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 25px;">Acceso Restringido a Personal Autorizado</p>
+            
+            <form id="formAuth" onsubmit="handleSupabaseLogin(event)">
+                <div class="form-group" style="text-align: left;">
+                    <label>Correo Electrónico</label>
+                    <input type="email" id="authEmail" placeholder="admin@gcncorp.com" required>
+                </div>
+                <div class="form-group" style="text-align: left;">
+                    <label>Contraseña</label>
+                    <input type="password" id="authPassword" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 14px; margin-top: 10px; font-size: 15px;">
+                    🔐 Iniciar Sesión en Supabase
+                </button>
+            </form>
+            
+            <p id="authErrorMsg" style="font-size: 12px; color: #ef4444; margin-top: 15px; display: none;"></p>
+        </div>
+    </div>
+
+    <!-- MODAL NUEVO AGENTE -->
+    <div class="modal-overlay" id="modalAgent">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Agregar Agente Autorizado</h3>
+                <button class="btn-close-modal" onclick="closeModal('modalAgent')">×</button>
+            </div>
+            <form id="formAgent" onsubmit="saveAgent(event)">
+                <div class="form-group">
+                    <label>Nombre Completo</label>
+                    <input type="text" id="ageName" required>
+                </div>
+                <div class="form-group">
+                    <label>Correo Corporativo</label>
+                    <input type="email" id="ageEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Teléfono Móvil</label>
+                    <input type="text" id="agePhone" required>
+                </div>
+                <div class="modal-footer-btns">
+                    <button type="button" class="btn-secondary" onclick="closeModal('modalAgent')">Cancelar</button>
+                    <button type="submit" class="btn-primary">Añadir Staff</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= DATOS Y CONTROLADORES JS ================= -->
+    <script>
+        // Seed Database
+        const defaultAgents = [
+            { id: 1, nombre: 'Alejandro Toledo', email: 'a.toledo@grupocentral.pe', telefono: '+51 987 654 321' },
+            { id: 2, nombre: 'Mariana Pineda', email: 'm.pineda@remax.pe', telefono: '+51 912 345 678' },
+            { id: 3, nombre: 'Eduardo Valdivia', email: 'e.valdivia@gcncorp.com', telefono: '+51 955 411 222' }
+        ];
+
+        const defaultProperties = [
+            { id: 1, brand: 'gcn', tipo_activo: 'Terreno', titulo: 'Lote Residencial - Huaral', precio: 45000, area_m2: 500, ubicacion: 'A 20 min de Huaral', estado: 'Disponible', id_agente: 1, imagen: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80', zonificacion: 'Residencial', parametros: '2 Pisos', descripcion: 'Hermoso lote a 20 min de Huaral. Clima soleado todo el año, ideal para construir la casa de campo familiar.' },
+            { id: 2, brand: 'gcn', tipo_activo: 'Departamento', titulo: 'Departamento - San Isidro', precio: 420000, area_m2: 150, ubicacion: 'Av. Camino Real 450, San Isidro', estado: 'Disponible', id_agente: 2, imagen: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80', habitaciones: 3, banos: 2.5, descripcion: 'Hermoso departamento céntrico cerca al corazón financiero. Una inversión patrimonial altamente rentable.' },
+            { id: 3, brand: 'gcn', tipo_activo: 'Casa', titulo: 'Residencia de Lujo con Piscina', precio: 890000, area_m2: 420, ubicacion: 'Las Casuarinas, Surco', estado: 'Reservado', id_agente: 3, imagen: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80', habitaciones: 4, banos: 4, descripcion: 'Casa moderna en zona residencial exclusiva y segura.' },
+            { id: 4, brand: 'gcn', tipo_activo: 'Terreno', titulo: 'Parque Industrial - Lurín', precio: 3500000, area_m2: 10000, ubicacion: 'Km 32 Panamericana Sur, Lurín', estado: 'Disponible', id_agente: 2, imagen: 'https://images.pexels.com/photos/236705/pexels-photo-236705.jpeg?auto=compress&cs=tinysrgb&w=800', zonificacion: 'Industrial (I2)', parametros: 'Naves', descripcion: 'Lote industrial compactado. Fácil acceso a la Panamericana Sur. Alta plusvalía a mediano plazo.' }
+        ];
+
+        const defaultClients = [
+            { id: 1, nombre_completo: 'Carlos Mendoza', telefono: '+51 944 821 732', email: 'carlos.m@hotmail.com', estado_lead: 'Negociacion', fecha_registro: '2026-07-25', origen: 'Norte Chico', tipo_interes: 'Lote para Mi Vivienda' },
+            { id: 2, nombre_completo: 'Inversiones Sur SpA', telefono: '+56 9 8812 3456', email: 'contacto@surinversiones.com', estado_lead: 'Nuevo', fecha_registro: '2026-07-24', origen: 'Norte Chico', tipo_interes: 'Inversión Patrimonial' },
+            { id: 3, nombre_completo: 'Gabriela Ortiz', telefono: '+51 981 772 199', email: 'gortiz@gmail.com', estado_lead: 'Cerrado', fecha_registro: '2026-07-10', origen: 'Manual', tipo_interes: 'Consulta General' }
+        ];
+
+        const defaultInteractions = [
+            { id: 1, id_cliente: 1, id_propiedad: 1, tipo_contacto: 'Visita Presencial', notas: 'Visita en físico realizada con éxito. Cliente solicita descuento del 3%.', fecha_interaccion: '2026-07-25' },
+            { id: 2, id_cliente: 2, id_propiedad: 4, tipo_contacto: 'Llamada', notas: 'Primer contacto. Solicitó parámetros urbanísticos del terreno.', fecha_interaccion: '2026-07-24' }
+        ];
+
+        // Init LocalStorage if empty
+        function initializeDatabase() {
+            if (!localStorage.getItem('crm_agentes')) localStorage.setItem('crm_agentes', JSON.stringify(defaultAgents));
+            if (!localStorage.getItem('crm_propiedades')) localStorage.setItem('crm_propiedades', JSON.stringify(defaultProperties));
+            if (!localStorage.getItem('crm_clientes')) localStorage.setItem('crm_clientes', JSON.stringify(defaultClients));
+            if (!localStorage.getItem('crm_interacciones')) localStorage.setItem('crm_interacciones', JSON.stringify(defaultInteractions));
+        }
+
+        // Get Data
+        const getAgents = () => JSON.parse(localStorage.getItem('crm_agentes'));
+        const getProperties = () => JSON.parse(localStorage.getItem('crm_propiedades'));
+        const getClients = () => JSON.parse(localStorage.getItem('crm_clientes'));
+        const getInteractions = () => JSON.parse(localStorage.getItem('crm_interacciones'));
+
+        // Save Helpers
+        const setProperties = (data) => localStorage.setItem('crm_propiedades', JSON.stringify(data));
+        const setClients = (data) => localStorage.setItem('crm_clientes', JSON.stringify(data));
+        const setAgents = (data) => localStorage.setItem('crm_agentes', JSON.stringify(data));
+        const setInteractions = (data) => localStorage.setItem('crm_interacciones', JSON.stringify(data));
+
+        // State control
+        // Always GCN theme
+        function setTheme(theme) {
+            document.body.className = 'theme-gcn';
+            renderDashboard();
+            renderProperties();
+            renderClients();
+            renderAgents();
+        }
+
+        // Switch Active View Panels
+        function switchView(viewId, element) {
+            // Remove active classes
+            document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.nav-menu li a').forEach(a => a.classList.remove('active'));
+
+            // Set active
+            document.getElementById('view-' + viewId).classList.add('active');
+            if (element) element.classList.add('active');
+
+            // Update Topbar Title
+            const titles = {
+                dashboard: 'Métricas Generales & Resumen',
+                inventario: 'Inventario Unificado de Activos',
+                crm: 'Gestión Integral CRM & Leads',
+                agentes: 'Administración de Agentes'
+            };
+            document.getElementById('pageTitle').innerText = titles[viewId];
+
+            // Trigger re-renders
+            if (viewId === 'dashboard') renderDashboard();
+            if (viewId === 'inventario') renderProperties();
+            if (viewId === 'crm') renderClients();
+            if (viewId === 'agentes') renderAgents();
+
+            // Auto-close mobile sidebar if open
+            document.getElementById('appSidebar').classList.remove('active');
+        }
+
+        function toggleSidebarMenu() {
+            document.getElementById('appSidebar').classList.toggle('active');
+        }
+
+        // ================= BUSINESS LOGIC RENDERING =================
+
+        // Render Dashboard Metrics & Charts
+        function renderDashboard() {
+            const props = getProperties();
+            const clients = getClients();
+            const interactions = getInteractions();
+
+            // KPIs
+            const activeLeads = clients.filter(c => c.estado_lead !== 'Cerrado').length;
+            const landingLeads = clients.filter(c => c.origen === 'Norte Chico').length;
+            const availableProps = props.filter(p => p.estado === 'Disponible').length;
+            const closedDeals = clients.filter(c => c.estado_lead === 'Cerrado').length;
+
+            // Project Commissions (Dynamic calculate: 3% of available properties total value)
+            const sumValues = props.reduce((acc, p) => p.estado === 'Disponible' ? acc + parseFloat(p.precio) : acc, 0);
+            const projection = Math.round(sumValues * 0.03);
+
+            document.getElementById('kpiLeads').innerText = activeLeads;
+            if (document.getElementById('kpiLandingLeads')) document.getElementById('kpiLandingLeads').innerText = landingLeads;
+            document.getElementById('kpiDispo').innerText = availableProps;
+            document.getElementById('kpiCierres').innerText = closedDeals;
+            document.getElementById('kpiComision').innerText = '$' + projection.toLocaleString();
+
+            // Render Interaction List
+            const tbody = document.getElementById('interactionTableBody');
+            tbody.innerHTML = '';
+
+            const recentInts = interactions.slice(-4).reverse();
+            recentInts.forEach(int => {
+                const client = clients.find(c => c.id === int.id_cliente);
+                const prop = props.find(p => p.id === int.id_propiedad);
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${client ? client.nombre_completo : 'Desconocido'}</strong></td>
+                        <td>${prop ? prop.titulo : 'Consulta General'}</td>
+                        <td><span class="status-badge" style="background: rgba(var(--accent-rgb),0.1); color: var(--accent);">${int.tipo_contacto}</span></td>
+                        <td>${int.fecha_interaccion}</td>
+                        <td style="color: var(--text-muted); font-size: 13px;">${int.notas}</td>
+                    </tr>
+                `;
+            });
+
+            // SVG charts injection
+            renderDonutChart(clients);
+            renderBarChart(props);
+        }
+
+        // Render SVG Donut Chart dynamically
+        function renderDonutChart(clients) {
+            const statusCounts = { Nuevo: 0, Contacto: 0, Negociacion: 0, Cerrado: 0 };
+            clients.forEach(c => {
+                if (c.estado_lead === 'Nuevo') statusCounts.Nuevo++;
+                else if (c.estado_lead === 'En Contacto') statusCounts.Contacto++;
+                else if (c.estado_lead === 'Negociacion') statusCounts.Negociacion++;
+                else if (c.estado_lead === 'Cerrado') statusCounts.Cerrado++;
+            });
+
+            const total = clients.length || 1;
+            const pNuevo = (statusCounts.Nuevo / total) * 100;
+            const pContacto = (statusCounts.Contacto / total) * 100;
+            const pNegociacion = (statusCounts.Negociacion / total) * 100;
+            const pCerrado = (statusCounts.Cerrado / total) * 100;
+
+            const accentColor = '#cb9f74';
+
+            const container = document.getElementById('chartLeads');
+            container.innerHTML = `
+                <svg width="220" height="220" viewBox="0 0 42 42" class="donut">
+                    <circle class="donut-hole" cx="21" cy="21" r="15.91549430918954" fill="transparent"></circle>
+                    <circle class="donut-ring" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="rgba(255,255,255,0.05)" stroke-width="3"></circle>
+                    
+                    <!-- Segment 1: Nuevo (Blue) -->
+                    <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#3b82f6" stroke-width="3" 
+                            stroke-dasharray="${pNuevo} ${100 - pNuevo}" stroke-dashoffset="100"></circle>
+                    
+                    <!-- Segment 2: Contacto (Purple) -->
+                    <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#a855f7" stroke-width="3" 
+                            stroke-dasharray="${pContacto} ${100 - pContacto}" stroke-dashoffset="${100 - pNuevo}"></circle>
+
+                    <!-- Segment 3: Negociacion (Orange) -->
+                    <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#f59e0b" stroke-width="3" 
+                            stroke-dasharray="${pNegociacion} ${100 - pNegociacion}" stroke-dashoffset="${100 - pNuevo - pContacto}"></circle>
+
+                    <!-- Segment 4: Cerrado (Accent) -->
+                    <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="${accentColor}" stroke-width="3" 
+                            stroke-dasharray="${pCerrado} ${100 - pCerrado}" stroke-dashoffset="${100 - pNuevo - pContacto - pNegociacion}"></circle>
+                </svg>
+                <div style="position: absolute; text-align: left; right: -10px; top: 30px; font-size: 11px; display: flex; flex-direction: column; gap: 6px;">
+                    <div><span style="display:inline-block;width:10px;height:10px;background:#3b82f6;border-radius:50%;margin-right:8px;"></span>Nuevo: ${statusCounts.Nuevo}</div>
+                    <div><span style="display:inline-block;width:10px;height:10px;background:#a855f7;border-radius:50%;margin-right:8px;"></span>En Contacto: ${statusCounts.Contacto}</div>
+                    <div><span style="display:inline-block;width:10px;height:10px;background:#f59e0b;border-radius:50%;margin-right:8px;"></span>Negociación: ${statusCounts.Negociacion}</div>
+                    <div><span style="display:inline-block;width:10px;height:10px;background:${accentColor};border-radius:50%;margin-right:8px;"></span>Cerrado: ${statusCounts.Cerrado}</div>
+                </div>
+            `;
+        }
+
+        // Render SVG Bar Chart dynamically (Prices per Property Type)
+        function renderBarChart(properties) {
+            const sumTerrenos = properties.filter(p => p.tipo_activo === 'Terreno').reduce((acc, p) => acc + p.precio, 0);
+            const countTerrenos = properties.filter(p => p.tipo_activo === 'Terreno').length || 1;
+            const avgTerreno = Math.round(sumTerrenos / countTerrenos);
+
+            const sumDeptos = properties.filter(p => p.tipo_activo === 'Departamento').reduce((acc, p) => acc + p.precio, 0);
+            const countDeptos = properties.filter(p => p.tipo_activo === 'Departamento').length || 1;
+            const avgDepto = Math.round(sumDeptos / countDeptos);
+
+            const sumCasas = properties.filter(p => p.tipo_activo === 'Casa').reduce((acc, p) => acc + p.precio, 0);
+            const countCasas = properties.filter(p => p.tipo_activo === 'Casa').length || 1;
+            const avgCasa = Math.round(sumCasas / countCasas);
+
+            const maxVal = Math.max(avgTerreno, avgDepto, avgCasa) || 1;
+            const heightTerreno = (avgTerreno / maxVal) * 120;
+            const heightDepto = (avgDepto / maxVal) * 120;
+            const heightCasa = (avgCasa / maxVal) * 120;
+
+            const accentColor = '#cb9f74';
+
+            const container = document.getElementById('chartPrice');
+            container.innerHTML = `
+                <div style="display: flex; align-items: flex-end; justify-content: center; gap: 40px; height: 160px; width: 100%; border-bottom: 2px solid var(--border); padding-bottom: 5px;">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                        <span style="font-size: 11px; font-weight: 700;">$${avgTerreno.toLocaleString()}</span>
+                        <div style="width: 45px; height: ${heightTerreno}px; background: ${accentColor}; border-radius: 6px 6px 0 0; transition: height 0.5s;"></div>
+                        <span style="font-size: 10px; font-weight: 600; text-transform: uppercase;">Terrenos</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                        <span style="font-size: 11px; font-weight: 700;">$${avgDepto.toLocaleString()}</span>
+                        <div style="width: 45px; height: ${heightDepto}px; background: #3b82f6; border-radius: 6px 6px 0 0; transition: height 0.5s;"></div>
+                        <span style="font-size: 10px; font-weight: 600; text-transform: uppercase;">Deptos</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                        <span style="font-size: 11px; font-weight: 700;">$${avgCasa.toLocaleString()}</span>
+                        <div style="width: 45px; height: ${heightCasa}px; background: #10b981; border-radius: 6px 6px 0 0; transition: height 0.5s;"></div>
+                        <span style="font-size: 10px; font-weight: 600; text-transform: uppercase;">Casas</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render Properties List/Grid
+        function renderProperties() {
+            const props = getProperties();
+            const agents = getAgents();
+            const query = document.getElementById('propSearch').value.toLowerCase();
+
+            const grid = document.getElementById('inventoryDisplay');
+            grid.innerHTML = '';
+
+            const filtered = props.filter(p => {
+                return p.titulo.toLowerCase().includes(query) || p.ubicacion.toLowerCase().includes(query);
+            });
+
+            filtered.forEach(p => {
+                const agent = agents.find(a => a.id === p.id_agente);
+                const defaultImg = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80';
+                
+                grid.innerHTML += `
+                    <div class="dashboard-prop-card">
+                        <div class="card-img-wrap" style="background-image: url('${p.imagen || defaultImg}');">
+                            <span class="brand-pill brand-gcn" style="position: absolute; top: 15px; left: 15px;">
+                                GCN
+                            </span>
+                            <span class="status-badge badge-${p.estado.toLowerCase()}" style="position: absolute; top: 15px; right: 15px; background: var(--bg-card);">
+                                ${p.estado}
+                            </span>
+                            <div class="card-price-tag">$${parseFloat(p.precio).toLocaleString()}</div>
+                        </div>
+                        <div class="card-body-content">
+                            <div style="font-size: 11px; color: var(--accent); font-weight: 700; text-transform: uppercase; margin-bottom: 5px;">
+                                ${p.tipo_activo}
+                            </div>
+                            <h4 class="card-title-text">${p.titulo}</h4>
+                            <p style="font-size: 13px; color: var(--text-muted); display:flex; align-items:center; gap:5px;">
+                                📍 ${p.ubicacion}
+                            </p>
+                            <p style="font-size: 12px; color: var(--text-muted); margin-top: 10px;">
+                                Agente: <strong>${agent ? agent.nombre : 'Sin Asignar'}</strong>
+                            </p>
+                            
+                            <div class="card-specs-row">
+                                <span>📐 ${p.area_m2} M²</span>
+                                <span style="margin-left: auto;">
+                                    <button class="btn-icon-table" onclick="editProperty(${p.id})">✏️ Editar</button>
+                                    <button class="btn-icon-table" onclick="deleteProperty(${p.id})" style="color:#ef4444;">🗑️</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function filterProperties() {
+            renderProperties();
+        }
+
+        // Render Clients/CRM Leads Table
+        function renderClients() {
+            const clients = getClients();
+            const tbody = document.getElementById('clientsTableBody');
+            tbody.innerHTML = '';
+
+            clients.forEach(c => {
+                const statusClass = c.estado_lead.toLowerCase().replace(' ', '');
+                const origen = c.origen || 'Manual';
+                const interes = c.tipo_interes || 'Consulta General';
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${c.nombre_completo}</strong></td>
+                        <td>${c.telefono}</td>
+                        <td>${c.email}</td>
+                        <td><span class="brand-pill brand-gcn">${origen}</span></td>
+                        <td style="font-size: 13px; color: var(--text-muted);">${interes}</td>
+                        <td><span class="status-badge badge-${statusClass}">${c.estado_lead}</span></td>
+                        <td>${c.fecha_registro}</td>
+                        <td>
+                            <button class="btn-icon-table" onclick="deleteClient(${c.id})" style="color:#ef4444;" title="Eliminar Lead">🗑️ Eliminar</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Render Agents/Staff Table
+        function renderAgents() {
+            const agents = getAgents();
+            const tbody = document.getElementById('agentsTableBody');
+            tbody.innerHTML = '';
+
+            agents.forEach(a => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>#${a.id}</td>
+                        <td><strong>${a.nombre}</strong></td>
+                        <td>${a.email}</td>
+                        <td>${a.telefono}</td>
+                        <td><span class="status-badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">Activo</span></td>
+                    </tr>
+                `;
+            });
+        }
+
+        // ================= CRUD LOGICS & MODAL ACTIONS =================
+
+        // Modals management
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        // Populate dynamic select menus
+        function populateSelectors() {
+            const clients = getClients();
+            const properties = getProperties();
+            const agents = getAgents();
+
+            // Interaction selectors
+            const cliSelect = document.getElementById('intCliente');
+            cliSelect.innerHTML = '';
+            clients.forEach(c => cliSelect.innerHTML += `<option value="${c.id}">${c.nombre_completo}</option>`);
+
+            const propSelect = document.getElementById('intPropiedad');
+            propSelect.innerHTML = '<option value="">Consulta General (Sin activo específico)</option>';
+            properties.forEach(p => propSelect.innerHTML += `<option value="${p.id}">${p.titulo} (${p.brand.toUpperCase()})</option>`);
+
+            // Property Agent Selector
+            const agentSelect = document.getElementById('propAgent');
+            agentSelect.innerHTML = '';
+            agents.forEach(a => agentSelect.innerHTML += `<option value="${a.id}">${a.nombre}</option>`);
+        }
+
+        // Interactive CRUD: Interaction Save
+        function openInteractionModal() {
+            populateSelectors();
+            openModal('modalInteraction');
+        }
+
+        function saveInteraction(e) {
+            e.preventDefault();
+            const intList = getInteractions();
+            const newInt = {
+                id: Date.now(),
+                id_cliente: parseInt(document.getElementById('intCliente').value),
+                id_propiedad: document.getElementById('intPropiedad').value ? parseInt(document.getElementById('intPropiedad').value) : null,
+                tipo_contacto: document.getElementById('intTipo').value,
+                notas: document.getElementById('intNotas').value,
+                fecha_interaccion: new Date().toISOString().split('T')[0]
+            };
+
+            intList.push(newInt);
+            setInteractions(intList);
+            closeModal('modalInteraction');
+            document.getElementById('formInteraction').reset();
+            renderDashboard();
+        }
+
+        // Toggle dynamic spec fields in property modal
+        function toggleSpecFields() {
+            const type = document.getElementById('propType').value;
+            const viv = document.getElementById('specsVivienda');
+            const ter = document.getElementById('specsTerreno');
+
+            if (type === 'Terreno') {
+                viv.style.display = 'none';
+                ter.style.display = 'block';
+            } else {
+                viv.style.display = 'block';
+                ter.style.display = 'none';
+            }
+        }
+
+        // Compression & Base64 FileReader for Uploaded Images
+        function previewUploadedImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        // Canvas compression to avoid localStorage overflow (max 1000px)
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        const maxDim = 1000;
+
+                        if (width > maxDim || height > maxDim) {
+                            if (width > height) {
+                                height = Math.round((height * maxDim) / width);
+                                width = maxDim;
+                            } else {
+                                width = Math.round((width * maxDim) / height);
+                                height = maxDim;
+                            }
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        const base64Data = canvas.toDataURL('image/jpeg', 0.85);
+
+                        document.getElementById('propImage').value = base64Data;
+                        document.getElementById('imagePreviewImg').src = base64Data;
+                        document.getElementById('imagePreviewBox').style.display = 'block';
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handleUrlImageInput(url) {
+            if (url.trim()) {
+                document.getElementById('propImage').value = url.trim();
+                document.getElementById('imagePreviewImg').src = url.trim();
+                document.getElementById('imagePreviewBox').style.display = 'block';
+            }
+        }
+
+        // Interactive CRUD: Property
+        function openAddPropertyModal() {
+            document.getElementById('formProperty').reset();
+            document.getElementById('propId').value = '';
+            document.getElementById('propImage').value = '';
+            document.getElementById('imagePreviewBox').style.display = 'none';
+            document.getElementById('imagePreviewImg').src = '';
+            document.getElementById('propModalTitle').innerText = 'Agregar Propiedad';
+            populateSelectors();
+            toggleSpecFields();
+            openModal('modalProperty');
+        }
+
+        function editProperty(id) {
+            const props = getProperties();
+            const p = props.find(x => x.id === id);
+            if (!p) return;
+
+            populateSelectors();
+            document.getElementById('propId').value = p.id;
+            document.getElementById('propBrand').value = p.brand || 'gcn';
+            document.getElementById('propTitle').value = p.titulo;
+            document.getElementById('propType').value = p.tipo_activo;
+            document.getElementById('propPrice').value = p.precio;
+            document.getElementById('propArea').value = p.area_m2;
+            document.getElementById('propLocation').value = p.ubicacion;
+            
+            const imgVal = p.imagen || '';
+            document.getElementById('propImage').value = imgVal;
+            if (imgVal) {
+                document.getElementById('imagePreviewImg').src = imgVal;
+                document.getElementById('imagePreviewBox').style.display = 'block';
+            } else {
+                document.getElementById('imagePreviewBox').style.display = 'none';
+            }
+
+            document.getElementById('propDesc').value = p.descripcion || '';
+            document.getElementById('propHabitaciones').value = p.habitaciones || '';
+            document.getElementById('propBanos').value = p.banos || '';
+            document.getElementById('propZonificacion').value = p.zonificacion || '';
+            document.getElementById('propParametros').value = p.parametros || '';
+            document.getElementById('propStatus').value = p.estado;
+            document.getElementById('propAgent').value = p.id_agente;
+
+            toggleSpecFields();
+            document.getElementById('propModalTitle').innerText = 'Editar Propiedad';
+            openModal('modalProperty');
+        }
+
+        async function saveProperty(e) {
+            e.preventDefault();
+            const props = getProperties();
+            const idVal = document.getElementById('propId').value;
+            
+            const pData = {
+                id: idVal ? parseInt(idVal) : Date.now(),
+                brand: document.getElementById('propBrand').value,
+                titulo: document.getElementById('propTitle').value,
+                tipo_activo: document.getElementById('propType').value,
+                precio: parseFloat(document.getElementById('propPrice').value),
+                area_m2: parseFloat(document.getElementById('propArea').value),
+                ubicacion: document.getElementById('propLocation').value,
+                imagen: document.getElementById('propImage').value || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80',
+                descripcion: document.getElementById('propDesc').value,
+                habitaciones: document.getElementById('propHabitaciones').value || undefined,
+                banos: document.getElementById('propBanos').value || undefined,
+                zonificacion: document.getElementById('propZonificacion').value || undefined,
+                parametros: document.getElementById('propParametros').value || undefined,
+                estado: document.getElementById('propStatus').value,
+                id_agente: parseInt(document.getElementById('propAgent').value)
+            };
+
+            // Supabase Sync
+            if (typeof supabaseClient !== 'undefined' && supabaseClient) {
+                try {
+                    const supabasePayload = {
+                        titulo: pData.titulo,
+                        tipo_activo: pData.tipo_activo,
+                        precio: pData.precio,
+                        area_m2: pData.area_m2,
+                        ubicacion: pData.ubicacion,
+                        imagen_url: pData.imagen,
+                        descripcion: pData.descripcion,
+                        habitaciones: pData.habitaciones ? parseInt(pData.habitaciones) : null,
+                        banos: pData.banos ? parseFloat(pData.banos) : null,
+                        zonificacion: pData.zonificacion || null,
+                        parametros: pData.parametros || null,
+                        estado: pData.estado
+                    };
+
+                    if (idVal) {
+                        await supabaseClient.from('propiedades').update(supabasePayload).eq('id', idVal);
+                    } else {
+                        await supabaseClient.from('propiedades').insert([supabasePayload]);
+                    }
+                    console.log("✅ Propiedad guardada en Supabase Cloud DB.");
+                } catch (err) {
+                    console.error("Error sincronizando propiedad con Supabase:", err);
+                }
+            }
+
+            if (idVal) {
+                const index = props.findIndex(x => x.id === pData.id);
+                if (index !== -1) props[index] = pData;
+            } else {
+                props.push(pData);
+            }
+
+            setProperties(props);
+            closeModal('modalProperty');
+            renderProperties();
+            renderDashboard();
+        }
+
+        async function deleteProperty(id) {
+            if (confirm('¿Está seguro de eliminar esta propiedad?')) {
+                if (typeof supabaseClient !== 'undefined' && supabaseClient) {
+                    try {
+                        await supabaseClient.from('propiedades').delete().eq('id', id);
+                        console.log("✅ Propiedad eliminada de Supabase.");
+                    } catch (err) {
+                        console.error("Error eliminando propiedad en Supabase:", err);
+                    }
+                }
+                let props = getProperties();
+                props = props.filter(p => p.id !== id);
+                setProperties(props);
+                renderProperties();
+                renderDashboard();
+            }
+        }
+
+        // Interactive CRUD: Leads/Clients
+        function openAddClientModal() {
+            document.getElementById('formClient').reset();
+            openModal('modalClient');
+        }
+
+        async function saveClient(e) {
+            e.preventDefault();
+            const clients = getClients();
+            const newClient = {
+                id: Date.now(),
+                nombre_completo: document.getElementById('cliName').value,
+                telefono: document.getElementById('cliPhone').value,
+                email: document.getElementById('cliEmail').value,
+                estado_lead: document.getElementById('cliStatus').value,
+                origen: 'Manual Admin',
+                tipo_interes: 'Registro Interno',
+                fecha_registro: new Date().toISOString().split('T')[0]
+            };
+
+            if (typeof supabaseClient !== 'undefined' && supabaseClient) {
+                try {
+                    await supabaseClient.from('clientes').insert([{
+                        nombre_completo: newClient.nombre_completo,
+                        telefono: newClient.telefono,
+                        email: newClient.email,
+                        estado_lead: newClient.estado_lead,
+                        origen: newClient.origen,
+                        tipo_interes: newClient.tipo_interes,
+                        fecha_registro: newClient.fecha_registro
+                    }]);
+                    console.log("✅ Lead guardado en Supabase DB.");
+                } catch (err) {
+                    console.error("Error al guardar cliente en Supabase:", err);
+                }
+            }
+
+            clients.push(newClient);
+            setClients(clients);
+            closeModal('modalClient');
+            renderClients();
+            renderDashboard();
+        }
+
+        async function deleteClient(id) {
+            if (confirm('¿Está seguro de eliminar este lead?')) {
+                if (typeof supabaseClient !== 'undefined' && supabaseClient) {
+                    try {
+                        await supabaseClient.from('clientes').delete().eq('id', id);
+                        console.log("✅ Lead eliminado de Supabase.");
+                    } catch (err) {
+                        console.error("Error al eliminar cliente de Supabase:", err);
+                    }
+                }
+                let clients = getClients();
+                clients = clients.filter(c => c.id !== id);
+                setClients(clients);
+                renderClients();
+                renderDashboard();
+            }
+        }
+
+        // Interactive CRUD: Agents
+        function openAddAgentModal() {
+            document.getElementById('formAgent').reset();
+            openModal('modalAgent');
+        }
+
+        function saveAgent(e) {
+            e.preventDefault();
+            const agents = getAgents();
+            const newAgent = {
+                id: agents.length ? Math.max(...agents.map(a => a.id)) + 1 : 1,
+                nombre: document.getElementById('ageName').value,
+                email: document.getElementById('ageEmail').value,
+                telefono: document.getElementById('agePhone').value
+            };
+
+            agents.push(newAgent);
+            setAgents(agents);
+            closeModal('modalAgent');
+            renderAgents();
+        }
+
+        // ================= SUPABASE AUTH HANDLERS =================
+        async function checkSupabaseSession() {
+            if (!supabaseClient) return; // Si no hay Supabase configurado aún, permite modo demo local
+            
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) {
+                openModal('modalAuth');
+            } else {
+                closeModal('modalAuth');
+                if (document.getElementById('displayUserName')) {
+                    document.getElementById('displayUserName').innerText = session.user.email;
+                }
+            }
+        }
+
+        async function handleSupabaseLogin(e) {
+            e.preventDefault();
+            const errBox = document.getElementById('authErrorMsg');
+            errBox.style.display = 'none';
+
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+
+            if (!supabaseClient) {
+                // Modo demo local sin Supabase configurado aún
+                closeModal('modalAuth');
+                return;
+            }
+
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                errBox.innerText = "Error: " + error.message;
+                errBox.style.display = 'block';
+            } else {
+                closeModal('modalAuth');
+                if (document.getElementById('displayUserName')) {
+                    document.getElementById('displayUserName').innerText = data.user.email;
+                }
+            }
+        }
+
+        async function handleSupabaseLogout() {
+            if (supabaseClient) {
+                await supabaseClient.auth.signOut();
+                openModal('modalAuth');
+            } else {
+                openModal('modalAuth');
+            }
+        }
+
+        // Initialize App
+        window.addEventListener('load', () => {
+            initializeDatabase();
+            setTheme('gcn'); // Default theme
+            checkSupabaseSession();
+        });
+    </script>
+</body>
+
+</html>

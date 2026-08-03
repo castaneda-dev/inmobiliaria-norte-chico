@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Global CEO Net | Premium Real Estate</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Montserrat:wght@300;400;600;700&display=swap"
+        rel="stylesheet" />
+    <style>
+        /* ================= 1. CORE & RESET ================= */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg-main: #F7F8FA;
+            --bg-card: #FFFFFF;
+            --text-dark: #1A1A1A;
+            --text-muted: #666666;
+            --gold: #C5A059;
+            --gold-hover: #A88646;
+            --border: #EAEAEA;
+            --font-heading: 'Playfair Display', serif;
+            --font-body: 'Montserrat', sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ================= 2. NAVEGACIÓN (PORTAL STYLE) ================= */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-family: var(--font-heading);
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--text-dark);
+        }
+
+        .logo span {
+            color: var(--gold);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-dark);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--gold);
+        }
+
+        .btn-nav {
+            background: var(--gold);
+            color: #fff !important;
+            padding: 10px 20px;
+            border-radius: 4px;
+        }
+
+        .btn-nav:hover {
+            background: var(--gold-hover);
+        }
+
+        /* ================= 3. HERO & SEARCH BAR ================= */
+        .hero {
+            position: relative;
+            height: 80vh;
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1600&q=80') center/cover no-repeat;
+            text-align: center;
+            padding: 0 20px;
+            margin-top: 60px;
+        }
+
+        .hero h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(32px, 5vw, 56px);
+            color: #fff;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero p {
+            font-size: clamp(14px, 2vw, 18px);
+            color: #f0f0f0;
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+
+        .search-container {
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            max-width: 900px;
+            position: absolute;
+            bottom: -40px;
+        }
+
+        .search-input,
+        .search-select {
+            flex: 1;
+            padding: 15px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-family: var(--font-body);
+            font-size: 14px;
+            outline: none;
+        }
+
+        .search-input:focus,
+        .search-select:focus {
+            border-color: var(--gold);
+        }
+
+        .btn-search {
+            background: var(--text-dark);
+            color: #fff;
+            border: none;
+            padding: 0 35px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-family: var(--font-body);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-search:hover {
+            background: var(--gold);
+        }
+
+        /* ================= 4. PORTAFOLIO (GRID) ================= */
+        .featured-section {
+            padding: 120px 5% 80px;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 15px;
+        }
+
+        .section-header h2 {
+            font-family: var(--font-heading);
+            color: var(--text-dark);
+            font-size: 28px;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 20px;
+        }
+
+        .tab {
+            background: none;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding-bottom: 5px;
+            position: relative;
+            font-family: var(--font-body);
+            text-transform: uppercase;
+        }
+
+        .tab.active {
+            color: var(--gold);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -17px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--gold);
+        }
+
+        .properties-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .property-card {
+            background: var(--bg-card);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .property-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .property-img {
+            height: 240px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .property-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .property-card:hover .property-img img {
+            transform: scale(1.05);
+        }
+
+        .tag-status {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--text-dark);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            z-index: 2;
+            letter-spacing: 1px;
+        }
+
+        .tag-price {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background: var(--gold);
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+            padding: 6px 15px;
+            border-radius: 4px;
+            z-index: 2;
+            font-family: var(--font-heading);
+        }
+
+        .property-info {
+            padding: 25px 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .property-type {
+            font-size: 11px;
+            color: var(--gold);
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        .property-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .property-specs {
+            display: flex;
+            justify-content: flex-start;
+            gap: 20px;
+            border-top: 1px solid var(--border);
+            padding-top: 15px;
+            margin-top: auto;
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .spec-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* ================= 5. CONTACTO / CRM ================= */
+        .contact-module {
+            padding: 80px 5%;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+        }
+
+        .contact-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .contact-text h2 {
+            font-family: var(--font-heading);
+            color: var(--text-dark);
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        .contact-text p {
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            background: var(--bg-main);
+            padding: 40px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .form-grid input,
+        .form-grid select {
+            width: 100%;
+            padding: 15px;
+            background: #fff;
+            border: 1px solid var(--border);
+            color: var(--text-dark);
+            font-family: var(--font-body);
+            font-size: 14px;
+            outline: none;
+            border-radius: 4px;
+        }
+
+        .form-grid input:focus,
+        .form-grid select:focus {
+            border-color: var(--gold);
+        }
+
+        .btn-submit {
+            background: var(--text-dark);
+            color: #fff;
+            border: none;
+            padding: 18px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-family: var(--font-body);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            background: var(--gold);
+        }
+
+        /* ================= 6. FOOTER ================= */
+        footer {
+            background: var(--text-dark);
+            color: #fff;
+            padding: 60px 5% 30px;
+            text-align: center;
+        }
+
+        footer .logo-f {
+            font-family: var(--font-heading);
+            font-size: 24px;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        footer .logo-f span {
+            color: var(--gold);
+        }
+
+        footer p {
+            font-size: 13px;
+            color: #aaa;
+        }
+
+        /* ================= 7. MODAL DETALLE ================= */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: #fff;
+            width: 100%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 8px;
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            color: var(--text-dark);
+            cursor: pointer;
+            z-index: 10;
+            background: #fff;
+            border: 1px solid var(--border);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-img {
+            min-height: 350px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .modal-body {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-body h2 {
+            font-family: var(--font-heading);
+            color: var(--text-dark);
+            font-size: 26px;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+        .modal-body .price {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--gold);
+            margin-bottom: 20px;
+            font-family: var(--font-heading);
+        }
+
+        .modal-body .desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            line-height: 1.6;
+            flex-grow: 1;
+        }
+
+        .modal-specs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .modal-specs div {
+            background: var(--bg-main);
+            padding: 15px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+            border-left: 3px solid var(--gold);
+        }
+
+        .modal-body .btn-submit {
+            width: 100%;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+        }
+
+        /* ================= 8. RESPONSIVE ================= */
+        @media (max-width: 900px) {
+            .contact-container {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .search-container {
+                flex-direction: column;
+                bottom: -120px;
+            }
+
+            .hero {
+                margin-bottom: 120px;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .modal-content {
+                grid-template-columns: 1fr;
+                max-height: 85vh;
+            }
+
+            .modal-img {
+                height: 250px;
+                min-height: 250px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVEGACIÓN -->
+    <nav>
+        <div class="logo">GLOBAL<span>CEONET</span></div>
+        <div class="nav-links">
+            <a onclick="filtrarPorCategoria('todos')">Propiedades</a>
+            <a onclick="filtrarPorCategoria('vivienda')">Viviendas</a>
+            <a onclick="filtrarPorCategoria('terreno')">Terrenos</a>
+            <a href="#contacto" class="btn-nav">Vender mi Propiedad</a>
+        </div>
+    </nav>
+
+    <!-- HERO & BUSCADOR -->
+    <header class="hero">
+        <h1>Encuentra tu próximo activo</h1>
+        <p>El estándar más alto en bienes raíces corporativos y residenciales</p>
+
+        <div class="search-container">
+            <select class="search-select" id="search-tipo">
+                <option value="todos">Cualquier tipo de propiedad</option>
+                <option value="vivienda">Departamentos y Casas</option>
+                <option value="terreno">Terrenos y Proyectos</option>
+            </select>
+            <input type="text" class="search-input" placeholder="Ubicación (ej. San Isidro, Miraflores)" readonly>
+            <button class="btn-search" onclick="ejecutarBuscador()">Buscar</button>
+        </div>
+    </header>
+
+    <!-- PORTAFOLIO DINÁMICO -->
+    <section class="featured-section" id="portafolio">
+        <div class="section-header">
+            <h2>Propiedades Destacadas</h2>
+            <div class="filter-tabs">
+                <button class="tab active" id="tab-todos" onclick="filtrarPorCategoria('todos')">Todos</button>
+                <button class="tab" id="tab-vivienda" onclick="filtrarPorCategoria('vivienda')">Viviendas</button>
+                <button class="tab" id="tab-terreno" onclick="filtrarPorCategoria('terreno')">Terrenos</button>
+            </div>
+        </div>
+
+        <div class="properties-grid" id="grid-propiedades">
+            <!-- Generado por JS -->
+        </div>
+    </section>
+
+    <!-- CONTACTO / CRM -->
+    <section class="contact-module" id="contacto">
+        <div class="contact-container">
+            <div class="contact-text">
+                <h2>¿Desea vender o comprar?</h2>
+                <p>Déjenos sus datos y uno de nuestros agentes corporativos se comunicará con usted en menos de 24 horas
+                    para brindarle asesoría personalizada.</p>
+            </div>
+            <div class="form-grid">
+                <input type="text" id="crm-nombre" placeholder="Nombre Completo" required />
+                <input type="tel" id="crm-telefono" placeholder="Teléfono Móvil" required />
+                <select id="crm-interes" required>
+                    <option value="" disabled selected>Seleccione el motivo</option>
+                    <option value="Comprar Vivienda">Quiero comprar una Vivienda</option>
+                    <option value="Comprar Terreno">Quiero comprar un Terreno</option>
+                    <option value="Vender Propiedad">Quiero vender mi Propiedad</option>
+                </select>
+                <button class="btn-submit" onclick="enviarCRM()">Enviar Solicitud</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="logo-f">GLOBAL<span>CEONET</span></div>
+        <p>&copy; 2026 Grupo Inmobiliario. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- VENTANA MODAL (DETALLE) -->
+    <div class="modal-overlay" id="property-modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="cerrarModal()">×</button>
+            <div class="modal-img" id="modal-img"></div>
+            <div class="modal-body">
+                <h2 id="modal-title">Título</h2>
+                <div class="price" id="modal-price">$0</div>
+                <p class="desc" id="modal-desc">Descripción</p>
+                <div class="modal-specs" id="modal-specs"></div>
+                <a href="#contacto" class="btn-submit" onclick="cerrarModal()">Contactar Asesor</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- LÓGICA JAVASCRIPT -->
+    <script>
+        const inventario = [
+            { id: 1, categoria: 'vivienda', estado: 'Venta', titulo: 'Penthouse Panorámico - Miraflores', precio: '$1,250,000', imagen: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=800&q=80', area: '350 m²', habitaciones: '4', banos: '4.5', descripcion: 'Espectacular Penthouse con vista al mar. Acabados de mármol importado, ascensor directo y domótica.' },
+            { id: 2, categoria: 'terreno', estado: 'Desarrollo', titulo: 'Lote Comercial - San Isidro', precio: '$850,000', imagen: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80', area: '1,200 m²', zonificacion: 'Comercial (CZ)', parametros: '12 Pisos', descripcion: 'Terreno estratégicamente ubicado en el corazón financiero. Ideal para proyecto corporativo.' },
+            { id: 3, categoria: 'vivienda', estado: 'Venta', titulo: 'Residencia Exclusiva - La Molina', precio: '$2,100,000', imagen: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80', area: '800 m²', habitaciones: '5', banos: '6', descripcion: 'Casa de diseño moderno. Amplios jardines, piscina climatizada, y máxima seguridad en condominio cerrado.' },
+            { id: 4, categoria: 'terreno', estado: 'Industrial', titulo: 'Parque Industrial - Lurín', precio: '$3,500,000', imagen: 'https://images.pexels.com/photos/236705/pexels-photo-236705.jpeg?auto=compress&cs=tinysrgb&w=800', area: '10,000 m²', zonificacion: 'Industrial (I2)', parametros: 'Naves', descripcion: 'Lote industrial compactado. Fácil acceso a la Panamericana Sur. Energía de media tensión y control de acceso.' }
+        ];
+
+        const gridContenedor = document.getElementById('grid-propiedades');
+        const modal = document.getElementById('property-modal');
+        const body = document.body;
+
+        function renderizarInventario(datos) {
+            gridContenedor.innerHTML = '';
+            datos.forEach(prop => {
+                let specsHTML = prop.categoria === 'vivienda'
+                    ? `<div class="spec-item"><span>📏</span> ${prop.area}</div> <div class="spec-item"><span>🛏️</span> ${prop.habitaciones} Hab</div> <div class="spec-item"><span>🛁</span> ${prop.banos} Baños</div>`
+                    : `<div class="spec-item"><span>📏</span> ${prop.area}</div> <div class="spec-item"><span>📍</span> ${prop.zonificacion}</div> <div class="spec-item"><span>🏗️</span> ${prop.parametros}</div>`;
+
+                let tipoEtiqueta = prop.categoria === 'vivienda' ? 'Residencial' : 'Terreno / Proyecto';
+
+                gridContenedor.innerHTML += `
+          <article class="property-card" onclick="abrirModal(${prop.id})">
+            <div class="property-img">
+              <div class="tag-status">${prop.estado}</div>
+              <div class="tag-price">${prop.precio}</div>
+              <img src="${prop.imagen}" alt="${prop.titulo}" loading="lazy">
+            </div>
+            <div class="property-info">
+              <div class="property-type">${tipoEtiqueta}</div>
+              <h3 class="property-title">${prop.titulo}</h3>
+              <div class="property-specs">${specsHTML}</div>
+            </div>
+          </article>
+        `;
+            });
+        }
+
+        function filtrarPorCategoria(categoria) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + categoria).classList.add('active');
+            renderizarInventario(categoria === 'todos' ? inventario : inventario.filter(prop => prop.categoria === categoria));
+        }
+
+        function ejecutarBuscador() {
+            const seleccion = document.getElementById('search-tipo').value;
+            document.getElementById('portafolio').scrollIntoView({ behavior: 'smooth' });
+            filtrarPorCategoria(seleccion);
+        }
+
+        function abrirModal(id) {
+            const prop = inventario.find(p => p.id === id);
+            document.getElementById('modal-img').style.backgroundImage = `url('${prop.imagen}')`;
+            document.getElementById('modal-title').innerText = prop.titulo;
+            document.getElementById('modal-price').innerText = prop.precio;
+            document.getElementById('modal-desc').innerText = prop.descripcion;
+
+            let specsHTML = `<div><strong>Área Total</strong><br>${prop.area}</div>`;
+            if (prop.categoria === 'vivienda') {
+                specsHTML += `<div><strong>Habitaciones</strong><br>${prop.habitaciones}</div><div><strong>Baños</strong><br>${prop.banos}</div>`;
+            } else {
+                specsHTML += `<div><strong>Zonificación</strong><br>${prop.zonificacion}</div><div><strong>Parámetros</strong><br>${prop.parametros}</div>`;
+            }
+            document.getElementById('modal-specs').innerHTML = specsHTML;
+
+            modal.classList.add('active');
+            body.style.overflow = 'hidden';
+        }
+
+        function cerrarModal() { modal.classList.remove('active'); body.style.overflow = ''; }
+        modal.addEventListener('click', (e) => { if (e.target === modal) cerrarModal(); });
+
+        function enviarCRM() {
+            const nombre = document.getElementById('crm-nombre').value;
+            const telefono = document.getElementById('crm-telefono').value;
+            const interes = document.getElementById('crm-interes').value;
+
+            if (!nombre || !telefono || !interes) {
+                alert("Por favor, complete todos los campos requeridos.");
+                return;
+            }
+
+            console.log("Payload CRM generado:", JSON.stringify({ nombre_completo: nombre, telefono: telefono, tipo_interes: interes, fecha: new Date().toISOString() }));
+            alert("¡Registro exitoso! Los datos han sido enviados.");
+
+            document.getElementById('crm-nombre').value = '';
+            document.getElementById('crm-telefono').value = '';
+            document.getElementById('crm-interes').value = '';
+        }
+
+        renderizarInventario(inventario);
+    </script>
+
+</body>
+
+</html>
