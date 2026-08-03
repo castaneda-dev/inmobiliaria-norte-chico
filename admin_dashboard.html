@@ -10,7 +10,7 @@
     <!-- Supabase SDK & Config -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase_config.js"></script>
-    <link rel="stylesheet" href="assets/css/admin.css">
+    <link rel="stylesheet" href="assets/css/admin.min.css">
 </head>
 
 <body class="theme-gcn">
@@ -198,8 +198,20 @@
                     <div class="table-header">
                         <h3>Clientes y Leads Registrados</h3>
                         <div class="table-controls">
+                            <div class="search-bar">
+                                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                <input type="text" id="crmSearch" placeholder="Buscar por nombre, email, teléfono..." onkeyup="filterCRMLeads()">
+                            </div>
                             <button class="btn-primary" onclick="openAddClientModal()">+ Nuevo Lead</button>
                         </div>
+                    </div>
+                    <!-- FILTROS POR ESTADO Y ORIGEN -->
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; padding: 0 5px;">
+                        <button class="btn-outline btn-active" id="crmFilterAll" onclick="filterCRMByStatus('todos')" style="font-size: 12px; padding: 6px 14px;">Todos</button>
+                        <button class="btn-outline" id="crmFilterNuevo" onclick="filterCRMByStatus('Nuevo')" style="font-size: 12px; padding: 6px 14px;">🟢 Nuevo</button>
+                        <button class="btn-outline" id="crmFilterContacto" onclick="filterCRMByStatus('En Contacto')" style="font-size: 12px; padding: 6px 14px;">🔵 En Contacto</button>
+                        <button class="btn-outline" id="crmFilterNegociacion" onclick="filterCRMByStatus('Negociacion')" style="font-size: 12px; padding: 6px 14px;">🟡 Negociación</button>
+                        <button class="btn-outline" id="crmFilterCerrado" onclick="filterCRMByStatus('Cerrado')" style="font-size: 12px; padding: 6px 14px;">✅ Cerrado</button>
                     </div>
                     <div class="table-responsive">
                         <table>
@@ -208,7 +220,7 @@
                                     <th>Nombre</th>
                                     <th>Teléfono</th>
                                     <th>Email</th>
-                                    <th>Origen / Marca</th>
+                                    <th>Canal / Origen</th>
                                     <th>Interés</th>
                                     <th>Estado Lead</th>
                                     <th>Ingreso</th>
@@ -495,7 +507,7 @@
     </div>
 
     <!-- ================= DATOS Y CONTROLADORES JS ================= -->
-    <script src="assets/js/api.js"></script>
-    <script src="assets/js/app.js" defer></script>
+    <script src="assets/js/api.min.js"></script>
+    <script src="assets/js/app.min.js" defer></script>
 </body>
 </html>

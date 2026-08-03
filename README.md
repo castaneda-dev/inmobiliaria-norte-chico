@@ -3,10 +3,22 @@
 Plataforma inmobiliaria integral para la gestión de lotes residenciales, departamentos y terrenos con CRM de prospectos en tiempo real.
 
 ## 🚀 Arquitectura
-- **Landing Page Pública**: `BORRADOR.HTML` (ó `index.html`)
+- **Landing Page Pública**: `index.html`
 - **Dashboard de Control CRM**: `admin_dashboard.html`
 - **Base de Datos & Autenticación**: Supabase Cloud PostgreSQL
+- **Webhook de Leads (Serverless)**: `api/webhook.js` — Recibe leads automáticamente de Facebook Lead Ads, TikTok Ads y formularios externos
 - **Despliegue Continuo**: Vercel con Dominio `banka.cl`
+
+## 🔑 Variables de Entorno (Vercel)
+
+Las siguientes variables deben estar configuradas en **Vercel > Settings > Environment Variables**:
+
+| Variable | Descripción |
+| :--- | :--- |
+| `SUPABASE_URL` | URL de tu proyecto Supabase |
+| `SUPABASE_ANON_KEY` | Clave anónima (pública) de Supabase |
+| `TELEGRAM_BOT_TOKEN` | Token del bot de Telegram (obtenido vía @BotFather) |
+| `TELEGRAM_CHAT_ID` | ID numérico del chat de Telegram donde se reciben alertas |
 
 ---
 
@@ -27,3 +39,8 @@ Para garantizar la estabilidad del sistema durante futuras implementaciones y me
 ### 3. Loading = Lazy en Elementos Ocultos Horizontalmente
 - **Regla:** **No** aplicar `loading="lazy"` nativo a las imágenes de un carrusel o slider de fotos.
 - **Motivo:** Los navegadores a menudo no logran calcular correctamente la intersección (visibilidad) de elementos que están desplazados horizontalmente fuera de la pantalla mediante transformaciones (translates). Esto ocasiona que las imágenes nunca se descarguen, mostrando espacios vacíos al deslizar el carrusel.
+
+### 4. Credenciales y Variables de Entorno (Seguridad)
+- **Regla:** Las credenciales sensibles (tokens de Telegram, claves de servicio de Supabase, API keys) **nunca** deben escribirse directamente en el código fuente que se despliega al navegador.
+- **Motivo:** Cualquier persona puede inspeccionar el código fuente de una página web desde el navegador. Las claves expuestas pueden ser utilizadas por terceros malintencionados.
+- **Alternativa:** Utilizar las **Variables de Entorno** del proveedor de hosting (Vercel, en nuestro caso). El archivo `api/webhook.js` accede a las credenciales via `process.env.NOMBRE_VARIABLE`, las cuales son inyectadas de forma segura por el servidor y **nunca** llegan al navegador del usuario. La clave `SUPABASE_ANON_KEY` del frontend es la excepción aceptable, ya que Supabase la diseña para ser pública (protegida por Row Level Security).

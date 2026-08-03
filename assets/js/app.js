@@ -279,22 +279,38 @@ function filterProperties() {
     renderProperties();
 }
 
-function renderClients() {
-    const clients = globalState.clients || [];
+// Estado activo de filtro CRM
+let crmActiveFilter = 'todos';
+
+function getOrigenBadge(origen) {
+    const o = (origen || '').toLowerCase();
+    if (o.includes('facebook')) return '<span class="status-badge" style="background:rgba(59,130,246,0.15);color:#3b82f6;">📘 Facebook Ads</span>';
+    if (o.includes('tiktok')) return '<span class="status-badge" style="background:rgba(255,255,255,0.1);color:#fff;">🎵 TikTok Ads</span>';
+    if (o.includes('norte chico') || o.includes('landing')) return '<span class="status-badge" style="background:rgba(16,185,129,0.15);color:#10b981;">🌐 Landing Web</span>';
+    if (o.includes('webhook')) return '<span class="status-badge" style="background:rgba(168,85,247,0.15);color:#a855f7;">⚡ Webhook</span>';
+    return '<span class="status-badge" style="background:rgba(var(--accent-rgb),0.1);color:var(--accent);">' + (origen || 'Manual') + '</span>';
+}
+
+function renderClients(filteredList) {
+    const clients = filteredList || globalState.clients || [];
     const tbody = document.getElementById('clientsTableBody');
     if (!tbody) return;
     tbody.innerHTML = '';
 
+    if (clients.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-muted);">No se encontraron leads con ese filtro.</td></tr>';
+        return;
+    }
+
     clients.forEach(c => {
         const statusClass = c.estado_lead ? c.estado_lead.toLowerCase().replace(' ', '') : '';
-        const origen = c.origen || 'Manual';
         const interes = c.tipo_interes || 'Consulta General';
         tbody.innerHTML += `
             <tr>
                 <td><strong>${c.nombre_completo}</strong></td>
                 <td>${c.telefono}</td>
                 <td>${c.email}</td>
-                <td><span class="brand-pill brand-gcn">${origen}</span></td>
+                <td>${getOrigenBadge(c.origen)}</td>
                 <td style="font-size: 13px; color: var(--text-muted);">${interes}</td>
                 <td><span class="status-badge badge-${statusClass}">${c.estado_lead}</span></td>
                 <td>${c.fecha_registro || ''}</td>
@@ -304,6 +320,40 @@ function renderClients() {
             </tr>
         `;
     });
+}
+
+function filterCRMByStatus(status) {
+    crmActiveFilter = status;
+    // Actualizar botones activos
+    document.querySelectorAll('[id^="crmFilter"]').forEach(btn => btn.classList.remove('btn-active'));
+    const btnMap = { 'todos': 'crmFilterAll', 'Nuevo': 'crmFilterNuevo', 'En Contacto': 'crmFilterContacto', 'Negociacion': 'crmFilterNegociacion', 'Cerrado': 'crmFilterCerrado' };
+    const activeBtn = document.getElementById(btnMap[status]);
+    if (activeBtn) activeBtn.classList.add('btn-active');
+    applyAllCRMFilters();
+}
+
+function filterCRMLeads() {
+    applyAllCRMFilters();
+}
+
+function applyAllCRMFilters() {
+    let clients = globalState.clients || [];
+    // Filtro por estado
+    if (crmActiveFilter !== 'todos') {
+        clients = clients.filter(c => c.estado_lead === crmActiveFilter);
+    }
+    // Filtro por búsqueda
+    const searchEl = document.getElementById('crmSearch');
+    if (searchEl && searchEl.value.trim()) {
+        const q = searchEl.value.toLowerCase();
+        clients = clients.filter(c => {
+            return (c.nombre_completo || '').toLowerCase().includes(q)
+                || (c.email || '').toLowerCase().includes(q)
+                || (c.telefono || '').toLowerCase().includes(q)
+                || (c.origen || '').toLowerCase().includes(q);
+        });
+    }
+    renderClients(clients);
 }
 
 function renderAgents() {
