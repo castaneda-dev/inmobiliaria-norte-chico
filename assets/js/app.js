@@ -11,13 +11,6 @@ let globalState = {
 
 // ================= INICIALIZACIÓN Y CARGA DE DATOS =================
 document.addEventListener('DOMContentLoaded', async () => {
-    // Inicializar listeners
-    document.getElementById('formAuth')?.addEventListener('submit', handleSupabaseLogin);
-    document.getElementById('formProperty')?.addEventListener('submit', saveProperty);
-    document.getElementById('formClient')?.addEventListener('submit', saveClient);
-    document.getElementById('formAgent')?.addEventListener('submit', saveAgent);
-    document.getElementById('formInteraction')?.addEventListener('submit', saveInteraction);
-    
     // Verificar sesión y cargar vista inicial
     await checkSupabaseSession();
     
@@ -393,6 +386,9 @@ async function editProperty(id) {
 // ================= SUPABASE CRUD (Via API Module) =================
 async function saveProperty(e) {
     e.preventDefault();
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
+
     const idVal = document.getElementById('propId').value;
     const isUpdate = !!idVal;
     
@@ -414,6 +410,8 @@ async function saveProperty(e) {
     };
 
     const success = await api.saveProperty(payload, isUpdate ? idVal : null);
+    if (submitBtn) submitBtn.disabled = false;
+
     if (success) {
         alert('✅ Propiedad guardada exitosamente en Supabase.');
         closeModal('modalProperty');
