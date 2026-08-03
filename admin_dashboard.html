@@ -1714,7 +1714,8 @@
                         banos: pData.banos ? parseFloat(pData.banos) : null,
                         zonificacion: pData.zonificacion || null,
                         parametros: pData.parametros || null,
-                        estado: pData.estado
+                        estado: pData.estado,
+                        id_agente: pData.id_agente ? parseInt(pData.id_agente) : null
                     };
 
                     let res;
@@ -1934,9 +1935,23 @@
         async function syncDataWithSupabase() {
             if (typeof supabaseClient !== 'undefined' && supabaseClient) {
                 try {
-                    // Cargar Propiedades desde Supabase
+                    // Cargar Agentes/Asesores desde Supabase Cloud DB
+                    const { data: dbAgents, error: errAgents } = await supabaseClient.from('agentes').select('*');
+                    if (!errAgents && dbAgents) {
+                        const mappedAgents = dbAgents.map(a => ({
+                            id: a.id,
+                            nombre: a.nombre,
+                            email: a.email,
+                            telefono: a.telefono
+                        }));
+                        setAgents(mappedAgents);
+                        renderAgents();
+                        populateSelectors();
+                    }
+
+                    // Cargar Propiedades desde Supabase Cloud DB
                     const { data: props, error: errProps } = await supabaseClient.from('propiedades').select('*');
-                    if (!errProps && props && props.length > 0) {
+                    if (!errProps && props) {
                         const mappedProps = props.map(p => ({
                             id: p.id,
                             brand: 'gcn',
@@ -1952,16 +1967,16 @@
                             zonificacion: p.zonificacion,
                             parametros: p.parametros,
                             estado: p.estado,
-                            id_agente: p.id_agente || 1
+                            id_agente: p.id_agente || null
                         }));
                         setProperties(mappedProps);
                         renderProperties();
                         renderDashboard();
                     }
 
-                    // Cargar Clientes/Leads desde Supabase
+                    // Cargar Clientes/Leads desde Supabase Cloud DB
                     const { data: clients, error: errClients } = await supabaseClient.from('clientes').select('*');
-                    if (!errClients && clients && clients.length > 0) {
+                    if (!errClients && clients) {
                         const mappedClients = clients.map(c => ({
                             id: c.id,
                             nombre_completo: c.nombre_completo,
