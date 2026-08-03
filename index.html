@@ -932,7 +932,7 @@
         }
 
         async function cargarPropiedades() {
-            // Intentar cargar desde Supabase DB primero
+            // 1. Intentar cargar desde Supabase Cloud DB
             if (typeof supabaseClient !== 'undefined' && supabaseClient) {
                 try {
                     const { data, error } = await supabaseClient.from('propiedades').select('*');
@@ -945,9 +945,9 @@
                                 categoria: mapCategoria(p.tipo_activo),
                                 estado: mapEstado(p.estado),
                                 titulo: p.titulo,
-                                precio: '$' + parseFloat(p.precio).toLocaleString(),
+                                precio: typeof p.precio === 'number' ? '$' + parseFloat(p.precio).toLocaleString() : p.precio,
                                 imagen: p.imagen_url || p.imagen || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80',
-                                area: (p.area_m2 || 0) + ' m²',
+                                area: typeof p.area_m2 === 'number' ? p.area_m2 + ' m²' : (p.area || '500 m²'),
                                 habitaciones: p.habitaciones || '3',
                                 banos: p.banos || '2',
                                 zonificacion: p.zonificacion || 'Residencial',
@@ -956,37 +956,38 @@
                             }));
                     }
                 } catch (err) {
-                    console.warn("No se pudo cargar desde Supabase, intentando localStorage local...", err);
+                    console.warn("Error consultando Supabase DB, usando fallback local...", err);
                 }
             }
 
-            // Fallback a localStorage
+            // 2. Intentar cargar desde localStorage
             const raw = localStorage.getItem('crm_propiedades');
-            if (!raw) return getSeedData();
-
-            try {
-                const propiedades = JSON.parse(raw);
-                if (!propiedades.length) return getSeedData();
-
-                return propiedades
-                    .filter(p => p.estado !== 'Vendido')
-                    .map(p => ({
-                        id: p.id,
-                        categoria: mapCategoria(p.tipo_activo),
-                        estado: mapEstado(p.estado),
-                        titulo: p.titulo,
-                        precio: '$' + parseFloat(p.precio).toLocaleString(),
-                        imagen: p.imagen || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80',
-                        area: (p.area_m2 || 0) + ' m²',
-                        habitaciones: p.habitaciones || '3',
-                        banos: p.banos || '2',
-                        zonificacion: p.zonificacion || 'Residencial',
-                        parametros: p.parametros || '2 Pisos',
-                        descripcion: p.descripcion || 'Propiedad disponible. Contáctenos para más información.'
-                    }));
-            } catch (e) {
-                return getSeedData();
+            if (raw) {
+                try {
+                    const propiedades = JSON.parse(raw);
+                    if (propiedades && propiedades.length > 0) {
+                        return propiedades
+                            .filter(p => p.estado !== 'Vendido')
+                            .map(p => ({
+                                id: p.id,
+                                categoria: mapCategoria(p.tipo_activo),
+                                estado: mapEstado(p.estado),
+                                titulo: p.titulo,
+                                precio: typeof p.precio === 'number' ? '$' + parseFloat(p.precio).toLocaleString() : p.precio,
+                                imagen: p.imagen || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80',
+                                area: typeof p.area_m2 === 'number' ? p.area_m2 + ' m²' : (p.area || '500 m²'),
+                                habitaciones: p.habitaciones || '3',
+                                banos: p.banos || '2',
+                                zonificacion: p.zonificacion || 'Residencial',
+                                parametros: p.parametros || '2 Pisos',
+                                descripcion: p.descripcion || 'Propiedad disponible. Contáctenos para más información.'
+                            }));
+                    }
+                } catch (e) {}
             }
+
+            // 3. Fallback de respaldo: Retornar SIEMPRE la colección semilla por defecto
+            return getSeedData();
         }
 
         const coleccion = cargarPropiedades();
