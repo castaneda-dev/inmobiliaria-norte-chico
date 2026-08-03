@@ -1764,6 +1764,7 @@
             }
 
             setProperties(props);
+            notifyPropertyChange();
             closeModal('modalProperty');
             renderProperties();
             renderDashboard();
@@ -1783,6 +1784,7 @@
                 let props = getProperties();
                 props = props.filter(p => p.id !== id);
                 setProperties(props);
+                notifyPropertyChange();
                 renderProperties();
                 renderDashboard();
             }
@@ -1920,6 +1922,15 @@
                 openModal('modalAuth');
             } else {
                 openModal('modalAuth');
+            }
+        }
+
+        // Canal de transmisión en tiempo real
+        const syncChannel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('crm_properties_channel') : null;
+
+        function notifyPropertyChange() {
+            if (syncChannel) {
+                syncChannel.postMessage({ type: 'REFRESH_PROPERTIES', timestamp: Date.now() });
             }
         }
 

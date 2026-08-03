@@ -1175,11 +1175,37 @@
 
         let coleccion = [];
 
-        // Inicialización asíncrona
+        // Inicialización asíncrona con sincronización en tiempo real
         async function initApp() {
             coleccion = await cargarPropiedades();
             renderizarColeccion(coleccion);
             actualizarContadores();
+
+            // Escuchar actualizaciones de pestañas locales en tiempo real
+            if (typeof BroadcastChannel !== 'undefined') {
+                const syncChannel = new BroadcastChannel('crm_properties_channel');
+                syncChannel.onmessage = async () => {
+                    console.log("⚡ Actualizando catálogo desde Dashboard local...");
+                    coleccion = await cargarPropiedades();
+                    renderizarColeccion(coleccion);
+                    actualizarContadores();
+                };
+            }
+
+            // Escuchar actualizaciones en vivo desde Supabase Cloud DB
+            if (typeof supabaseClient !== 'undefined' && supabaseClient) {
+                try {
+                    supabaseClient
+                        .channel('public:propiedades')
+                        .on('postgres_changes', { event: '*', schema: 'public', table: 'propiedades' }, async () => {
+                            console.log("⚡ Actualizando catálogo en tiempo real desde Supabase Cloud...");
+                            coleccion = await cargarPropiedades();
+                            renderizarColeccion(coleccion);
+                            actualizarContadores();
+                        })
+                        .subscribe();
+                } catch (e) {}
+            }
         }
 
         initApp();
