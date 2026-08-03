@@ -1215,40 +1215,50 @@
             renderAgents();
         }
 
-        // Switch Active View Panels (Safe & Bulletproof)
+        // Switch Active View Panels (Safe & Bulletproof Display Toggle)
         function switchView(viewId, element) {
-            try {
-                // Remove active classes
-                document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
-                document.querySelectorAll('.nav-menu li a').forEach(a => a.classList.remove('active'));
+            console.log("🔄 Cambiando a módulo:", viewId);
 
-                // Set active
-                const targetView = document.getElementById('view-' + viewId);
-                if (targetView) targetView.classList.add('active');
-                if (element) element.classList.add('active');
+            // 1. Ocultar todas las secciones visualmente
+            const sections = document.querySelectorAll('.view-section');
+            sections.forEach(sec => {
+                sec.classList.remove('active');
+                sec.style.display = 'none';
+            });
 
-                // Update Topbar Title
-                const titles = {
-                    dashboard: 'Métricas Generales & Resumen',
-                    inventario: 'Inventario Unificado de Activos',
-                    crm: 'Gestión Integral CRM & Leads',
-                    agentes: 'Administración de Agentes'
-                };
-                const titleEl = document.getElementById('pageTitle');
-                if (titleEl && titles[viewId]) titleEl.innerText = titles[viewId];
+            // 2. Desactivar todos los botones del menú
+            document.querySelectorAll('.nav-menu li a').forEach(a => a.classList.remove('active'));
 
-                // Trigger re-renders
-                if (viewId === 'dashboard') renderDashboard();
-                if (viewId === 'inventario') renderProperties();
-                if (viewId === 'crm') renderClients();
-                if (viewId === 'agentes') renderAgents();
-
-                // Auto-close mobile sidebar if open
-                const sidebar = document.getElementById('appSidebar');
-                if (sidebar) sidebar.classList.remove('active');
-            } catch (err) {
-                console.error("Error en switchView:", err);
+            // 3. Activar y mostrar la sección deseada
+            const targetView = document.getElementById('view-' + viewId);
+            if (targetView) {
+                targetView.classList.add('active');
+                targetView.style.display = 'block';
             }
+
+            // 4. Marcar botón activo en el menú
+            const navLink = element || document.querySelector(`.nav-menu li a[onclick*="${viewId}"]`);
+            if (navLink) navLink.classList.add('active');
+
+            // 5. Actualizar título de cabecera
+            const titles = {
+                dashboard: 'Métricas Generales & Resumen',
+                inventario: 'Inventario Unificado de Activos',
+                crm: 'Gestión Integral CRM & Leads',
+                agentes: 'Administración de Agentes'
+            };
+            const titleEl = document.getElementById('pageTitle');
+            if (titleEl && titles[viewId]) titleEl.innerText = titles[viewId];
+
+            // 6. Ejecutar renderizados aislados para que ningún error de datos bloquee la pantalla
+            if (viewId === 'dashboard') { try { renderDashboard(); } catch (e) { console.warn("Error dashboard:", e); } }
+            if (viewId === 'inventario') { try { renderProperties(); } catch (e) { console.warn("Error inventario:", e); } }
+            if (viewId === 'crm') { try { renderClients(); } catch (e) { console.warn("Error crm:", e); } }
+            if (viewId === 'agentes') { try { renderAgents(); } catch (e) { console.warn("Error agentes:", e); } }
+
+            // 7. Cerrar sidebar móvil si aplica
+            const sidebar = document.getElementById('appSidebar');
+            if (sidebar) sidebar.classList.remove('active');
         }
 
         function toggleSidebarMenu() {
