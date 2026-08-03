@@ -1623,7 +1623,7 @@
             }
         }
 
-        function openNewPropertyModal() {
+        function openAddPropertyModal() {
             document.getElementById('formProperty').reset();
             document.getElementById('propId').value = '';
             document.getElementById('imagePreviewBox').style.display = 'none';
@@ -1632,6 +1632,8 @@
             document.getElementById('propModalTitle').innerText = 'Publicar Nuevo Inmueble';
             openModal('modalProperty');
         }
+
+        const openNewPropertyModal = openAddPropertyModal;
 
         function editProperty(id) {
             const props = getProperties();
