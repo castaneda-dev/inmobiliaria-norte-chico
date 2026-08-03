@@ -1036,17 +1036,17 @@
                 } catch (e) { }
             }
 
-            // 3. Combinar todo: Base + Local + Supabase DB (Deduplicando por título)
+            // 3. Combinar todo: Base + Local + Supabase DB (Deduplicando por ID único)
             const mapaCombinado = new Map();
 
             // Agregar primero la base por defecto
-            listaBase.forEach(p => mapaCombinado.set(p.titulo, p));
+            listaBase.forEach(p => mapaCombinado.set(p.id, p));
 
             // Superponer las locales (agrega nuevas del Admin)
-            listaLocal.forEach(p => mapaCombinado.set(p.titulo, p));
+            listaLocal.forEach(p => mapaCombinado.set(p.id, p));
 
             // Superponer las de Supabase Cloud DB (máxima prioridad)
-            listaNube.forEach(p => mapaCombinado.set(p.titulo, p));
+            listaNube.forEach(p => mapaCombinado.set(p.id, p));
 
             const combinada = Array.from(mapaCombinado.values());
             return combinada.filter(p => p.estado !== 'Vendido');
@@ -1126,7 +1126,7 @@
         }
 
         function abrirModal(id) {
-            const prop = coleccion.find(p => p.id === id);
+            const prop = coleccion.find(p => p.id == id);
             document.getElementById('modal-img').style.backgroundImage = `url('${prop.imagen}')`;
             document.getElementById('modal-title').innerText = prop.titulo;
             document.getElementById('modal-price').innerText = prop.precio;
