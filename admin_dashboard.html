@@ -1606,7 +1606,13 @@
         }
 
         function populateSelectors() {
-            const agents = getAgents() || defaultAgents;
+            let agents = getAgents() || [];
+            if (!agents || agents.length === 0) {
+                agents = [
+                    { id: 1, nombre: 'Brayan Murillo', email: 'sincorreo@hotmail.com', telefono: '+51978654041' },
+                    { id: 2, nombre: 'Juan Castañeda', email: 'alonsocastaneda538@gmail.com', telefono: '+56982816844' }
+                ];
+            }
             const selectAgent = document.getElementById('propAgent');
             if (selectAgent) {
                 selectAgent.innerHTML = agents.map(a => `<option value="${a.id}">${a.nombre} (${a.telefono})</option>`).join('');
