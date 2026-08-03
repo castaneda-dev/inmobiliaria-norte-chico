@@ -1734,15 +1734,25 @@
                         estado: pData.estado
                     };
 
+                    let res;
                     if (idVal) {
-                        await supabaseClient.from('propiedades').update(supabasePayload).eq('id', idVal);
+                        res = await supabaseClient.from('propiedades').update(supabasePayload).eq('id', idVal);
                     } else {
-                        await supabaseClient.from('propiedades').insert([supabasePayload]);
+                        res = await supabaseClient.from('propiedades').insert([supabasePayload]);
                     }
-                    console.log("✅ Propiedad guardada exitosamente en Supabase Cloud DB.");
-                    await syncDataWithSupabase();
+
+                    if (res && res.error) {
+                        alert("⚠️ Error de Supabase DB: " + res.error.message + "\n\n(Asegúrate de ejecutar la política RLS en Supabase SQL Editor).");
+                        console.error("Error de inserción en Supabase DB:", res.error);
+                        return;
+                    } else {
+                        console.log("✅ Propiedad guardada exitosamente en Supabase Cloud DB.");
+                        await syncDataWithSupabase();
+                    }
                 } catch (err) {
-                    console.error("Error sincronizando propiedad con Supabase:", err);
+                    console.error("Excepción sincronizando propiedad con Supabase:", err);
+                    alert("⚠️ Error al conectar con Supabase: " + err.message);
+                    return;
                 }
             }
 
