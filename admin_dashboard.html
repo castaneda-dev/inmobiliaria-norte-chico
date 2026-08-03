@@ -1623,24 +1623,13 @@
             }
         }
 
-        function handleUrlImageInput(url) {
-            if (url.trim()) {
-                document.getElementById('propImage').value = url.trim();
-                document.getElementById('imagePreviewImg').src = url.trim();
-                document.getElementById('imagePreviewBox').style.display = 'block';
-            }
-        }
-
-        // Interactive CRUD: Property
-        function openAddPropertyModal() {
+        function openNewPropertyModal() {
             document.getElementById('formProperty').reset();
             document.getElementById('propId').value = '';
-            document.getElementById('propImage').value = '';
             document.getElementById('imagePreviewBox').style.display = 'none';
             document.getElementById('imagePreviewImg').src = '';
-            document.getElementById('propModalTitle').innerText = 'Agregar Propiedad';
-            populateSelectors();
             toggleSpecFields();
+            document.getElementById('propModalTitle').innerText = 'Publicar Nuevo Inmueble';
             openModal('modalProperty');
         }
 
@@ -1649,31 +1638,28 @@
             const p = props.find(x => x.id === id);
             if (!p) return;
 
-            populateSelectors();
             document.getElementById('propId').value = p.id;
-            document.getElementById('propBrand').value = p.brand || 'gcn';
-            document.getElementById('propTitle').value = p.titulo;
-            document.getElementById('propType').value = p.tipo_activo;
-            document.getElementById('propPrice').value = p.precio;
-            document.getElementById('propArea').value = p.area_m2;
-            document.getElementById('propLocation').value = p.ubicacion;
+            if (document.getElementById('propTitle')) document.getElementById('propTitle').value = p.titulo || '';
+            if (document.getElementById('propType')) document.getElementById('propType').value = p.tipo_activo || 'Terreno';
+            if (document.getElementById('propPrice')) document.getElementById('propPrice').value = p.precio || '';
+            if (document.getElementById('propArea')) document.getElementById('propArea').value = p.area_m2 || '';
+            if (document.getElementById('propLocation')) document.getElementById('propLocation').value = p.ubicacion || '';
             
             const imgVal = p.imagen || '';
-            document.getElementById('propImage').value = imgVal;
-            if (imgVal) {
+            if (document.getElementById('propImage')) document.getElementById('propImage').value = imgVal;
+            if (imgVal && document.getElementById('imagePreviewImg')) {
                 document.getElementById('imagePreviewImg').src = imgVal;
                 document.getElementById('imagePreviewBox').style.display = 'block';
-            } else {
+            } else if (document.getElementById('imagePreviewBox')) {
                 document.getElementById('imagePreviewBox').style.display = 'none';
             }
 
-            document.getElementById('propDesc').value = p.descripcion || '';
-            document.getElementById('propHabitaciones').value = p.habitaciones || '';
-            document.getElementById('propBanos').value = p.banos || '';
-            document.getElementById('propZonificacion').value = p.zonificacion || '';
-            document.getElementById('propParametros').value = p.parametros || '';
-            document.getElementById('propStatus').value = p.estado;
-            document.getElementById('propAgent').value = p.id_agente;
+            if (document.getElementById('propDesc')) document.getElementById('propDesc').value = p.descripcion || '';
+            if (document.getElementById('propHabitaciones')) document.getElementById('propHabitaciones').value = p.habitaciones || '';
+            if (document.getElementById('propBanos')) document.getElementById('propBanos').value = p.banos || '';
+            if (document.getElementById('propZonificacion')) document.getElementById('propZonificacion').value = p.zonificacion || '';
+            if (document.getElementById('propParametros')) document.getElementById('propParametros').value = p.parametros || '';
+            if (document.getElementById('propStatus')) document.getElementById('propStatus').value = p.estado || 'Disponible';
 
             toggleSpecFields();
             document.getElementById('propModalTitle').innerText = 'Editar Propiedad';
@@ -1682,25 +1668,38 @@
 
         async function saveProperty(e) {
             e.preventDefault();
-            const props = getProperties();
+            const props = getProperties() || [];
             const idVal = document.getElementById('propId').value;
             
+            const propTitleEl = document.getElementById('propTitle');
+            const propTypeEl = document.getElementById('propType');
+            const propPriceEl = document.getElementById('propPrice');
+            const propAreaEl = document.getElementById('propArea');
+            const propLocationEl = document.getElementById('propLocation');
+            const propImageEl = document.getElementById('propImage');
+            const propDescEl = document.getElementById('propDesc');
+            const propHabEl = document.getElementById('propHabitaciones');
+            const propBanosEl = document.getElementById('propBanos');
+            const propZoniEl = document.getElementById('propZonificacion');
+            const propParamEl = document.getElementById('propParametros');
+            const propStatusEl = document.getElementById('propStatus');
+
             const pData = {
                 id: idVal ? parseInt(idVal) : Date.now(),
-                brand: document.getElementById('propBrand').value,
-                titulo: document.getElementById('propTitle').value,
-                tipo_activo: document.getElementById('propType').value,
-                precio: parseFloat(document.getElementById('propPrice').value),
-                area_m2: parseFloat(document.getElementById('propArea').value),
-                ubicacion: document.getElementById('propLocation').value,
-                imagen: document.getElementById('propImage').value || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80',
-                descripcion: document.getElementById('propDesc').value,
-                habitaciones: document.getElementById('propHabitaciones').value || undefined,
-                banos: document.getElementById('propBanos').value || undefined,
-                zonificacion: document.getElementById('propZonificacion').value || undefined,
-                parametros: document.getElementById('propParametros').value || undefined,
-                estado: document.getElementById('propStatus').value,
-                id_agente: parseInt(document.getElementById('propAgent').value)
+                brand: 'gcn',
+                titulo: propTitleEl ? propTitleEl.value : '',
+                tipo_activo: propTypeEl ? propTypeEl.value : 'Terreno',
+                precio: propPriceEl ? parseFloat(propPriceEl.value) || 0 : 0,
+                area_m2: propAreaEl ? parseFloat(propAreaEl.value) || 0 : 0,
+                ubicacion: propLocationEl ? propLocationEl.value : '',
+                imagen: (propImageEl && propImageEl.value) ? propImageEl.value : 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80',
+                descripcion: propDescEl ? propDescEl.value : '',
+                habitaciones: propHabEl ? propHabEl.value : undefined,
+                banos: propBanosEl ? propBanosEl.value : undefined,
+                zonificacion: propZoniEl ? propZoniEl.value : undefined,
+                parametros: propParamEl ? propParamEl.value : undefined,
+                estado: propStatusEl ? propStatusEl.value : 'Disponible',
+                id_agente: 1
             };
 
             // Supabase Sync
@@ -1726,7 +1725,7 @@
                     } else {
                         await supabaseClient.from('propiedades').insert([supabasePayload]);
                     }
-                    console.log("✅ Propiedad guardada en Supabase Cloud DB.");
+                    console.log("✅ Propiedad guardada exitosamente en Supabase Cloud DB.");
                     await syncDataWithSupabase();
                 } catch (err) {
                     console.error("Error sincronizando propiedad con Supabase:", err);
@@ -1744,6 +1743,7 @@
             closeModal('modalProperty');
             renderProperties();
             renderDashboard();
+            alert('✅ ¡Propiedad guardada con éxito! Aparecerá inmediatamente en tu Landing Page.');
         }
 
         async function deleteProperty(id) {
