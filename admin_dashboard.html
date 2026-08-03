@@ -1182,24 +1182,15 @@
         const defaultAgents = [];
 
         const defaultProperties = [];
-
-        const defaultClients = [
-            { id: 1, nombre_completo: 'Carlos Mendoza', telefono: '+51 944 821 732', email: 'carlos.m@hotmail.com', estado_lead: 'Negociacion', fecha_registro: '2026-07-25', origen: 'Norte Chico', tipo_interes: 'Lote para Mi Vivienda' },
-            { id: 2, nombre_completo: 'Inversiones Sur SpA', telefono: '+56 9 8812 3456', email: 'contacto@surinversiones.com', estado_lead: 'Nuevo', fecha_registro: '2026-07-24', origen: 'Norte Chico', tipo_interes: 'Inversión Patrimonial' },
-            { id: 3, nombre_completo: 'Gabriela Ortiz', telefono: '+51 981 772 199', email: 'gortiz@gmail.com', estado_lead: 'Cerrado', fecha_registro: '2026-07-10', origen: 'Manual', tipo_interes: 'Consulta General' }
-        ];
-
-        const defaultInteractions = [
-            { id: 1, id_cliente: 1, id_propiedad: 1, tipo_contacto: 'Visita Presencial', notas: 'Visita en físico realizada con éxito. Cliente solicita descuento del 3%.', fecha_interaccion: '2026-07-25' },
-            { id: 2, id_cliente: 2, id_propiedad: 4, tipo_contacto: 'Llamada', notas: 'Primer contacto. Solicitó parámetros urbanísticos del terreno.', fecha_interaccion: '2026-07-24' }
-        ];
+        const defaultClients = [];
+        const defaultInteractions = [];
 
         // Init LocalStorage si está vacío
         function initializeDatabase() {
             if (!localStorage.getItem('crm_agentes')) localStorage.setItem('crm_agentes', JSON.stringify([]));
             if (!localStorage.getItem('crm_propiedades')) localStorage.setItem('crm_propiedades', JSON.stringify([]));
-            if (!localStorage.getItem('crm_clientes')) localStorage.setItem('crm_clientes', JSON.stringify(defaultClients));
-            if (!localStorage.getItem('crm_interacciones')) localStorage.setItem('crm_interacciones', JSON.stringify(defaultInteractions));
+            if (!localStorage.getItem('crm_clientes')) localStorage.setItem('crm_clientes', JSON.stringify([]));
+            if (!localStorage.getItem('crm_interacciones')) localStorage.setItem('crm_interacciones', JSON.stringify([]));
         }
 
         // Get Data
