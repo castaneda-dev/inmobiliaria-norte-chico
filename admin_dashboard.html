@@ -1184,12 +1184,7 @@
             { id: 2, nombre: 'Juan Castañeda', email: 'alonsocastaneda538@gmail.com', telefono: '+56982816844' }
         ];
 
-        const defaultProperties = [
-            { id: 1, brand: 'gcn', tipo_activo: 'Terreno', titulo: 'Lote Residencial - Huaral', precio: 45000, area_m2: 500, ubicacion: 'A 20 min de Huaral', estado: 'Disponible', id_agente: 1, imagen: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80', zonificacion: 'Residencial', parametros: '2 Pisos', descripcion: 'Hermoso lote a 20 min de Huaral. Clima soleado todo el año, ideal para construir la casa de campo familiar.' },
-            { id: 2, brand: 'gcn', tipo_activo: 'Departamento', titulo: 'Departamento - San Isidro', precio: 420000, area_m2: 150, ubicacion: 'Av. Camino Real 450, San Isidro', estado: 'Disponible', id_agente: 2, imagen: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80', habitaciones: 3, banos: 2.5, descripcion: 'Hermoso departamento céntrico cerca al corazón financiero. Una inversión patrimonial altamente rentable.' },
-            { id: 3, brand: 'gcn', tipo_activo: 'Casa', titulo: 'Residencia de Lujo con Piscina', precio: 890000, area_m2: 420, ubicacion: 'Las Casuarinas, Surco', estado: 'Reservado', id_agente: 3, imagen: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80', habitaciones: 4, banos: 4, descripcion: 'Casa moderna en zona residencial exclusiva y segura.' },
-            { id: 4, brand: 'gcn', tipo_activo: 'Terreno', titulo: 'Parque Industrial - Lurín', precio: 3500000, area_m2: 10000, ubicacion: 'Km 32 Panamericana Sur, Lurín', estado: 'Disponible', id_agente: 2, imagen: 'https://images.pexels.com/photos/236705/pexels-photo-236705.jpeg?auto=compress&cs=tinysrgb&w=800', zonificacion: 'Industrial (I2)', parametros: 'Naves', descripcion: 'Lote industrial compactado. Fácil acceso a la Panamericana Sur. Alta plusvalía a mediano plazo.' }
-        ];
+        const defaultProperties = [];
 
         const defaultClients = [
             { id: 1, nombre_completo: 'Carlos Mendoza', telefono: '+51 944 821 732', email: 'carlos.m@hotmail.com', estado_lead: 'Negociacion', fecha_registro: '2026-07-25', origen: 'Norte Chico', tipo_interes: 'Lote para Mi Vivienda' },
@@ -1205,7 +1200,7 @@
         // Init LocalStorage if empty
         function initializeDatabase() {
             localStorage.setItem('crm_agentes', JSON.stringify(defaultAgents));
-            if (!localStorage.getItem('crm_propiedades')) localStorage.setItem('crm_propiedades', JSON.stringify(defaultProperties));
+            if (!localStorage.getItem('crm_propiedades')) localStorage.setItem('crm_propiedades', JSON.stringify([]));
             if (!localStorage.getItem('crm_clientes')) localStorage.setItem('crm_clientes', JSON.stringify(defaultClients));
             if (!localStorage.getItem('crm_interacciones')) localStorage.setItem('crm_interacciones', JSON.stringify(defaultInteractions));
         }
