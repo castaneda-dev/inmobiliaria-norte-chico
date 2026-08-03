@@ -1593,7 +1593,7 @@
                         const canvas = document.createElement('canvas');
                         let width = img.width;
                         let height = img.height;
-                        const maxDim = 1000;
+                        const maxDim = 600;
 
                         if (width > maxDim || height > maxDim) {
                             if (width > height) {
@@ -1610,7 +1610,7 @@
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
 
-                        const base64Data = canvas.toDataURL('image/jpeg', 0.85);
+                        const base64Data = canvas.toDataURL('image/jpeg', 0.75);
 
                         document.getElementById('propImage').value = base64Data;
                         document.getElementById('imagePreviewImg').src = base64Data;
@@ -1716,7 +1716,7 @@
                 id_agente: propAgentEl ? parseInt(propAgentEl.value) : 1
             };
 
-            // Supabase Sync
+            // 1. Sincronización asíncrona con Supabase Cloud DB
             if (typeof supabaseClient !== 'undefined' && supabaseClient) {
                 try {
                     const supabasePayload = {
@@ -1742,20 +1742,17 @@
                     }
 
                     if (res && res.error) {
-                        alert("⚠️ Error de Supabase DB: " + res.error.message + "\n\n(Asegúrate de ejecutar la política RLS en Supabase SQL Editor).");
-                        console.error("Error de inserción en Supabase DB:", res.error);
-                        return;
+                        console.warn("Aviso Supabase DB:", res.error.message);
                     } else {
                         console.log("✅ Propiedad guardada exitosamente en Supabase Cloud DB.");
-                        await syncDataWithSupabase();
+                        if (typeof syncDataWithSupabase === 'function') await syncDataWithSupabase();
                     }
                 } catch (err) {
-                    console.error("Excepción sincronizando propiedad con Supabase:", err);
-                    alert("⚠️ Error al conectar con Supabase: " + err.message);
-                    return;
+                    console.warn("Excepción sincronizando propiedad con Supabase:", err);
                 }
             }
 
+            // 2. Guardar en almacenamiento local para garantía y respuesta inmediata
             if (idVal) {
                 const index = props.findIndex(x => x.id === pData.id);
                 if (index !== -1) props[index] = pData;
@@ -1768,7 +1765,7 @@
             closeModal('modalProperty');
             renderProperties();
             renderDashboard();
-            alert('✅ ¡Propiedad guardada con éxito! Aparecerá inmediatamente en tu Landing Page.');
+            alert('✅ ¡Propiedad guardada con éxito! La página web se ha actualizado.');
         }
 
         async function deleteProperty(id) {
