@@ -936,31 +936,33 @@
             if (typeof supabaseClient !== 'undefined' && supabaseClient) {
                 try {
                     const { data, error } = await supabaseClient.from('propiedades').select('*');
-                    if (!error && data && data.length > 0) {
-                        console.log("✅ Propiedades cargadas desde Supabase Cloud DB:", data.length);
-                        return data
-                            .filter(p => p.estado !== 'Vendido')
-                            .map(p => ({
-                                id: p.id,
-                                categoria: mapCategoria(p.tipo_activo),
-                                estado: mapEstado(p.estado),
-                                titulo: p.titulo,
-                                precio: typeof p.precio === 'number' ? '$' + parseFloat(p.precio).toLocaleString() : p.precio,
-                                imagen: p.imagen_url || p.imagen || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80',
-                                area: typeof p.area_m2 === 'number' ? p.area_m2 + ' m²' : (p.area || '500 m²'),
-                                habitaciones: p.habitaciones || '3',
-                                banos: p.banos || '2',
-                                zonificacion: p.zonificacion || 'Residencial',
-                                parametros: p.parametros || '2 Pisos',
-                                descripcion: p.descripcion || 'Propiedad disponible. Contáctenos para más información.'
-                            }));
+                    if (!error && data) {
+                        console.log("✅ Propiedades consultadas en Supabase Cloud DB:", data.length);
+                        if (data.length > 0) {
+                            return data
+                                .filter(p => p.estado !== 'Vendido')
+                                .map(p => ({
+                                    id: p.id,
+                                    categoria: mapCategoria(p.tipo_activo),
+                                    estado: mapEstado(p.estado),
+                                    titulo: p.titulo,
+                                    precio: typeof p.precio === 'number' ? '$' + parseFloat(p.precio).toLocaleString() : p.precio,
+                                    imagen: p.imagen_url || p.imagen || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80',
+                                    area: typeof p.area_m2 === 'number' ? p.area_m2 + ' m²' : (p.area || '500 m²'),
+                                    habitaciones: p.habitaciones || '3',
+                                    banos: p.banos || '2',
+                                    zonificacion: p.zonificacion || 'Residencial',
+                                    parametros: p.parametros || '2 Pisos',
+                                    descripcion: p.descripcion || 'Propiedad disponible. Contáctenos para más información.'
+                                }));
+                        }
                     }
                 } catch (err) {
-                    console.warn("Error consultando Supabase DB, usando fallback local...", err);
+                    console.warn("Error consultando Supabase DB:", err);
                 }
             }
 
-            // 2. Intentar cargar desde localStorage
+            // 2. Intentar cargar desde localStorage local
             const raw = localStorage.getItem('crm_propiedades');
             if (raw) {
                 try {
@@ -986,8 +988,8 @@
                 } catch (e) {}
             }
 
-            // 3. Fallback de respaldo: Retornar SIEMPRE la colección semilla por defecto
-            return getSeedData();
+            // 3. Si no hay propiedades creadas desde el Admin Dashboard, retornar arreglo vacío (Cero datos simulados)
+            return [];
         }
 
         const coleccion = cargarPropiedades();
@@ -1020,11 +1022,12 @@
         function renderizarColeccion(datos) {
             gridContenedor.innerHTML = '';
 
-            if (datos.length === 0) {
+            if (!datos || datos.length === 0) {
                 gridContenedor.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-icon">🏠</div>
-                        <p>No hay propiedades disponibles en esta categoría.</p>
+                        <h3 style="color: #fff; margin-bottom: 8px; font-size: 20px;">No hay inmuebles publicados actualmente</h3>
+                        <p style="font-size: 14px;">Las propiedades agregadas desde el Panel de Administración aparecerán automáticamente aquí.</p>
                     </div>
                 `;
                 return;
