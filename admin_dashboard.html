@@ -746,7 +746,7 @@
                 <div class="topbar-title" id="pageTitle">Panel de Operaciones</div>
             </div>
             <div style="display: flex; align-items: center; gap: 15px;">
-                <a href="BORRADOR.HTML" target="_blank" class="btn-primary" style="background: rgba(var(--accent-rgb), 0.15); color: var(--accent); border: 1px solid var(--border); text-decoration: none;">
+                <a href="https://banka.cl" target="_blank" class="btn-primary" style="background: rgba(var(--accent-rgb), 0.15); color: var(--accent); border: 1px solid var(--border); text-decoration: none;">
                     🌐 Ver Landing Norte Chico
                 </a>
                 <div class="user-profile">
@@ -1193,11 +1193,11 @@
             if (!localStorage.getItem('crm_interacciones')) localStorage.setItem('crm_interacciones', JSON.stringify([]));
         }
 
-        // Get Data
-        const getAgents = () => JSON.parse(localStorage.getItem('crm_agentes'));
-        const getProperties = () => JSON.parse(localStorage.getItem('crm_propiedades'));
-        const getClients = () => JSON.parse(localStorage.getItem('crm_clientes'));
-        const getInteractions = () => JSON.parse(localStorage.getItem('crm_interacciones'));
+        // Get Data con salvaguarda || []
+        const getAgents = () => JSON.parse(localStorage.getItem('crm_agentes')) || [];
+        const getProperties = () => JSON.parse(localStorage.getItem('crm_propiedades')) || [];
+        const getClients = () => JSON.parse(localStorage.getItem('crm_clientes')) || [];
+        const getInteractions = () => JSON.parse(localStorage.getItem('crm_interacciones')) || [];
 
         // Save Helpers
         const setProperties = (data) => localStorage.setItem('crm_propiedades', JSON.stringify(data));
