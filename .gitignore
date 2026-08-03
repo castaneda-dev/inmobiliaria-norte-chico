@@ -1,0 +1,12 @@
+# Dependencias de Node.js (nunca subir al repositorio)
+node_modules/
+
+# Archivos temporales de scripts de optimización
+scripts/_tmp_opt/
+
+# Logs
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db

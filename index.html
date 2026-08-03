@@ -4,14 +4,26 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Norte Chico Properties | Vive en Huaral</title>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Montserrat:wght@400;700;900&display=swap"
-        rel="stylesheet" />
-    <!-- Supabase SDK & Config -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase_config.js"></script>
+    <title>Norte Chico Properties | Lotes e Inmuebles en Huaral y Chancay</title>
 
+    <!-- SEO & Open Graph -->
+    <meta name="description" content="Invierte en lotes residenciales y terrenos de alta plusvalía en Huaral y Chancay. Grupo Inmobiliario Norte Chico. Agenda una visita hoy." />
+    <meta name="robots" content="index, follow" />
+    <meta property="og:title" content="Norte Chico Properties | Lotes en Huaral y Chancay" />
+    <meta property="og:description" content="Terrenos e inmuebles de alta plusvalía en el Norte Chico del Perú. Asesoría personalizada sin costo." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="PR_PLAZA_HUARAL_desktop.webp" />
+
+    <!-- Preconnect a dominios críticos (reduce latencia DNS) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    <link rel="preconnect" href="https://jlgnqiedkagkcqoakmom.supabase.co" />
+
+    <!-- Google Fonts con font-display swap (no bloquea el renderizado) -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Montserrat:wght@400;700;900&display=swap&font-display=swap" rel="stylesheet" />
+
+    <!-- CSS Principal -->
     <link rel="stylesheet" href="assets/css/index.min.css" />
 </head>
 
@@ -45,10 +57,12 @@
             <!-- CARRUSEL DE FOTOS -->
             <div class="hero-video">
                 <div class="carousel-track" id="carouselTrack">
-                    <img src="PR_PLAZA_HUARAL_desktop.webp" alt="Plaza de Armas de Huaral" class="carousel-img">
-                    <img src="PR_PLAZA_CHANCAY_desktop.webp" alt="Plaza de Armas de Chancay" class="carousel-img">
-                    <img src="PR_ECOTRULY_PARK_desktop.webp" alt="EcoTruly Park" class="carousel-img">
-                    <img src="PR_CHANCAY_desktop.webp" alt="Chancay" class="carousel-img">
+                    <!-- Primera imagen: carga prioritaria para el Largest Contentful Paint -->
+                    <img src="PR_PLAZA_HUARAL_desktop.webp" alt="Plaza de Armas de Huaral" class="carousel-img" fetchpriority="high" decoding="async">
+                    <!-- Imágenes 2, 3, 4: sin lazy (regla README #3 — carrusel horizontal) -->
+                    <img src="PR_PLAZA_CHANCAY_desktop.webp" alt="Plaza de Armas de Chancay" class="carousel-img" decoding="async">
+                    <img src="PR_ECOTRULY_PARK_desktop.webp" alt="EcoTruly Park" class="carousel-img" decoding="async">
+                    <img src="PR_CHANCAY_desktop.webp" alt="Chancay" class="carousel-img" decoding="async">
                 </div>
                 <button class="carousel-btn prev-btn" onclick="moveCarousel(-1)">&#10094;</button>
                 <button class="carousel-btn next-btn" onclick="moveCarousel(1)">&#10095;</button>
@@ -141,9 +155,13 @@
         </div>
     </div>
 
-    <!-- ================= LÓGICA JAVASCRIPT UNIFICADA ================= -->
-    <script src="assets/js/api.min.js"></script>
-    <script src="assets/js/index-app.min.js" defer></script>
+    <!-- Supabase SDK & Config (defer: no bloquea el renderizado del body) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="supabase_config.js" defer></script>
+
+    <!-- JS Ofuscado Nivel B (código protegido, ilegible al inspector) -->
+    <script src="assets/js/api.obf.js" defer></script>
+    <script src="assets/js/index-app.obf.js" defer></script>
 
     <!-- Meta Pixel Code (Deferred) -->
     <script>
