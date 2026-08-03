@@ -1727,6 +1727,7 @@
                         await supabaseClient.from('propiedades').insert([supabasePayload]);
                     }
                     console.log("✅ Propiedad guardada en Supabase Cloud DB.");
+                    await syncDataWithSupabase();
                 } catch (err) {
                     console.error("Error sincronizando propiedad con Supabase:", err);
                 }
@@ -1898,11 +1899,64 @@
             }
         }
 
+        // Sincronización automática con Supabase Cloud DB
+        async function syncDataWithSupabase() {
+            if (typeof supabaseClient !== 'undefined' && supabaseClient) {
+                try {
+                    // Cargar Propiedades desde Supabase
+                    const { data: props, error: errProps } = await supabaseClient.from('propiedades').select('*');
+                    if (!errProps && props && props.length > 0) {
+                        const mappedProps = props.map(p => ({
+                            id: p.id,
+                            brand: 'gcn',
+                            titulo: p.titulo,
+                            tipo_activo: p.tipo_activo,
+                            precio: parseFloat(p.precio),
+                            area_m2: parseFloat(p.area_m2),
+                            ubicacion: p.ubicacion,
+                            imagen: p.imagen_url || p.imagen,
+                            descripcion: p.descripcion,
+                            habitaciones: p.habitaciones,
+                            banos: p.banos,
+                            zonificacion: p.zonificacion,
+                            parametros: p.parametros,
+                            estado: p.estado,
+                            id_agente: p.id_agente || 1
+                        }));
+                        setProperties(mappedProps);
+                        renderProperties();
+                        renderDashboard();
+                    }
+
+                    // Cargar Clientes/Leads desde Supabase
+                    const { data: clients, error: errClients } = await supabaseClient.from('clientes').select('*');
+                    if (!errClients && clients && clients.length > 0) {
+                        const mappedClients = clients.map(c => ({
+                            id: c.id,
+                            nombre_completo: c.nombre_completo,
+                            telefono: c.telefono,
+                            email: c.email,
+                            estado_lead: c.estado_lead || 'Nuevo',
+                            origen: c.origen || 'Norte Chico',
+                            tipo_interes: c.tipo_interes || 'General',
+                            fecha_registro: c.fecha_registro || new Date().toISOString().split('T')[0]
+                        }));
+                        setClients(mappedClients);
+                        renderClients();
+                        renderDashboard();
+                    }
+                } catch (e) {
+                    console.warn("Sync Supabase warn:", e);
+                }
+            }
+        }
+
         // Initialize App
-        window.addEventListener('load', () => {
+        window.addEventListener('load', async () => {
             initializeDatabase();
             setTheme('gcn'); // Default theme
             checkSupabaseSession();
+            await syncDataWithSupabase();
         });
     </script>
 </body>
