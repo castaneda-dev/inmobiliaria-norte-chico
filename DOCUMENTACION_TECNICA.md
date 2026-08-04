@@ -215,4 +215,32 @@ node scripts/obfuscate.js
 
 ---
 
+## 9. Estrategia de Procesamiento y Renderizado de Imágenes HD
+
+Para garantizar la máxima nitidez visual en pantallas 4K, Retina y móviles sin comprometer la velocidad de carga ni gastar ancho de banda excesivo, se ha implementado la siguiente estrategia estandarizada:
+
+### 📐 1. Presets de Resolución y Compresión
+- **Hero Carousel (`1920px max`, WebP 88% calidad)**: Destinado a imágenes de fondo de la cabecera y fotos principales del carrusel inicial.
+- **Catálogo / Modales (`1200px max`, WebP 85% calidad)**: Destinado a las propiedades del inventario y galerías en ventanas emergentes.
+- **Versión Móvil (`800px max`, WebP 80% calidad)**: Para optimizaciones ultra-ligeras en redes móviles 3G/4G.
+
+### ⚡ 2. Automatización con `scripts/optimize_images.py`
+Cada vez que se requiera actualizar imágenes de producción:
+1. Coloca las imágenes originales (PNG, JPG, JFIF) dentro de la carpeta `IMAGENES_PROD/` (o `IMAGENES_PROD/CARRUSEL_INICIO/`).
+2. Ejecuta el script automatizado:
+   ```bash
+   python scripts/optimize_images.py
+   ```
+3. El script convertirá las imágenes automáticamente a WebP de alta definición, reduciendo el peso entre un **90% y 95%** manteniendo nitidez HD con muestreo Lanczos.
+
+### 🎨 3. Renderizado CSS por Hardware
+Todas las imágenes de las tarjetas de propiedades, el carrusel hero y los modales cuentan con la regla CSS:
+```css
+image-rendering: -webkit-optimize-contrast;
+object-fit: cover;
+```
+Esto fuerza a los navegadores (Safari, Chrome, Edge) a aplicar algoritmos de enfoque por hardware en la tarjeta gráfica del dispositivo, eliminando bordes borrosos en celulares y monitores Retina.
+
+---
+
 *Documentación técnica actualizada para la plataforma Inmobiliaria Norte Chico.*
