@@ -316,7 +316,7 @@ async function enviarCRM(origenMarca) {
         // Redirección de WhatsApp opcional con mensaje prellenado
         let propContext = '';
         if (window.currentOpenedProperty && interes === 'Inmueble: ' + window.currentOpenedProperty.titulo) {
-            propContext = `%0A%0A📌 *Propiedad de Interés:* ${encodeURIComponent(window.currentOpenedProperty.titulo)}%0A💰 *Precio:* ${encodeURIComponent(window.currentOpenedProperty.precio)}`;
+            propContext = `%0A%0A📌 *Propiedad de Interés:* ${encodeURIComponent(window.currentOpenedProperty.titulo)}`;
         }
         
         const wsMsg = `Hola,%20soy%20*${encodeURIComponent(nombre)}*.%20Me%20interesa%20recibir%20asesoría%20sobre:%20${encodeURIComponent(interes)}${propContext}`;
