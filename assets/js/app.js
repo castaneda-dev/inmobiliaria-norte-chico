@@ -3,6 +3,13 @@
 // Security: Auth Guard, XSS Sanitization, Inactivity Timeout, Rate Limiting
 // Performance: Parallel Fetches, Data Cache with TTL, Optimistic UI
 
+// Helper seguro para obtener el cliente de Supabase
+function getSupabaseClient() {
+    if (typeof window !== 'undefined' && window.supabaseClient) return window.supabaseClient;
+    if (typeof supabaseClient !== 'undefined' && supabaseClient) return supabaseClient;
+    return null;
+}
+
 // ================= GLOBAL STATE =================
 let globalState = {
     properties: [],
@@ -99,8 +106,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Escuchar eventos de autenticación en tiempo real
-    if (window.supabaseClient) {
-        supabaseClient.auth.onAuthStateChange((event, session) => {
+    const client = getSupabaseClient();
+    if (client) {
+        client.auth.onAuthStateChange((event, session) => {
             console.log("🔐 Evento de autenticación Supabase:", event);
             if (event === 'SIGNED_IN' && session) {
                 updateAuthStateUI(session);
@@ -754,13 +762,14 @@ const LOCKOUT_DURATION_MS = 2 * 60 * 1000;
 let lockoutUntil = 0;
 
 async function checkSupabaseSession() {
-    if (!window.supabaseClient) {
+    const client = getSupabaseClient();
+    if (!client) {
         updateAuthStateUI(null);
         return false;
     }
     
     try {
-        const { data: { session } } = await supabaseClient.auth.getSession();
+        const { data: { session } } = await client.auth.getSession();
         updateAuthStateUI(session);
         return !!session;
     } catch (err) {
@@ -789,7 +798,8 @@ async function handleSupabaseLogin(e) {
 
     console.log("🔐 Intentando iniciar sesión en Supabase para:", email);
 
-    if (!window.supabaseClient) {
+    const client = getSupabaseClient();
+    if (!client) {
         if (errBox) {
             errBox.innerText = "❌ Cliente de Supabase no inicializado.";
             errBox.style.display = 'block';
@@ -804,7 +814,7 @@ async function handleSupabaseLogin(e) {
     }
 
     try {
-        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        const { data, error } = await client.auth.signInWithPassword({ email, password });
         
         if (submitBtn) {
             submitBtn.disabled = false;
@@ -856,8 +866,9 @@ async function handleSupabaseLogin(e) {
 
 async function handleSupabaseLogout() {
     clearInactivityTimer();
-    if (window.supabaseClient) {
-        await supabaseClient.auth.signOut();
+    const client = getSupabaseClient();
+    if (client) {
+        await client.auth.signOut();
     }
     invalidateCache();
     updateAuthStateUI(null);
@@ -932,8 +943,9 @@ function hideInactivityWarning() {
 
 async function forceLogoutByInactivity() {
     clearInactivityTimer();
-    if (window.supabaseClient) {
-        await supabaseClient.auth.signOut();
+    const client = getSupabaseClient();
+    if (client) {
+        await client.auth.signOut();
     }
     invalidateCache();
     updateAuthStateUI(null);
