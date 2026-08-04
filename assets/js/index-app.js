@@ -139,8 +139,9 @@ function filtrarPorCategoria(categoria) {
     }
 }
 
-// ================= MODAL HD CAROUSEL =================
+// ================= MODAL HD CAROUSEL & PRELLENADO DE LOTE =================
 let modalCurrentImgIdx = 0;
+window.currentOpenedProperty = null;
 
 function renderModalCarousel() {
     const container = document.getElementById('modal-img');
@@ -180,6 +181,7 @@ function abrirModal(id) {
     const prop = coleccion.find(p => p.id == id);
     if (!prop || !modal) return;
 
+    window.currentOpenedProperty = prop;
     window.modalPropImages = prop.imagenes || [prop.imagen];
     modalCurrentImgIdx = 0;
     renderModalCarousel();
@@ -196,8 +198,51 @@ function abrirModal(id) {
     }
     
     document.getElementById('modal-specs').innerHTML = specsHTML;
+
+    // Configurar enlace directo a WhatsApp especificando la propiedad
+    const wsBtn = document.getElementById('modal-ws-btn');
+    if (wsBtn) {
+        const wsText = `Hola, estoy viendo en la web el inmueble: ${prop.titulo} (${prop.precio}). Me gustaría recibir información detallada, ubicación y facilidades de pago.`;
+        wsBtn.href = `https://wa.me/56982816844?text=${encodeURIComponent(wsText)}`;
+    }
+
     modal.classList.add('active');
     body.style.overflow = 'hidden';
+}
+
+function prellenarCRMPropiedad() {
+    const prop = window.currentOpenedProperty;
+    cerrarModal();
+
+    const contactoSection = document.getElementById('contacto');
+    const selectInteres = document.getElementById('crm-interes');
+    const badgeBox = document.getElementById('crm-prop-badge');
+
+    if (prop && selectInteres) {
+        const valText = `Inmueble: ${prop.titulo} (${prop.precio})`;
+        
+        let optExists = Array.from(selectInteres.options).find(o => o.value === valText);
+        if (!optExists) {
+            const opt = document.createElement('option');
+            opt.value = valText;
+            opt.textContent = `📍 ${prop.titulo} (${prop.precio})`;
+            selectInteres.appendChild(opt);
+        }
+        selectInteres.value = valText;
+
+        if (badgeBox) {
+            badgeBox.innerHTML = `📍 Solicitando atención personalizada para: <strong>${prop.titulo}</strong> (${prop.precio})`;
+            badgeBox.style.display = 'block';
+        }
+    }
+
+    if (contactoSection) {
+        contactoSection.scrollIntoView({ behavior: 'smooth' });
+        setTimeout(() => {
+            const nameInput = document.getElementById('crm-nombre');
+            if (nameInput) nameInput.focus();
+        }, 400);
+    }
 }
 
 function cerrarModal() { 

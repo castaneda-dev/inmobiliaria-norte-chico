@@ -90,6 +90,9 @@
         <div class="form-container">
             <h2>Construye el futuro de <span class="text-gradient">tu Familia</span></h2>
             <p>Déjenos sus datos para organizar un recorrido por nuestros lotes en Huaral y Chancay.</p>
+            
+            <div id="crm-prop-badge" style="display: none; background: rgba(203, 159, 116, 0.15); border: 1px solid var(--gold-light); color: var(--gold-light); padding: 12px 18px; border-radius: 12px; font-size: 14px; font-weight: 700; margin-bottom: 25px; text-align: center;"></div>
+
             <div class="form-grid">
                 <input type="text" id="crm-nombre" placeholder="Nombre Completo" required />
                 <input type="email" id="crm-email" placeholder="Correo Electrónico" required />
@@ -149,8 +152,10 @@
                 <div class="price" id="modal-price">$0</div>
                 <p class="desc" id="modal-desc">Descripción</p>
                 <div class="modal-specs" id="modal-specs"></div>
-                <a href="#contacto" class="btn-pill" style="width: 100%; text-align: center;"
-                    onclick="cerrarModal()">Contactar Asesor</a>
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                    <a id="modal-ws-btn" href="#" target="_blank" class="btn-pill" style="width: 100%; text-align: center; background: #25d366; color: #fff; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);">💬 CONSULTAR POR WHATSAPP</a>
+                    <button type="button" class="btn-outline" style="width: 100%; text-align: center; padding: 14px 20px;" onclick="prellenarCRMPropiedad()">📅 AGENDAR VISITA A ESTE INMUEBLE</button>
+                </div>
             </div>
         </div>
     </div>
