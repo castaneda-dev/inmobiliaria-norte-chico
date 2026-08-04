@@ -202,7 +202,7 @@ function abrirModal(id) {
     // Configurar enlace directo a WhatsApp especificando la propiedad
     const wsBtn = document.getElementById('modal-ws-btn');
     if (wsBtn) {
-        const wsText = `Hola, estoy viendo en la web el inmueble: ${prop.titulo} (${prop.precio}). Me gustaría recibir información detallada, ubicación y facilidades de pago.`;
+        const wsText = `Hola, estoy viendo en la web el inmueble: ${prop.titulo}. Me gustaría recibir información detallada, ubicación y facilidades de pago.`;
         wsBtn.href = `https://wa.me/56982816844?text=${encodeURIComponent(wsText)}`;
     }
 
@@ -219,19 +219,19 @@ function prellenarCRMPropiedad() {
     const badgeBox = document.getElementById('crm-prop-badge');
 
     if (prop && selectInteres) {
-        const valText = `Inmueble: ${prop.titulo} (${prop.precio})`;
+        const valText = `Inmueble: ${prop.titulo}`;
         
         let optExists = Array.from(selectInteres.options).find(o => o.value === valText);
         if (!optExists) {
             const opt = document.createElement('option');
             opt.value = valText;
-            opt.textContent = `📍 ${prop.titulo} (${prop.precio})`;
+            opt.textContent = `📍 ${prop.titulo}`;
             selectInteres.appendChild(opt);
         }
         selectInteres.value = valText;
 
         if (badgeBox) {
-            badgeBox.innerHTML = `📍 Solicitando atención personalizada para: <strong>${prop.titulo}</strong> (${prop.precio})`;
+            badgeBox.innerHTML = `📍 Solicitando atención personalizada para: <strong>${prop.titulo}</strong>`;
             badgeBox.style.display = 'block';
         }
     }
