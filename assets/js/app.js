@@ -1,7 +1,9 @@
 // ================= MAIN APP & UI MODULE =================
 // Dependencias: supabaseClient (global), api (assets/js/api.js)
+// Security: Auth Guard, XSS Sanitization, Inactivity Timeout, Rate Limiting
+// Performance: Parallel Fetches, Data Cache with TTL, Optimistic UI
 
-// Estado Global en Memoria (Caché en ejecución, NO persistente)
+// ================= GLOBAL STATE =================
 let globalState = {
     properties: [],
     clients: [],
@@ -9,61 +11,113 @@ let globalState = {
     interactions: []
 };
 
+// ================= XSS SANITIZATION =================
+function escapeHTML(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+// ================= DATA CACHE (TTL 30s) =================
+const DATA_CACHE_TTL = 30 * 1000;
+const dataCache = {
+    properties:   { data: null, timestamp: 0 },
+    clients:      { data: null, timestamp: 0 },
+    agents:       { data: null, timestamp: 0 },
+    interactions: { data: null, timestamp: 0 }
+};
+
+function getCached(key) {
+    const entry = dataCache[key];
+    if (entry && entry.data && (Date.now() - entry.timestamp) < DATA_CACHE_TTL) {
+        return entry.data;
+    }
+    return null;
+}
+
+function setCache(key, data) {
+    dataCache[key] = { data, timestamp: Date.now() };
+}
+
+function invalidateCache(key) {
+    if (key) {
+        if (dataCache[key]) dataCache[key].timestamp = 0;
+    } else {
+        Object.keys(dataCache).forEach(k => dataCache[k].timestamp = 0);
+    }
+}
+
+async function cachedFetch(key, fetchFn) {
+    const cached = getCached(key);
+    if (cached) return cached;
+    const data = await fetchFn();
+    setCache(key, data);
+    return data;
+}
+
 // ================= INICIALIZACIÓN Y CARGA DE DATOS =================
 document.addEventListener('DOMContentLoaded', async () => {
-    // Verificar sesión y cargar vista inicial
-    await checkSupabaseSession();
-    
-    // La primera vista siempre es Dashboard, así que forzamos su carga y render
-    switchView('dashboard');
-});
-
-// Switch Active View Panels (Safe & Bulletproof Display Toggle)
-async function switchView(viewId, element = null) {
-    console.log("🔄 Cambiando a módulo:", viewId);
-
-    // Mostrar UI de carga (opcional, podrías agregar un spinner global aquí)
-    
-    // 1. Obtener datos desde Supabase para la vista solicitada ANTES de cambiar visualmente
-    try {
-        if (viewId === 'dashboard') {
-            globalState.properties = await api.fetchProperties();
-            globalState.clients = await api.fetchClients();
-            globalState.interactions = await api.fetchInteractions();
-        } else if (viewId === 'inventario') {
-            globalState.properties = await api.fetchProperties();
-            globalState.agents = await api.fetchAgents();
-        } else if (viewId === 'crm') {
-            globalState.clients = await api.fetchClients();
-        } else if (viewId === 'agentes') {
-            globalState.agents = await api.fetchAgents();
-        }
-    } catch(err) {
-        console.error("Error al cargar datos desde Supabase:", err);
+    // Verificar sesión — si no hay, el appShell queda oculto
+    const authenticated = await checkSupabaseSession();
+    if (authenticated) {
+        switchView('dashboard');
     }
 
-    // 2. Ocultar todas las secciones visualmente
-    const sections = document.querySelectorAll('.view-section');
-    sections.forEach(sec => {
+    // Detectar cambios de auth en tiempo real (logout desde otra pestaña)
+    if (window.supabaseClient) {
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_OUT' || !session) {
+                const appShell = document.getElementById('appShell');
+                if (appShell) appShell.style.display = 'none';
+                openModal('modalAuth');
+                clearInactivityTimer();
+            }
+        });
+    }
+});
+
+// ================= SWITCH VIEW (OPTIMIZED) =================
+// Cambio visual INMEDIATO + fetch en paralelo en background
+async function switchView(viewId, element = null) {
+    // Verificar sesión antes de permitir navegación
+    if (window.supabaseClient) {
+        try {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) {
+                const appShell = document.getElementById('appShell');
+                if (appShell) appShell.style.display = 'none';
+                openModal('modalAuth');
+                return;
+            }
+        } catch (err) {
+            console.error('Error verificando sesión:', err);
+            return;
+        }
+    }
+
+    console.log("🔄 Cambiando a módulo:", viewId);
+
+    // PASO 1: Cambio visual inmediato (UI optimista — cero latencia percibida)
+    document.querySelectorAll('.view-section').forEach(sec => {
         sec.classList.remove('active');
         sec.style.display = 'none';
     });
 
-    // 3. Desactivar todos los botones del menú
     document.querySelectorAll('.nav-menu li a').forEach(a => a.classList.remove('active'));
 
-    // 4. Activar y mostrar la sección deseada
     const targetView = document.getElementById('view-' + viewId);
     if (targetView) {
         targetView.classList.add('active');
         targetView.style.display = 'block';
     }
 
-    // 5. Marcar botón activo en el menú
     const navLink = element || document.querySelector(`.nav-menu li a[onclick*="${viewId}"]`);
     if (navLink) navLink.classList.add('active');
 
-    // 6. Actualizar título de cabecera
     const titles = {
         dashboard: 'Métricas Generales & Resumen',
         inventario: 'Inventario Unificado de Activos',
@@ -73,7 +127,34 @@ async function switchView(viewId, element = null) {
     const titleEl = document.getElementById('pageTitle');
     if (titleEl && titles[viewId]) titleEl.innerText = titles[viewId];
 
-    // 7. Renderizar UI con el estado global actualizado
+    // PASO 2: Fetch de datos en PARALELO (background, con caché)
+    try {
+        if (viewId === 'dashboard') {
+            const [props, clients, interactions] = await Promise.all([
+                cachedFetch('properties', () => api.fetchProperties()),
+                cachedFetch('clients', () => api.fetchClients()),
+                cachedFetch('interactions', () => api.fetchInteractions())
+            ]);
+            globalState.properties = props;
+            globalState.clients = clients;
+            globalState.interactions = interactions;
+        } else if (viewId === 'inventario') {
+            const [props, agents] = await Promise.all([
+                cachedFetch('properties', () => api.fetchProperties()),
+                cachedFetch('agents', () => api.fetchAgents())
+            ]);
+            globalState.properties = props;
+            globalState.agents = agents;
+        } else if (viewId === 'crm') {
+            globalState.clients = await cachedFetch('clients', () => api.fetchClients());
+        } else if (viewId === 'agentes') {
+            globalState.agents = await cachedFetch('agents', () => api.fetchAgents());
+        }
+    } catch(err) {
+        console.error("Error al cargar datos desde Supabase:", err);
+    }
+
+    // PASO 3: Renderizar UI con datos actualizados
     try {
         if (viewId === 'dashboard') renderDashboard();
         if (viewId === 'inventario') renderProperties();
@@ -83,7 +164,7 @@ async function switchView(viewId, element = null) {
         console.warn(`Error renderizando UI ${viewId}:`, e);
     }
 
-    // 8. Cerrar sidebar móvil si aplica
+    // PASO 4: Cerrar sidebar móvil si aplica
     const sidebar = document.getElementById('appSidebar');
     if (sidebar) sidebar.classList.remove('active');
 }
@@ -114,21 +195,21 @@ function renderDashboard() {
     if (document.getElementById('kpiCierres')) document.getElementById('kpiCierres').innerText = closedDeals;
     if (document.getElementById('kpiComision')) document.getElementById('kpiComision').innerText = '$' + projection.toLocaleString();
 
-    // Interaction List
+    // Interaction List (with XSS protection)
     const tbody = document.getElementById('interactionTableBody');
     if (tbody) {
         tbody.innerHTML = '';
-        const recentInts = interactions.slice(0, 4); // Suponiendo order DESC
+        const recentInts = interactions.slice(0, 4);
         recentInts.forEach(int => {
             const client = clients.find(c => c.id === int.id_cliente);
             const prop = props.find(p => p.id === int.id_propiedad);
             tbody.innerHTML += `
                 <tr>
-                    <td><strong>${client ? client.nombre_completo : 'Desconocido'}</strong></td>
-                    <td>${prop ? prop.titulo : 'Consulta General'}</td>
-                    <td><span class="status-badge" style="background: rgba(var(--accent-rgb),0.1); color: var(--accent);">${int.tipo_contacto}</span></td>
-                    <td>${int.fecha_interaccion || ''}</td>
-                    <td style="color: var(--text-muted); font-size: 13px;">${int.notas || ''}</td>
+                    <td><strong>${escapeHTML(client ? client.nombre_completo : 'Desconocido')}</strong></td>
+                    <td>${escapeHTML(prop ? prop.titulo : 'Consulta General')}</td>
+                    <td><span class="status-badge" style="background: rgba(var(--accent-rgb),0.1); color: var(--accent);">${escapeHTML(int.tipo_contacto)}</span></td>
+                    <td>${escapeHTML(int.fecha_interaccion || '')}</td>
+                    <td style="color: var(--text-muted); font-size: 13px;">${escapeHTML(int.notas || '')}</td>
                 </tr>
             `;
         });
@@ -193,7 +274,6 @@ function renderBarChart(properties) {
     const heightTerreno = (avgTerreno / maxVal) * 120;
     const heightDepto = (avgDepto / maxVal) * 120;
     const heightCasa = (avgCasa / maxVal) * 120;
-    const accentColor = '#cb9f74';
 
     const container = document.getElementById('chartPrice');
     if(!container) return;
@@ -202,7 +282,7 @@ function renderBarChart(properties) {
         <div style="display: flex; align-items: flex-end; justify-content: center; gap: 40px; height: 160px; width: 100%; border-bottom: 2px solid var(--border); padding-bottom: 5px;">
             <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
                 <span style="font-size: 11px; font-weight: 700;">$${avgTerreno.toLocaleString()}</span>
-                <div style="width: 45px; height: ${heightTerreno}px; background: ${accentColor}; border-radius: 6px 6px 0 0;"></div>
+                <div style="width: 45px; height: ${heightTerreno}px; background: #cb9f74; border-radius: 6px 6px 0 0;"></div>
                 <span style="font-size: 10px; font-weight: 600; text-transform: uppercase;">Terrenos</span>
             </div>
             <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
@@ -246,27 +326,27 @@ function renderProperties() {
                         GCN
                     </span>
                     <span class="status-badge badge-${(p.estado || '').toLowerCase()}" style="position: absolute; top: 15px; right: 15px; background: var(--bg-card);">
-                        ${p.estado}
+                        ${escapeHTML(p.estado)}
                     </span>
                     <div class="card-price-tag">$${parseFloat(p.precio || 0).toLocaleString()}</div>
                 </div>
                 <div class="card-body-content">
                     <div style="font-size: 11px; color: var(--accent); font-weight: 700; text-transform: uppercase; margin-bottom: 5px;">
-                        ${p.tipo_activo}
+                        ${escapeHTML(p.tipo_activo)}
                     </div>
-                    <h4 class="card-title-text">${p.titulo}</h4>
+                    <h4 class="card-title-text">${escapeHTML(p.titulo)}</h4>
                     <p style="font-size: 13px; color: var(--text-muted); display:flex; align-items:center; gap:5px;">
-                        📍 ${p.ubicacion}
+                        📍 ${escapeHTML(p.ubicacion)}
                     </p>
                     <p style="font-size: 12px; color: var(--text-muted); margin-top: 10px;">
-                        Agente: <strong>${agent ? agent.nombre : 'Sin Asignar'}</strong>
+                        Agente: <strong>${escapeHTML(agent ? agent.nombre : 'Sin Asignar')}</strong>
                     </p>
                     
                     <div class="card-specs-row">
-                        <span>📐 ${p.area_m2} M²</span>
+                        <span>📐 ${escapeHTML(p.area_m2)} M²</span>
                         <span style="margin-left: auto;">
-                            <button class="btn-icon-table" onclick="editProperty(${p.id})">✏️ Editar</button>
-                            <button class="btn-icon-table" onclick="deleteProperty(${p.id})" style="color:#ef4444;">🗑️</button>
+                            <button class="btn-icon-table" onclick="editProperty(${parseInt(p.id)})">✏️ Editar</button>
+                            <button class="btn-icon-table" onclick="deleteProperty(${parseInt(p.id)})" style="color:#ef4444;">🗑️</button>
                         </span>
                     </div>
                 </div>
@@ -288,7 +368,7 @@ function getOrigenBadge(origen) {
     if (o.includes('tiktok')) return '<span class="status-badge" style="background:rgba(255,255,255,0.1);color:#fff;">🎵 TikTok Ads</span>';
     if (o.includes('norte chico') || o.includes('landing')) return '<span class="status-badge" style="background:rgba(16,185,129,0.15);color:#10b981;">🌐 Landing Web</span>';
     if (o.includes('webhook')) return '<span class="status-badge" style="background:rgba(168,85,247,0.15);color:#a855f7;">⚡ Webhook</span>';
-    return '<span class="status-badge" style="background:rgba(var(--accent-rgb),0.1);color:var(--accent);">' + (origen || 'Manual') + '</span>';
+    return '<span class="status-badge" style="background:rgba(var(--accent-rgb),0.1);color:var(--accent);">' + escapeHTML(origen || 'Manual') + '</span>';
 }
 
 function renderClients(filteredList) {
@@ -307,15 +387,15 @@ function renderClients(filteredList) {
         const interes = c.tipo_interes || 'Consulta General';
         tbody.innerHTML += `
             <tr>
-                <td><strong>${c.nombre_completo}</strong></td>
-                <td>${c.telefono}</td>
-                <td>${c.email}</td>
+                <td><strong>${escapeHTML(c.nombre_completo)}</strong></td>
+                <td>${escapeHTML(c.telefono)}</td>
+                <td>${escapeHTML(c.email)}</td>
                 <td>${getOrigenBadge(c.origen)}</td>
-                <td style="font-size: 13px; color: var(--text-muted);">${interes}</td>
-                <td><span class="status-badge badge-${statusClass}">${c.estado_lead}</span></td>
-                <td>${c.fecha_registro || ''}</td>
+                <td style="font-size: 13px; color: var(--text-muted);">${escapeHTML(interes)}</td>
+                <td><span class="status-badge badge-${escapeHTML(statusClass)}">${escapeHTML(c.estado_lead)}</span></td>
+                <td>${escapeHTML(c.fecha_registro || '')}</td>
                 <td>
-                    <button class="btn-icon-table" onclick="deleteClient(${c.id})" style="color:#ef4444;" title="Eliminar Lead">🗑️ Eliminar</button>
+                    <button class="btn-icon-table" onclick="deleteClient(${parseInt(c.id)})" style="color:#ef4444;" title="Eliminar Lead">🗑️ Eliminar</button>
                 </td>
             </tr>
         `;
@@ -365,10 +445,10 @@ function renderAgents() {
     agents.forEach(a => {
         tbody.innerHTML += `
             <tr>
-                <td>#${a.id}</td>
-                <td><strong>${a.nombre}</strong></td>
-                <td>${a.email}</td>
-                <td>${a.telefono}</td>
+                <td>#${parseInt(a.id)}</td>
+                <td><strong>${escapeHTML(a.nombre)}</strong></td>
+                <td>${escapeHTML(a.email)}</td>
+                <td>${escapeHTML(a.telefono)}</td>
                 <td><span class="status-badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">Activo</span></td>
             </tr>
         `;
@@ -463,6 +543,7 @@ async function saveProperty(e) {
     if (submitBtn) submitBtn.disabled = false;
 
     if (success) {
+        invalidateCache('properties'); // Limpiar caché
         alert('✅ Propiedad guardada exitosamente en Supabase.');
         closeModal('modalProperty');
         switchView('inventario'); // Refresh view and data
@@ -475,6 +556,7 @@ async function deleteProperty(id) {
     if (confirm('¿Está seguro de eliminar esta propiedad permanentemente de Supabase?')) {
         const success = await api.deleteProperty(id);
         if (success) {
+            invalidateCache('properties'); // Limpiar caché
             switchView('inventario');
         } else {
             alert('❌ Error al eliminar.');
@@ -501,6 +583,7 @@ async function saveClient(e) {
     
     const success = await api.saveClient(payload);
     if (success) {
+        invalidateCache('clients'); // Limpiar caché
         closeModal('modalClient');
         switchView('crm');
     } else {
@@ -511,7 +594,10 @@ async function saveClient(e) {
 async function deleteClient(id) {
     if (confirm('¿Está seguro de eliminar este lead permanentemente?')) {
         const success = await api.deleteClient(id);
-        if (success) switchView('crm');
+        if (success) {
+            invalidateCache('clients'); // Limpiar caché
+            switchView('crm');
+        }
     }
 }
 
@@ -529,6 +615,7 @@ async function saveAgent(e) {
     };
     const success = await api.saveAgent(payload);
     if (success) {
+        invalidateCache('agents'); // Limpiar caché
         alert('✅ Asesor registrado con éxito en Supabase.');
         closeModal('modalAgent');
         switchView('agentes');
@@ -539,27 +626,27 @@ async function saveAgent(e) {
 
 async function populateSelectors() {
     // Para modales y creación de interacciones
-    globalState.clients = await api.fetchClients();
-    globalState.properties = await api.fetchProperties();
-    globalState.agents = await api.fetchAgents();
+    globalState.clients = await cachedFetch('clients', () => api.fetchClients());
+    globalState.properties = await cachedFetch('properties', () => api.fetchProperties());
+    globalState.agents = await cachedFetch('agents', () => api.fetchAgents());
 
     const cliSelect = document.getElementById('intCliente');
     if (cliSelect) {
         cliSelect.innerHTML = '';
-        globalState.clients.forEach(c => cliSelect.innerHTML += `<option value="${c.id}">${c.nombre_completo}</option>`);
+        globalState.clients.forEach(c => cliSelect.innerHTML += `<option value="${c.id}">${escapeHTML(c.nombre_completo)}</option>`);
     }
 
     const propSelect = document.getElementById('intPropiedad');
     if (propSelect) {
         propSelect.innerHTML = '<option value="">Consulta General (Sin activo específico)</option>';
-        globalState.properties.forEach(p => propSelect.innerHTML += `<option value="${p.id}">${p.titulo}</option>`);
+        globalState.properties.forEach(p => propSelect.innerHTML += `<option value="${p.id}">${escapeHTML(p.titulo)}</option>`);
     }
 
     const agentSelect = document.getElementById('propAgent');
     if (agentSelect) {
         agentSelect.innerHTML = '';
         if (globalState.agents.length > 0) {
-            globalState.agents.forEach(a => agentSelect.innerHTML += `<option value="${a.id}">${a.nombre}</option>`);
+            globalState.agents.forEach(a => agentSelect.innerHTML += `<option value="${a.id}">${escapeHTML(a.nombre)}</option>`);
         } else {
             agentSelect.innerHTML = '<option value="">No hay asesores registrados en Supabase</option>';
         }
@@ -584,6 +671,7 @@ async function saveInteraction(e) {
     };
     const success = await api.saveInteraction(payload);
     if (success) {
+        invalidateCache('interactions'); // Limpiar caché
         closeModal('modalInteraction');
         switchView('dashboard');
     } else {
@@ -643,24 +731,62 @@ function previewUploadedImage(event) {
 }
 
 // ================= SUPABASE AUTH HANDLERS =================
+
+// Rate Limiting para login
+let loginAttempts = 0;
+const MAX_LOGIN_ATTEMPTS = 5;
+const LOCKOUT_DURATION_MS = 2 * 60 * 1000; // 2 minutos
+let lockoutUntil = 0;
+
 async function checkSupabaseSession() {
-    if (!window.supabaseClient) return; 
+    const appShell = document.getElementById('appShell');
     
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if (!session) {
+    // BLOQUEAR todo el dashboard hasta verificar sesión
+    if (appShell) appShell.style.display = 'none';
+    
+    // Si Supabase no está configurado, bloquear acceso completamente
+    if (!window.supabaseClient) {
         openModal('modalAuth');
-    } else {
-        closeModal('modalAuth');
-        if (document.getElementById('displayUserName')) {
-            document.getElementById('displayUserName').innerText = session.user.email;
+        return false;
+    }
+    
+    try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) {
+            if (appShell) appShell.style.display = 'none';
+            openModal('modalAuth');
+            return false;
+        } else {
+            closeModal('modalAuth');
+            if (appShell) appShell.style.display = 'flex';
+            if (document.getElementById('displayUserName')) {
+                document.getElementById('displayUserName').innerText = session.user.email;
+            }
+            initInactivityTimer();
+            return true;
         }
+    } catch (err) {
+        console.error('Error verificando sesión:', err);
+        if (appShell) appShell.style.display = 'none';
+        openModal('modalAuth');
+        return false;
     }
 }
 
 async function handleSupabaseLogin(e) {
     e.preventDefault();
     const errBox = document.getElementById('authErrorMsg');
-    if (errBox) errBox.style.display = 'none';
+    if (errBox) { errBox.style.display = 'none'; errBox.style.color = '#ef4444'; }
+
+    // Verificación de rate limiting
+    if (Date.now() < lockoutUntil) {
+        const secsLeft = Math.ceil((lockoutUntil - Date.now()) / 1000);
+        if (errBox) {
+            errBox.innerText = `🔒 Demasiados intentos. Espere ${secsLeft} segundos.`;
+            errBox.style.display = 'block';
+        }
+        return;
+    }
 
     const email = document.getElementById('authEmail').value;
     const password = document.getElementById('authPassword').value;
@@ -670,24 +796,141 @@ async function handleSupabaseLogin(e) {
         return;
     }
 
+    // Deshabilitar botón de login durante la solicitud
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
+
     const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    
+    if (submitBtn) submitBtn.disabled = false;
+
     if (error) {
-        if (errBox) {
-            errBox.innerText = "Error: " + error.message;
-            errBox.style.display = 'block';
-        } else alert("Error: " + error.message);
+        loginAttempts++;
+        if (loginAttempts >= MAX_LOGIN_ATTEMPTS) {
+            lockoutUntil = Date.now() + LOCKOUT_DURATION_MS;
+            loginAttempts = 0;
+            if (errBox) {
+                errBox.innerText = '🔒 Demasiados intentos fallidos. Bloqueado por 2 minutos.';
+                errBox.style.display = 'block';
+            }
+        } else {
+            if (errBox) {
+                errBox.innerText = "Error: " + error.message + ` (${MAX_LOGIN_ATTEMPTS - loginAttempts} intentos restantes)`;
+                errBox.style.display = 'block';
+            } else alert("Error: " + error.message);
+        }
     } else {
+        // Login exitoso
+        loginAttempts = 0;
+        lockoutUntil = 0;
         closeModal('modalAuth');
+        const appShell = document.getElementById('appShell');
+        if (appShell) appShell.style.display = 'flex';
         if (document.getElementById('displayUserName')) {
             document.getElementById('displayUserName').innerText = data.user.email;
         }
-        switchView('dashboard'); // Recargar dashboard con permisos
+        initInactivityTimer();
+        invalidateCache(); // Datos frescos tras login
+        switchView('dashboard');
     }
 }
 
 async function handleSupabaseLogout() {
+    clearInactivityTimer();
     if (window.supabaseClient) {
         await supabaseClient.auth.signOut();
     }
+    const appShell = document.getElementById('appShell');
+    if (appShell) appShell.style.display = 'none';
+    invalidateCache(); // Limpiar caché al cerrar sesión
     openModal('modalAuth');
+}
+
+// ================= INACTIVITY TIMEOUT (10 MIN) =================
+const INACTIVITY_LIMIT_MS = 10 * 60 * 1000; // 10 minutos
+const WARNING_BEFORE_MS = 60 * 1000; // Aviso 1 minuto antes
+let inactivityTimer = null;
+let warningTimer = null;
+let warningVisible = false;
+let lastResetTime = 0;
+const RESET_DEBOUNCE_MS = 1000; // Solo resetear timer una vez por segundo (rendimiento)
+
+function initInactivityTimer() {
+    const resetEvents = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart', 'click'];
+    // Limpiar listeners previos para evitar duplicados
+    resetEvents.forEach(evt => {
+        document.removeEventListener(evt, debouncedResetInactivity);
+    });
+    resetEvents.forEach(evt => {
+        document.addEventListener(evt, debouncedResetInactivity, { passive: true });
+    });
+    resetInactivityTimer();
+}
+
+function debouncedResetInactivity() {
+    const now = Date.now();
+    if (now - lastResetTime < RESET_DEBOUNCE_MS) return;
+    lastResetTime = now;
+    resetInactivityTimer();
+}
+
+function resetInactivityTimer() {
+    if (warningVisible) {
+        hideInactivityWarning();
+    }
+
+    clearTimeout(inactivityTimer);
+    clearTimeout(warningTimer);
+
+    // A los 9 minutos → mostrar advertencia
+    warningTimer = setTimeout(() => {
+        showInactivityWarning();
+    }, INACTIVITY_LIMIT_MS - WARNING_BEFORE_MS);
+
+    // A los 10 minutos → cerrar sesión
+    inactivityTimer = setTimeout(async () => {
+        hideInactivityWarning();
+        await forceLogoutByInactivity();
+    }, INACTIVITY_LIMIT_MS);
+}
+
+function clearInactivityTimer() {
+    clearTimeout(inactivityTimer);
+    clearTimeout(warningTimer);
+    hideInactivityWarning();
+    const resetEvents = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart', 'click'];
+    resetEvents.forEach(evt => {
+        document.removeEventListener(evt, debouncedResetInactivity);
+    });
+}
+
+function showInactivityWarning() {
+    warningVisible = true;
+    const banner = document.getElementById('inactivityWarning');
+    if (banner) banner.classList.add('active');
+}
+
+function hideInactivityWarning() {
+    warningVisible = false;
+    const banner = document.getElementById('inactivityWarning');
+    if (banner) banner.classList.remove('active');
+}
+
+async function forceLogoutByInactivity() {
+    clearInactivityTimer();
+    if (window.supabaseClient) {
+        await supabaseClient.auth.signOut();
+    }
+    const appShell = document.getElementById('appShell');
+    if (appShell) appShell.style.display = 'none';
+    invalidateCache();
+    openModal('modalAuth');
+
+    // Mostrar mensaje informativo en el modal de login
+    const errBox = document.getElementById('authErrorMsg');
+    if (errBox) {
+        errBox.innerText = '⏱️ Sesión cerrada automáticamente por 10 minutos de inactividad.';
+        errBox.style.display = 'block';
+        errBox.style.color = 'var(--accent)';
+    }
 }

@@ -679,3 +679,27 @@
                 width: 180px;
             }
         }
+
+        /* ================= INACTIVITY BANNER ================= */
+        .inactivity-banner {
+            position: fixed;
+            top: -70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #000;
+            padding: 12px 30px;
+            border-radius: 0 0 14px 14px;
+            font-size: 13px;
+            font-weight: 700;
+            z-index: 999999;
+            transition: top 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 25px rgba(245, 158, 11, 0.5);
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .inactivity-banner.active {
+            top: 0;
+        }
+
