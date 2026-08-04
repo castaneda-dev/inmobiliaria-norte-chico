@@ -15,8 +15,8 @@ const JS_DIR = path.join(ROOT, 'assets', 'js');
 
 // Archivos a ofuscar (solo los de la landing pública)
 const targets = [
-    { input: 'api.min.js',        output: 'api.obf.js' },
-    { input: 'index-app.min.js',  output: 'index-app.obf.js' },
+    { input: 'api.js',        output: 'api.obf.js' },
+    { input: 'index-app.js',  output: 'index-app.obf.js' },
 ];
 
 // Configuración Nivel B: Máxima ofuscación manteniendo compatibilidad
