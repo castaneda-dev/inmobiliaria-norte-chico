@@ -11,6 +11,29 @@ const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL || "admin@nortechico.com";
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
+// Control de límite de seguridad mensual (Max 90,000 invocaciones)
+const MONTHLY_MAX_LIMIT = 90000;
+let globalMonthlyRequestCount = 0;
+let lastCountMonth = new Date().getMonth();
+
+const ipRequestMap = new Map(); // Rate limiting por IP
+
+function isRateLimited(ip) {
+    const now = Date.now();
+    const windowMs = 10 * 60 * 1000; // 10 minutos
+    const maxPerWindow = 40; // Máximo 40 mensajes por IP cada 10 min
+
+    const record = ipRequestMap.get(ip) || { count: 0, resetTime: now + windowMs };
+    if (now > record.resetTime) {
+        record.count = 1;
+        record.resetTime = now + windowMs;
+    } else {
+        record.count++;
+    }
+    ipRequestMap.set(ip, record);
+    return record.count > maxPerWindow;
+}
+
 // Contexto e instrucciones de la IA Inmobiliaria para Norte Chico
 const SYSTEM_KNOWLEDGE = `
 Eres la Asistente Virtual Oficial con Inteligencia Artificial de "Inmobiliaria Norte Chico".
@@ -43,6 +66,30 @@ module.exports = async function handler(req, res) {
 
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
+    }
+
+    // Guard de límite mensual (90,000 peticiones)
+    const currentMonth = new Date().getMonth();
+    if (currentMonth !== lastCountMonth) {
+        lastCountMonth = currentMonth;
+        globalMonthlyRequestCount = 0;
+    }
+    globalMonthlyRequestCount++;
+
+    if (globalMonthlyRequestCount > MONTHLY_MAX_LIMIT) {
+        return res.status(429).json({
+            error: 'Límite de atención automatizada alcanzado por este mes',
+            reply: '🏡 Nuestro asistente automático ha alcanzado su límite mensual de atención. Por favor haz clic en el botón verde para escribirnos a nuestro WhatsApp oficial.'
+        });
+    }
+
+    // Rate Limiting anti-bots por IP
+    const clientIp = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown';
+    if (isRateLimited(clientIp)) {
+        return res.status(429).json({
+            error: 'Demasiadas solicitudes desde tu IP',
+            reply: '⏳ Por favor espera unos minutos antes de enviar más mensajes.'
+        });
     }
 
     try {
