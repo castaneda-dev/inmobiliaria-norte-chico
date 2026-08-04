@@ -64,11 +64,11 @@
             <div class="hero-video">
                 <div class="carousel-track" id="carouselTrack">
                     <!-- Primera imagen: carga prioritaria para el Largest Contentful Paint -->
-                    <img src="PR_PLAZA_HUARAL_desktop.webp" alt="Plaza de Armas de Huaral" class="carousel-img" fetchpriority="high" decoding="async" width="1000" height="555">
-                    <!-- Imágenes 2, 3, 4: dimensiones explícitas para evitar CLS -->
-                    <img src="PR_PLAZA_CHANCAY_desktop.webp" alt="Plaza de Armas de Chancay" class="carousel-img" decoding="async" width="1000" height="555">
-                    <img src="PR_ECOTRULY_PARK_desktop.webp" alt="EcoTruly Park" class="carousel-img" decoding="async" width="1000" height="555">
-                    <img src="PR_CHANCAY_desktop.webp" alt="Chancay" class="carousel-img" decoding="async" width="1000" height="555">
+                    <img src="PR_PLAZA_HUARAL_desktop.webp" alt="Plaza de Armas de Huaral" class="carousel-img" fetchpriority="high" decoding="async" width="800" height="444">
+                    <!-- Imágenes 2, 3, 4: dimensiones adaptadas para evitar penalización de tamaño -->
+                    <img src="PR_PLAZA_CHANCAY_desktop.webp" alt="Plaza de Armas de Chancay" class="carousel-img" decoding="async" width="800" height="444">
+                    <img src="PR_ECOTRULY_PARK_desktop.webp" alt="EcoTruly Park" class="carousel-img" decoding="async" width="800" height="444">
+                    <img src="PR_CHANCAY_desktop.webp" alt="Chancay" class="carousel-img" decoding="async" width="800" height="444">
                 </div>
                 <button class="carousel-btn prev-btn" onclick="moveCarousel(-1)" aria-label="Imagen anterior" title="Imagen anterior">&#10094;</button>
                 <button class="carousel-btn next-btn" onclick="moveCarousel(1)" aria-label="Siguiente imagen" title="Siguiente imagen">&#10095;</button>
@@ -76,6 +76,7 @@
             </div>
         </div>
     </header>
+
 
     <!-- PUNTO DE REFERENCIA PRINCIPAL (MAIN) -->
     <main>
@@ -201,9 +202,10 @@
             ['touchstart', 'scroll', 'mousemove', 'click'].forEach(function(evt) {
                 window.addEventListener(evt, initMetaPixel, { passive: true, once: true });
             });
-            setTimeout(initMetaPixel, 6000);
+            setTimeout(initMetaPixel, 3000);
         })();
     </script>
+
 
     <noscript><img height="1" width="1" style="display:none"
             src="https://www.facebook.com/tr?id=TU_ID_DE_PIXEL_AQUI&ev=PageView&noscript=1" /></noscript>

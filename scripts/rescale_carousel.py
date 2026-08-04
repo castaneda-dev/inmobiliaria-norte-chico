@@ -17,11 +17,11 @@ for img_name in images:
         orig_size = os.path.getsize(filepath)
         with Image.open(filepath) as img:
             img = img.convert('RGB')
-            max_w = 1000
+            max_w = 850
             if img.width > max_w:
                 new_h = int((img.height * max_w) / img.width)
                 img = img.resize((max_w, new_h), Image.Resampling.LANCZOS)
-            img.save(filepath, 'WEBP', quality=78, method=6)
+            img.save(filepath, 'WEBP', quality=82, method=6)
         new_size = os.path.getsize(filepath)
         savings = (1 - (new_size / orig_size)) * 100
         print(f"Optimized {img_name}: {orig_size/1024:.1f} KB -> {new_size/1024:.1f} KB (-{savings:.1f}%)")
