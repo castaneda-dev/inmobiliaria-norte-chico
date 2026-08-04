@@ -190,11 +190,16 @@ async function switchView(viewId, element = null) {
 
     // PASO 4: Cerrar sidebar móvil si aplica
     const sidebar = document.getElementById('appSidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
     if (sidebar) sidebar.classList.remove('active');
+    if (backdrop) backdrop.classList.remove('active');
 }
 
 function toggleSidebarMenu() {
-    document.getElementById('appSidebar').classList.toggle('active');
+    const sidebar = document.getElementById('appSidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    if (sidebar) sidebar.classList.toggle('active');
+    if (backdrop) backdrop.classList.toggle('active');
 }
 
 // ================= BUSINESS LOGIC RENDERING =================

@@ -57,6 +57,9 @@
         </div>
     </aside>
 
+    <!-- BACKDROP PARA SIDEBAR EN MÓVIL -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebarMenu()"></div>
+
     <!-- MAIN BODY -->
     <main class="main-content">
         <!-- TOPBAR -->
@@ -65,16 +68,16 @@
                 <button class="menu-toggle" onclick="toggleSidebarMenu()">☰</button>
                 <div class="topbar-title" id="pageTitle">Panel de Operaciones</div>
             </div>
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <a href="https://banka.cl" target="_blank" class="btn-primary" style="background: rgba(var(--accent-rgb), 0.15); color: var(--accent); border: 1px solid var(--border); text-decoration: none;">
-                    🌐 Ver Landing Norte Chico
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <a href="https://banka.cl" target="_blank" class="btn-primary btn-landing-topbar" style="background: rgba(var(--accent-rgb), 0.15); color: var(--accent); border: 1px solid var(--border); text-decoration: none; padding: 8px 14px; font-size: 12px;">
+                    🌐 <span class="landing-text-desktop">Ver Landing</span>
                 </a>
                 <div class="user-profile">
                     <div class="user-name" id="displayUserName">Administrador General</div>
                     <div class="user-avatar" id="brandAvatar">ADM</div>
                 </div>
-                <button onclick="handleSupabaseLogout()" class="btn-secondary" style="padding: 8px 12px; font-size: 12px; color: #ef4444; border-color: rgba(239, 68, 68, 0.3);" title="Cerrar Sesión">
-                    🚪 Salir
+                <button onclick="handleSupabaseLogout()" class="btn-secondary btn-logout-topbar" style="padding: 8px 12px; font-size: 12px; color: #ef4444; border-color: rgba(239, 68, 68, 0.3);" title="Cerrar Sesión">
+                    🚪 <span class="logout-text-desktop">Salir</span>
                 </button>
             </div>
         </header>

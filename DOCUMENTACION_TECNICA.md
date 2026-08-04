@@ -21,7 +21,7 @@ Este documento contiene la especificación técnica completa del proyecto **Inmo
 ```
 PRUEBAS WEB/
 ├── index.html                  # Landing Page Pública de Venta de Inmuebles
-├── admin_dashboard.html        # Panel de Administración Privado (CRM, Inventario, Agentes)
+├── dashboard_admin.html        # Panel de Administración Privado (CRM, Inventario, Agentes)
 ├── supabase_config.js          # Configuración e Inicialización Global del Cliente Supabase
 ├── inmobiliaria_crm.sql        # Esquema de Base de Datos y Políticas RLS en Supabase
 ├── vercel.json                 # Configuración de Despliegue y Cabeceras HTTP de Seguridad
@@ -58,7 +58,7 @@ PRUEBAS WEB/
 
 ## 2. Arquitectura Frontend & Dashboard Admin
 
-### 📄 `admin_dashboard.html`
+### 📄 `dashboard_admin.html`
 - **Propósito**: Estructura principal del panel de administración.
 - **Componentes clave**:
   - `<div id="appShell">`: Contenedor principal que agrupa el Sidebar y el contenido. Se inicializa con `display: none` para evitar el destello de contenido no autorizado antes de la autenticación.
