@@ -497,11 +497,62 @@ function closeModal(id) {
     }
 }
 
+let currentPropertyImages = [];
+
+function renderAdminImageGallery() {
+    const previewBox = document.getElementById('imagePreviewBox');
+    const galleryGrid = document.getElementById('adminGalleryGrid');
+    const hiddenInput = document.getElementById('propImage');
+
+    if (!previewBox || !galleryGrid) return;
+
+    if (!currentPropertyImages || currentPropertyImages.length === 0) {
+        previewBox.style.display = 'none';
+        galleryGrid.innerHTML = '';
+        if (hiddenInput) hiddenInput.value = '';
+        return;
+    }
+
+    previewBox.style.display = 'block';
+    galleryGrid.innerHTML = '';
+
+    currentPropertyImages.forEach((imgUrl, idx) => {
+        const item = document.createElement('div');
+        item.style.cssText = 'position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: #000;';
+        item.innerHTML = `
+            <img src="${imgUrl}" style="width:100%; height:100%; object-fit:cover; display:block;" />
+            <button type="button" onclick="removeAdminImage(${idx})" style="position:absolute; top:4px; right:4px; background:rgba(239,68,68,0.85); color:#fff; border:none; width:22px; height:22px; border-radius:50%; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 5px rgba(0,0,0,0.5);">✕</button>
+        `;
+        galleryGrid.appendChild(item);
+    });
+
+    if (hiddenInput) {
+        hiddenInput.value = currentPropertyImages.length > 1 ? JSON.stringify(currentPropertyImages) : (currentPropertyImages[0] || '');
+    }
+}
+
+function removeAdminImage(index) {
+    if (index >= 0 && index < currentPropertyImages.length) {
+        currentPropertyImages.splice(index, 1);
+        renderAdminImageGallery();
+    }
+}
+
+function addExternalUrlImage() {
+    const urlInput = document.getElementById('propImageUrl');
+    const url = urlInput?.value?.trim();
+    if (url) {
+        currentPropertyImages.push(url);
+        urlInput.value = '';
+        renderAdminImageGallery();
+    }
+}
+
 async function openAddPropertyModal() {
     document.getElementById('formProperty').reset();
     document.getElementById('propId').value = '';
-    document.getElementById('imagePreviewBox').style.display = 'none';
-    document.getElementById('imagePreviewImg').src = '';
+    currentPropertyImages = [];
+    renderAdminImageGallery();
     await populateSelectors();
     toggleSpecFields();
     document.getElementById('propModalTitle').innerText = 'Publicar Nuevo Inmueble';
@@ -520,14 +571,23 @@ async function editProperty(id) {
     if (document.getElementById('propArea')) document.getElementById('propArea').value = p.area_m2 || '';
     if (document.getElementById('propLocation')) document.getElementById('propLocation').value = p.ubicacion || '';
     
-    const imgVal = p.imagen_url || p.imagen || '';
-    if (document.getElementById('propImage')) document.getElementById('propImage').value = imgVal;
-    if (imgVal && document.getElementById('imagePreviewImg')) {
-        document.getElementById('imagePreviewImg').src = imgVal;
-        document.getElementById('imagePreviewBox').style.display = 'block';
-    } else if (document.getElementById('imagePreviewBox')) {
-        document.getElementById('imagePreviewBox').style.display = 'none';
+    // Parsear imágenes (Soporte para múltiples fotos JSON o foto única)
+    const rawImg = p.imagen_url || p.imagen || '';
+    currentPropertyImages = [];
+
+    try {
+        if (rawImg && typeof rawImg === 'string' && rawImg.startsWith('[')) {
+            currentPropertyImages = JSON.parse(rawImg);
+        } else if (p.imagenes && Array.isArray(p.imagenes)) {
+            currentPropertyImages = p.imagenes;
+        } else if (rawImg) {
+            currentPropertyImages = [rawImg];
+        }
+    } catch (e) {
+        if (rawImg) currentPropertyImages = [rawImg];
     }
+
+    renderAdminImageGallery();
 
     if (document.getElementById('propDesc')) document.getElementById('propDesc').value = p.descripcion || '';
     if (document.getElementById('propHabitaciones')) document.getElementById('propHabitaciones').value = p.habitaciones || '';
@@ -551,6 +611,8 @@ async function saveProperty(e) {
 
     const idVal = document.getElementById('propId').value;
     const isUpdate = !!idVal;
+
+    const finalImageVal = currentPropertyImages.length > 1 ? JSON.stringify(currentPropertyImages) : (currentPropertyImages[0] || '');
     
     const payload = {
         titulo: document.getElementById('propTitle')?.value || '',
@@ -558,7 +620,7 @@ async function saveProperty(e) {
         precio: parseFloat(document.getElementById('propPrice')?.value) || 0,
         area_m2: parseFloat(document.getElementById('propArea')?.value) || 0,
         ubicacion: document.getElementById('propLocation')?.value || '',
-        imagen_url: document.getElementById('propImage')?.value || '',
+        imagen_url: finalImageVal,
         descripcion: document.getElementById('propDesc')?.value || '',
         habitaciones: document.getElementById('propHabitaciones')?.value ? parseInt(document.getElementById('propHabitaciones').value) : null,
         banos: document.getElementById('propBanos')?.value ? parseFloat(document.getElementById('propBanos').value) : null,
@@ -722,47 +784,55 @@ function toggleSpecFields() {
     }
 }
 
-function previewUploadedImage(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const img = new Image();
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                let width = img.width, height = img.height;
-                const maxDim = 1200; // Alta Definición HD (1200px max)
+async function previewUploadedImages(event) {
+    const files = Array.from(event.target.files || []);
+    if (!files.length) return;
 
-                if (width > maxDim || height > maxDim) {
-                    if (width > height) {
-                        height = Math.round((height * maxDim) / width);
-                        width = maxDim;
-                    } else {
-                        width = Math.round((width * maxDim) / height);
-                        height = maxDim;
+    for (const file of files) {
+        await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width, height = img.height;
+                    const maxDim = 1200; // Alta Definición HD (1200px max)
+
+                    if (width > maxDim || height > maxDim) {
+                        if (width > height) {
+                            height = Math.round((height * maxDim) / width);
+                            width = maxDim;
+                        } else {
+                            width = Math.round((width * maxDim) / height);
+                            height = maxDim;
+                        }
                     }
-                }
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.imageSmoothingEnabled = true;
-                ctx.imageSmoothingQuality = 'high';
-                ctx.drawImage(img, 0, 0, width, height);
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    ctx.drawImage(img, 0, 0, width, height);
 
-                // WebP a 0.85 de calidad para nitidez HD sin peso excesivo
-                let base64Data = canvas.toDataURL('image/webp', 0.85);
-                if (!base64Data.startsWith('data:image/webp')) {
-                    base64Data = canvas.toDataURL('image/jpeg', 0.85);
-                }
-                document.getElementById('propImage').value = base64Data;
-                document.getElementById('imagePreviewImg').src = base64Data;
-                document.getElementById('imagePreviewBox').style.display = 'block';
+                    let base64Data = canvas.toDataURL('image/webp', 0.85);
+                    if (!base64Data.startsWith('data:image/webp')) {
+                        base64Data = canvas.toDataURL('image/jpeg', 0.85);
+                    }
+                    currentPropertyImages.push(base64Data);
+                    resolve();
+                };
+                img.onerror = resolve;
+                img.src = e.target.result;
             };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
+            reader.onerror = resolve;
+            reader.readAsDataURL(file);
+        });
     }
+
+    renderAdminImageGallery();
+    event.target.value = '';
 }
+const previewUploadedImage = previewUploadedImages;
 
 // ================= SUPABASE AUTH HANDLERS =================
 

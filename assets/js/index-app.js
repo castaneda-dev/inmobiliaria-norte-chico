@@ -12,13 +12,33 @@ async function cargarPropiedades() {
             const tipo = (p.tipo_activo || '').toLowerCase();
             const esVivienda = (tipo === 'casa' || tipo === 'departamento');
             
+            // Parsear fotos múltiples
+            let imagenesList = [];
+            const rawImg = p.imagen_url || p.imagen || '';
+            try {
+                if (rawImg && typeof rawImg === 'string' && rawImg.startsWith('[')) {
+                    imagenesList = JSON.parse(rawImg);
+                } else if (p.imagenes && Array.isArray(p.imagenes)) {
+                    imagenesList = p.imagenes;
+                } else if (rawImg) {
+                    imagenesList = [rawImg];
+                }
+            } catch (e) {
+                if (rawImg) imagenesList = [rawImg];
+            }
+
+            if (!imagenesList.length) {
+                imagenesList = ['https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=85'];
+            }
+
             return {
                 id: p.id,
                 categoria: esVivienda ? 'vivienda' : 'terreno',
                 estado: p.estado || 'Disponible',
                 titulo: p.titulo,
                 precio: typeof p.precio === 'number' ? '$' + parseFloat(p.precio).toLocaleString() : (p.precio || '$0'),
-                imagen: p.imagen_url || p.imagen || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=85',
+                imagen: imagenesList[0],
+                imagenes: imagenesList,
                 area: typeof p.area_m2 === 'number' ? p.area_m2 + ' m²' : (p.area_m2 || p.area || '0 m²'),
                 habitaciones: p.habitaciones || '0',
                 banos: p.banos || '0',
@@ -85,10 +105,15 @@ function renderizarColeccion(datos) {
             ? `<span>📐 ${prop.area}</span> <span>🛏️ ${prop.habitaciones} Hab</span> <span>🛁 ${prop.banos} Baños</span>`
             : `<span>📐 ${prop.area}</span> <span>📍 ${prop.zonificacion}</span> <span>🏗️ ${prop.parametros}</span>`;
         
+        const photoBadge = (prop.imagenes && prop.imagenes.length > 1) 
+            ? `<div class="tag-photos">📷 ${prop.imagenes.length} Fotos</div>`
+            : '';
+
         gridContenedor.innerHTML += `
             <article class="property-card" onclick="abrirModal(${prop.id})">
                 <div class="property-img">
                     <div class="tag-status">${prop.estado}</div>
+                    ${photoBadge}
                     <img src="${prop.imagen}" alt="${prop.titulo}" loading="lazy">
                 </div>
                 <div class="property-info">
@@ -114,11 +139,51 @@ function filtrarPorCategoria(categoria) {
     }
 }
 
+// ================= MODAL HD CAROUSEL =================
+let modalCurrentImgIdx = 0;
+
+function renderModalCarousel() {
+    const container = document.getElementById('modal-img');
+    if (!container) return;
+
+    const imgs = window.modalPropImages || [];
+    const currentImg = imgs[modalCurrentImgIdx] || imgs[0] || '';
+
+    container.style.backgroundImage = `url('${currentImg}')`;
+
+    if (imgs.length > 1) {
+        container.innerHTML = `
+            <div class="modal-carousel-overlay">
+                <button class="modal-carousel-arrow prev" onclick="moveModalCarousel(-1, event)">&#10094;</button>
+                <button class="modal-carousel-arrow next" onclick="moveModalCarousel(1, event)">&#10095;</button>
+                <div class="modal-carousel-dots">
+                    ${imgs.map((_, idx) => `<span class="modal-dot ${idx === modalCurrentImgIdx ? 'active' : ''}"></span>`).join('')}
+                </div>
+                <div class="modal-photo-counter">📷 ${modalCurrentImgIdx + 1} / ${imgs.length}</div>
+            </div>
+        `;
+    } else {
+        container.innerHTML = '';
+    }
+}
+
+function moveModalCarousel(dir, e) {
+    if (e) e.stopPropagation();
+    const imgs = window.modalPropImages || [];
+    if (!imgs.length) return;
+
+    modalCurrentImgIdx = (modalCurrentImgIdx + dir + imgs.length) % imgs.length;
+    renderModalCarousel();
+}
+
 function abrirModal(id) {
     const prop = coleccion.find(p => p.id == id);
     if (!prop || !modal) return;
-    
-    document.getElementById('modal-img').style.backgroundImage = `url('${prop.imagen}')`;
+
+    window.modalPropImages = prop.imagenes || [prop.imagen];
+    modalCurrentImgIdx = 0;
+    renderModalCarousel();
+
     document.getElementById('modal-title').innerText = prop.titulo;
     document.getElementById('modal-price').innerText = prop.precio;
     document.getElementById('modal-desc').innerText = prop.descripcion;
