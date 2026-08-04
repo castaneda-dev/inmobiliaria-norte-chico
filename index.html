@@ -18,13 +18,19 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://cdn.jsdelivr.net" />
-    <link rel="preconnect" href="https://jlgnqiedkagkcqoakmom.supabase.co" />
+    <link rel="preconnect" href="https://jlgnqiedkagkcqoakmom.supabase.co" crossorigin />
 
-    <!-- Google Fonts con font-display swap (no bloquea el renderizado) -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Montserrat:wght@400;700;900&display=swap&font-display=swap" rel="stylesheet" />
+    <!-- Preload prioritario de la imagen LCP principal -->
+    <link rel="preload" as="image" href="PR_PLAZA_HUARAL_desktop.webp" fetchpriority="high" type="image/webp" />
 
-    <!-- CSS Principal -->
-    <link rel="stylesheet" href="assets/css/index.min.css" />
+    <!-- Google Fonts no bloqueante (display=swap + media print) -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet" /></noscript>
+
+    <!-- CSS Principal asíncrono no bloqueante -->
+    <link rel="preload" href="assets/css/index.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript><link rel="stylesheet" href="assets/css/index.min.css" /></noscript>
+
 </head>
 
 <body>

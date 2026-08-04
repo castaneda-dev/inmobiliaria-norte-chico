@@ -9,6 +9,57 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
+// Sanitización y Validación básica de campos
+function sanitizeField(val, fallback = 'No indicado') {
+    if (!val || typeof val !== 'string') return fallback;
+    const clean = val.trim().replace(/[<>/]/g, '');
+    return clean.length > 0 ? clean : fallback;
+}
+
+function sanitizeEmail(val) {
+    if (!val || typeof val !== 'string') return 'No indicado';
+    const email = val.trim().toLowerCase();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email) ? email : 'No indicado';
+}
+
+function sanitizePhone(val) {
+    if (!val || typeof val !== 'string') return 'No indicado';
+    const phone = val.trim().replace(/[^\d+()\s-]/g, '');
+    return phone.length >= 6 ? phone : 'No indicado';
+}
+
+// Envío resiliente con reintentos para Telegram
+async function sendTelegramAlertWithRetry(mensaje, maxRetries = 3) {
+    if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) return false;
+    const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            const response = await fetch(telegramUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: TELEGRAM_CHAT_ID,
+                    text: mensaje,
+                    parse_mode: 'Markdown'
+                })
+            });
+            if (response.ok) {
+                console.log(`✅ Notificación enviada a Telegram en el intento ${attempt}.`);
+                return true;
+            }
+            console.warn(`⚠️ Telegram API respondió estado ${response.status} en intento ${attempt}.`);
+        } catch (err) {
+            console.warn(`⚠️ Error conectando con Telegram API (intento ${attempt}/${maxRetries}):`, err.message);
+        }
+        if (attempt < maxRetries) {
+            await new Promise(r => setTimeout(r, attempt * 1000));
+        }
+    }
+    return false;
+}
+
 module.exports = async function handler(req, res) {
     // Solo aceptamos peticiones POST (Webhooks)
     if (req.method !== 'POST') {
@@ -16,16 +67,14 @@ module.exports = async function handler(req, res) {
     }
 
     try {
-        const payload = req.body;
+        const payload = req.body || {};
         console.log("Webhook recibido:", JSON.stringify(payload));
 
-        // EXTRAER DATOS DEL LEAD
-        // Soporta formato genérico Y formato de Facebook Lead Ads
-        let nombre = 'Lead Desconocido';
-        let telefono = 'No indicado';
-        let email = 'No indicado';
+        let rawNombre = 'Lead Desconocido';
+        let rawTelefono = 'No indicado';
+        let rawEmail = 'No indicado';
         let origen = 'Webhook';
-        let tipoInteres = 'Consulta General';
+        let rawTipoInteres = 'Consulta General';
 
         // --- Formato 1: Facebook Lead Ads (field_data array) ---
         if (payload.entry && Array.isArray(payload.entry)) {
@@ -40,27 +89,27 @@ module.exports = async function handler(req, res) {
                     const val = Array.isArray(field.values) ? field.values[0] : '';
 
                     if (key.includes('name') || key.includes('nombre') || key.includes('full_name')) {
-                        nombre = val;
+                        rawNombre = val;
                     } else if (key.includes('phone') || key.includes('telefono') || key.includes('tel')) {
-                        telefono = val;
+                        rawTelefono = val;
                     } else if (key.includes('email') || key.includes('correo')) {
-                        email = val;
+                        rawEmail = val;
                     } else if (key.includes('interes') || key.includes('busca') || key.includes('objetivo')) {
-                        tipoInteres = val;
+                        rawTipoInteres = val;
                     }
                 });
             } catch (fbErr) {
                 console.warn("Error parseando formato Facebook:", fbErr);
             }
         }
-        // --- Formato 2: TikTok Ads (similar a genérico) ---
+        // --- Formato 2: TikTok Ads ---
         else if (payload.leads && Array.isArray(payload.leads)) {
             origen = 'TikTok Ads';
             try {
                 const lead = payload.leads[0];
-                nombre = lead.name || lead.full_name || nombre;
-                telefono = lead.phone_number || lead.phone || telefono;
-                email = lead.email || email;
+                rawNombre = lead.name || lead.full_name || rawNombre;
+                rawTelefono = lead.phone_number || lead.phone || rawTelefono;
+                rawEmail = lead.email || rawEmail;
             } catch (ttErr) {
                 console.warn("Error parseando formato TikTok:", ttErr);
             }
@@ -68,23 +117,29 @@ module.exports = async function handler(req, res) {
         // --- Formato 3: Genérico (JSON plano) ---
         else {
             if (payload.nombre || payload.name || payload.full_name) {
-                nombre = payload.nombre || payload.name || payload.full_name;
+                rawNombre = payload.nombre || payload.name || payload.full_name;
             }
             if (payload.telefono || payload.phone || payload.phone_number) {
-                telefono = payload.telefono || payload.phone || payload.phone_number;
+                rawTelefono = payload.telefono || payload.phone || payload.phone_number;
             }
             if (payload.email || payload.correo) {
-                email = payload.email || payload.correo;
+                rawEmail = payload.email || payload.correo;
             }
             if (payload.origen || payload.source) {
                 origen = payload.origen || payload.source;
             }
             if (payload.tipo_interes || payload.interes || payload.interest) {
-                tipoInteres = payload.tipo_interes || payload.interes || payload.interest;
+                rawTipoInteres = payload.tipo_interes || payload.interes || payload.interest;
             }
         }
 
-        // GUARDAR EN SUPABASE (Tabla: clientes — minúscula)
+        // Sanitizar datos antes de guardar
+        const nombre = sanitizeField(rawNombre, 'Lead Desconocido');
+        const telefono = sanitizePhone(rawTelefono);
+        const email = sanitizeEmail(rawEmail);
+        const tipoInteres = sanitizeField(rawTipoInteres, 'Consulta General');
+
+        // GUARDAR EN SUPABASE (Tabla: clientes)
         const { data, error } = await supabase
             .from('clientes')
             .insert([
@@ -104,33 +159,21 @@ module.exports = async function handler(req, res) {
             throw error;
         }
 
-        // ENVIAR MENSAJE A TELEGRAM
-        if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
-            const mensaje = [
-                '🚨 *NUEVO LEAD RECIBIDO* 🚨',
-                '',
-                '👤 *Nombre:* ' + nombre,
-                '📱 *Telefono:* ' + telefono,
-                '📧 *Email:* ' + email,
-                '📣 *Origen:* ' + origen,
-                '🎯 *Interes:* ' + tipoInteres,
-                '',
-                '👉 Revisa el Dashboard para mas detalles.'
-            ].join('\n');
+        // ENVIAR NOTIFICACIÓN CON REINTENTOS A TELEGRAM
+        const mensaje = [
+            '🚨 *NUEVO LEAD RECIBIDO* 🚨',
+            '',
+            '👤 *Nombre:* ' + nombre,
+            '📱 *Telefono:* ' + telefono,
+            '📧 *Email:* ' + email,
+            '📣 *Origen:* ' + origen,
+            '🎯 *Interes:* ' + tipoInteres,
+            '',
+            '👉 Revisa el Dashboard para mas detalles.'
+        ].join('\n');
 
-            const telegramUrl = 'https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage';
-            await fetch(telegramUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: TELEGRAM_CHAT_ID,
-                    text: mensaje,
-                    parse_mode: 'Markdown'
-                })
-            });
-        }
+        await sendTelegramAlertWithRetry(mensaje, 3);
 
-        // Responder con éxito para que FB/TikTok no reintente
         return res.status(200).json({ success: true, message: 'Lead procesado correctamente' });
 
     } catch (error) {
