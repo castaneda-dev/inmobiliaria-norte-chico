@@ -25,12 +25,13 @@ PRESETS = {
     'mobile': {'max_w': 800, 'quality': 80}
 }
 
-# Mapeo automático de nombres del carrusel de inicio
+# Mapeo automático de nombres del carrusel de inicio y fondos
 CARRUSEL_MAPPING = {
     'OFICIAL_PLAZA_HUARAL.png': 'PR_PLAZA_HUARAL_desktop.webp',
     'OFICIAL_PLAZA_CHANCAY.png': 'PR_PLAZA_CHANCAY_desktop.webp',
     'OFICIAL_ECOTRULY_PARK.png': 'PR_ECOTRULY_PARK_desktop.webp',
     'OFICIAL_CHANCAY.png': 'PR_CHANCAY_desktop.webp',
+    'OFICIAL_GLORIETA_DELUXE.png': 'PR_GLORIETA_DELUXE.webp',
     'PR_GLORIETA_DELUXE.png': 'PR_GLORIETA_DELUXE.webp'
 }
 
@@ -58,33 +59,35 @@ def process_image(src_path, dst_path, preset='hero'):
 
     new_bytes = os.path.getsize(dst_path)
     savings = (1 - (new_bytes / original_bytes)) * 100
-    print(f"  ✅ {os.path.basename(src_path)} -> {os.path.basename(dst_path)}")
-    print(f"     Peso: {original_bytes/1024:.1f} KB -> {new_bytes/1024:.1f} KB (-{savings:.1f}% ahorro)\n")
+    print(f"  [+] {os.path.basename(src_path)} -> {os.path.basename(dst_path)}")
+    print(f"      Peso: {original_bytes/1024:.1f} KB -> {new_bytes/1024:.1f} KB (-{savings:.1f}% ahorro)\n")
 
 def main():
     root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     prod_dir = os.path.join(root_dir, 'IMAGENES_PROD')
 
-    print("🖼️  =======================================================")
-    print("   PROCESADOR AUTOMÁTICO DE IMÁGENES HD - NORTE CHICO")
-    print("   =======================================================\n")
+    print("=======================================================")
+    print("   PROCESADOR AUTOMATICO DE IMAGENES HD - NORTE CHICO")
+    print("=======================================================\n")
 
     if not os.path.exists(prod_dir):
-        print(f"⚠️  La carpeta {prod_dir} no existe. Créala y coloca allí tus imágenes.")
+        print(f"La carpeta {prod_dir} no existe. Creala y coloca alli tus imagenes.")
         return
 
     count = 0
 
-    # 1. Procesar carrusel oficial
-    carrusel_dir = os.path.join(prod_dir, 'CARRUSEL_INICIO')
-    if os.path.exists(carrusel_dir):
-        print("📸 Procesando imágenes oficiales del Carrusel Principal...")
-        for filename in os.listdir(carrusel_dir):
-            if filename in CARRUSEL_MAPPING:
-                src_path = os.path.join(carrusel_dir, filename)
-                dst_path = os.path.join(root_dir, CARRUSEL_MAPPING[filename])
-                process_image(src_path, dst_path, preset='hero')
-                count += 1
+    # 1. Procesar carrusel oficial y fondos
+    subdirs_to_check = ['CARRUSEL_INICIO', 'FONDO_PANTALLA']
+    for sub in subdirs_to_check:
+        sub_path = os.path.join(prod_dir, sub)
+        if os.path.exists(sub_path):
+            print(f"Procesando imagenes oficiales en {sub}...")
+            for filename in os.listdir(sub_path):
+                if filename in CARRUSEL_MAPPING:
+                    src_path = os.path.join(sub_path, filename)
+                    dst_path = os.path.join(root_dir, CARRUSEL_MAPPING[filename])
+                    process_image(src_path, dst_path, preset='hero')
+                    count += 1
 
     # 2. Procesar imágenes generales en IMAGENES_PROD
     for root, _, files in os.walk(prod_dir):
@@ -97,9 +100,9 @@ def main():
                 process_image(src_path, dst_path, preset='catalog')
                 count += 1
 
-    print("✨ =======================================================")
-    print(f"   ¡Proceso completado! Se optimizaron {count} imágenes.")
-    print("   =======================================================\n")
+    print("=======================================================")
+    print(f"   Proceso completado! Se optimizaron {count} imagenes.")
+    print("=======================================================\n")
 
 if __name__ == "__main__":
     main()
