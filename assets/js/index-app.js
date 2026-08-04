@@ -202,7 +202,7 @@ function abrirModal(id) {
     // Configurar enlace directo a WhatsApp especificando la propiedad
     const wsBtn = document.getElementById('modal-ws-btn');
     if (wsBtn) {
-        const wsText = `Hola, estoy viendo en la web el inmueble: ${prop.titulo}. Me gustaría recibir información detallada, ubicación y facilidades de pago.`;
+        const wsText = `Hola, estoy viendo en la web el inmueble: ${prop.titulo}. Me gustaría recibir información detallada y ubicación.`;
         wsBtn.href = `https://wa.me/56982816844?text=${encodeURIComponent(wsText)}`;
     }
 
