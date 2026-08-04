@@ -59,22 +59,44 @@ async function cachedFetch(key, fetchFn) {
     return data;
 }
 
+// ================= CENTRALIZED AUTH UI MANAGER =================
+function updateAuthStateUI(session) {
+    const appShell = document.getElementById('appShell');
+    if (session) {
+        closeModal('modalAuth');
+        if (appShell) {
+            appShell.style.display = 'flex';
+        }
+        if (document.getElementById('displayUserName')) {
+            document.getElementById('displayUserName').innerText = session.user.email;
+        }
+        initInactivityTimer();
+    } else {
+        if (appShell) {
+            appShell.style.display = 'none';
+        }
+        openModal('modalAuth');
+        clearInactivityTimer();
+    }
+}
+
 // ================= INICIALIZACIÓN Y CARGA DE DATOS =================
 document.addEventListener('DOMContentLoaded', async () => {
-    // Verificar sesión — si no hay, el appShell queda oculto
+    // Verificar sesión inicial
     const authenticated = await checkSupabaseSession();
     if (authenticated) {
         switchView('dashboard');
     }
 
-    // Detectar cambios de auth en tiempo real (logout desde otra pestaña)
+    // Escuchar eventos de autenticación en tiempo real
     if (window.supabaseClient) {
         supabaseClient.auth.onAuthStateChange((event, session) => {
-            if (event === 'SIGNED_OUT' || !session) {
-                const appShell = document.getElementById('appShell');
-                if (appShell) appShell.style.display = 'none';
-                openModal('modalAuth');
-                clearInactivityTimer();
+            console.log("🔐 Evento de autenticación Supabase:", event);
+            if (event === 'SIGNED_IN') {
+                updateAuthStateUI(session);
+                switchView('dashboard');
+            } else if (event === 'SIGNED_OUT') {
+                updateAuthStateUI(null);
             }
         });
     }
@@ -83,22 +105,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ================= SWITCH VIEW (OPTIMIZED) =================
 // Cambio visual INMEDIATO + fetch en paralelo en background
 async function switchView(viewId, element = null) {
-    // Verificar sesión antes de permitir navegación
-    if (window.supabaseClient) {
-        try {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session) {
-                const appShell = document.getElementById('appShell');
-                if (appShell) appShell.style.display = 'none';
-                openModal('modalAuth');
-                return;
-            }
-        } catch (err) {
-            console.error('Error verificando sesión:', err);
-            return;
-        }
-    }
-
     console.log("🔄 Cambiando a módulo:", viewId);
 
     // PASO 1: Cambio visual inmediato (UI optimista — cero latencia percibida)
@@ -404,7 +410,6 @@ function renderClients(filteredList) {
 
 function filterCRMByStatus(status) {
     crmActiveFilter = status;
-    // Actualizar botones activos
     document.querySelectorAll('[id^="crmFilter"]').forEach(btn => btn.classList.remove('btn-active'));
     const btnMap = { 'todos': 'crmFilterAll', 'Nuevo': 'crmFilterNuevo', 'En Contacto': 'crmFilterContacto', 'Negociacion': 'crmFilterNegociacion', 'Cerrado': 'crmFilterCerrado' };
     const activeBtn = document.getElementById(btnMap[status]);
@@ -418,11 +423,9 @@ function filterCRMLeads() {
 
 function applyAllCRMFilters() {
     let clients = globalState.clients || [];
-    // Filtro por estado
     if (crmActiveFilter !== 'todos') {
         clients = clients.filter(c => c.estado_lead === crmActiveFilter);
     }
-    // Filtro por búsqueda
     const searchEl = document.getElementById('crmSearch');
     if (searchEl && searchEl.value.trim()) {
         const q = searchEl.value.toLowerCase();
@@ -454,7 +457,6 @@ function renderAgents() {
         `;
     });
 }
-
 
 // ================= MODALS & FORMS =================
 function openModal(id) {
@@ -522,7 +524,6 @@ async function saveProperty(e) {
     const idVal = document.getElementById('propId').value;
     const isUpdate = !!idVal;
     
-    // Payload mapping
     const payload = {
         titulo: document.getElementById('propTitle')?.value || '',
         tipo_activo: document.getElementById('propType')?.value || 'Terreno',
@@ -543,10 +544,10 @@ async function saveProperty(e) {
     if (submitBtn) submitBtn.disabled = false;
 
     if (success) {
-        invalidateCache('properties'); // Limpiar caché
+        invalidateCache('properties');
         alert('✅ Propiedad guardada exitosamente en Supabase.');
         closeModal('modalProperty');
-        switchView('inventario'); // Refresh view and data
+        switchView('inventario');
     } else {
         alert('❌ Error al guardar la propiedad.');
     }
@@ -556,7 +557,7 @@ async function deleteProperty(id) {
     if (confirm('¿Está seguro de eliminar esta propiedad permanentemente de Supabase?')) {
         const success = await api.deleteProperty(id);
         if (success) {
-            invalidateCache('properties'); // Limpiar caché
+            invalidateCache('properties');
             switchView('inventario');
         } else {
             alert('❌ Error al eliminar.');
@@ -583,7 +584,7 @@ async function saveClient(e) {
     
     const success = await api.saveClient(payload);
     if (success) {
-        invalidateCache('clients'); // Limpiar caché
+        invalidateCache('clients');
         closeModal('modalClient');
         switchView('crm');
     } else {
@@ -595,7 +596,7 @@ async function deleteClient(id) {
     if (confirm('¿Está seguro de eliminar este lead permanentemente?')) {
         const success = await api.deleteClient(id);
         if (success) {
-            invalidateCache('clients'); // Limpiar caché
+            invalidateCache('clients');
             switchView('crm');
         }
     }
@@ -615,7 +616,7 @@ async function saveAgent(e) {
     };
     const success = await api.saveAgent(payload);
     if (success) {
-        invalidateCache('agents'); // Limpiar caché
+        invalidateCache('agents');
         alert('✅ Asesor registrado con éxito en Supabase.');
         closeModal('modalAgent');
         switchView('agentes');
@@ -625,7 +626,6 @@ async function saveAgent(e) {
 }
 
 async function populateSelectors() {
-    // Para modales y creación de interacciones
     globalState.clients = await cachedFetch('clients', () => api.fetchClients());
     globalState.properties = await cachedFetch('properties', () => api.fetchProperties());
     globalState.agents = await cachedFetch('agents', () => api.fetchAgents());
@@ -671,7 +671,7 @@ async function saveInteraction(e) {
     };
     const success = await api.saveInteraction(payload);
     if (success) {
-        invalidateCache('interactions'); // Limpiar caché
+        invalidateCache('interactions');
         closeModal('modalInteraction');
         switchView('dashboard');
     } else {
@@ -735,40 +735,22 @@ function previewUploadedImage(event) {
 // Rate Limiting para login
 let loginAttempts = 0;
 const MAX_LOGIN_ATTEMPTS = 5;
-const LOCKOUT_DURATION_MS = 2 * 60 * 1000; // 2 minutos
+const LOCKOUT_DURATION_MS = 2 * 60 * 1000;
 let lockoutUntil = 0;
 
 async function checkSupabaseSession() {
-    const appShell = document.getElementById('appShell');
-    
-    // BLOQUEAR todo el dashboard hasta verificar sesión
-    if (appShell) appShell.style.display = 'none';
-    
-    // Si Supabase no está configurado, bloquear acceso completamente
     if (!window.supabaseClient) {
-        openModal('modalAuth');
+        updateAuthStateUI(null);
         return false;
     }
     
     try {
         const { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session) {
-            if (appShell) appShell.style.display = 'none';
-            openModal('modalAuth');
-            return false;
-        } else {
-            closeModal('modalAuth');
-            if (appShell) appShell.style.display = 'flex';
-            if (document.getElementById('displayUserName')) {
-                document.getElementById('displayUserName').innerText = session.user.email;
-            }
-            initInactivityTimer();
-            return true;
-        }
+        updateAuthStateUI(session);
+        return !!session;
     } catch (err) {
         console.error('Error verificando sesión:', err);
-        if (appShell) appShell.style.display = 'none';
-        openModal('modalAuth');
+        updateAuthStateUI(null);
         return false;
     }
 }
@@ -778,7 +760,6 @@ async function handleSupabaseLogin(e) {
     const errBox = document.getElementById('authErrorMsg');
     if (errBox) { errBox.style.display = 'none'; errBox.style.color = '#ef4444'; }
 
-    // Verificación de rate limiting
     if (Date.now() < lockoutUntil) {
         const secsLeft = Math.ceil((lockoutUntil - Date.now()) / 1000);
         if (errBox) {
@@ -792,11 +773,10 @@ async function handleSupabaseLogin(e) {
     const password = document.getElementById('authPassword').value;
 
     if (!window.supabaseClient) {
-        closeModal('modalAuth');
+        updateAuthStateUI(null);
         return;
     }
 
-    // Deshabilitar botón de login durante la solicitud
     const submitBtn = e.target.querySelector('button[type="submit"]');
     if (submitBtn) submitBtn.disabled = true;
 
@@ -820,17 +800,10 @@ async function handleSupabaseLogin(e) {
             } else alert("Error: " + error.message);
         }
     } else {
-        // Login exitoso
         loginAttempts = 0;
         lockoutUntil = 0;
-        closeModal('modalAuth');
-        const appShell = document.getElementById('appShell');
-        if (appShell) appShell.style.display = 'flex';
-        if (document.getElementById('displayUserName')) {
-            document.getElementById('displayUserName').innerText = data.user.email;
-        }
-        initInactivityTimer();
-        invalidateCache(); // Datos frescos tras login
+        updateAuthStateUI(data.session);
+        invalidateCache();
         switchView('dashboard');
     }
 }
@@ -840,24 +813,21 @@ async function handleSupabaseLogout() {
     if (window.supabaseClient) {
         await supabaseClient.auth.signOut();
     }
-    const appShell = document.getElementById('appShell');
-    if (appShell) appShell.style.display = 'none';
-    invalidateCache(); // Limpiar caché al cerrar sesión
-    openModal('modalAuth');
+    invalidateCache();
+    updateAuthStateUI(null);
 }
 
 // ================= INACTIVITY TIMEOUT (10 MIN) =================
-const INACTIVITY_LIMIT_MS = 10 * 60 * 1000; // 10 minutos
-const WARNING_BEFORE_MS = 60 * 1000; // Aviso 1 minuto antes
+const INACTIVITY_LIMIT_MS = 10 * 60 * 1000;
+const WARNING_BEFORE_MS = 60 * 1000;
 let inactivityTimer = null;
 let warningTimer = null;
 let warningVisible = false;
 let lastResetTime = 0;
-const RESET_DEBOUNCE_MS = 1000; // Solo resetear timer una vez por segundo (rendimiento)
+const RESET_DEBOUNCE_MS = 1000;
 
 function initInactivityTimer() {
     const resetEvents = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart', 'click'];
-    // Limpiar listeners previos para evitar duplicados
     resetEvents.forEach(evt => {
         document.removeEventListener(evt, debouncedResetInactivity);
     });
@@ -882,12 +852,10 @@ function resetInactivityTimer() {
     clearTimeout(inactivityTimer);
     clearTimeout(warningTimer);
 
-    // A los 9 minutos → mostrar advertencia
     warningTimer = setTimeout(() => {
         showInactivityWarning();
     }, INACTIVITY_LIMIT_MS - WARNING_BEFORE_MS);
 
-    // A los 10 minutos → cerrar sesión
     inactivityTimer = setTimeout(async () => {
         hideInactivityWarning();
         await forceLogoutByInactivity();
@@ -921,12 +889,9 @@ async function forceLogoutByInactivity() {
     if (window.supabaseClient) {
         await supabaseClient.auth.signOut();
     }
-    const appShell = document.getElementById('appShell');
-    if (appShell) appShell.style.display = 'none';
     invalidateCache();
-    openModal('modalAuth');
+    updateAuthStateUI(null);
 
-    // Mostrar mensaje informativo en el modal de login
     const errBox = document.getElementById('authErrorMsg');
     if (errBox) {
         errBox.innerText = '⏱️ Sesión cerrada automáticamente por 10 minutos de inactividad.';
