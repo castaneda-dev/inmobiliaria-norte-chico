@@ -178,10 +178,13 @@
     <script src="assets/js/api.obf.js" defer></script>
     <script src="assets/js/index-app.obf.js" defer></script>
 
-    <!-- Meta Pixel Code (Diferido a 3s tras carga para no bloquear hilo principal móvil) -->
+    <!-- Meta Pixel Code (Carga inteligente por interacción de usuario) -->
     <script>
-        window.addEventListener('load', function () {
-            setTimeout(function () {
+        (function() {
+            let pixelLoaded = false;
+            function initMetaPixel() {
+                if (pixelLoaded) return;
+                pixelLoaded = true;
                 !function (f, b, e, v, n, t, s) {
                     if (f.fbq) return; n = f.fbq = function () {
                         n.callMethod ?
@@ -194,9 +197,14 @@
                 }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
                 fbq('init', 'TU_ID_DE_PIXEL_AQUI');
                 fbq('track', 'PageView');
-            }, 3000);
-        });
+            }
+            ['touchstart', 'scroll', 'mousemove', 'click'].forEach(function(evt) {
+                window.addEventListener(evt, initMetaPixel, { passive: true, once: true });
+            });
+            setTimeout(initMetaPixel, 6000);
+        })();
     </script>
+
     <noscript><img height="1" width="1" style="display:none"
             src="https://www.facebook.com/tr?id=TU_ID_DE_PIXEL_AQUI&ev=PageView&noscript=1" /></noscript>
     <!-- End Meta Pixel Code -->
