@@ -62,20 +62,30 @@ async function cachedFetch(key, fetchFn) {
 // ================= CENTRALIZED AUTH UI MANAGER =================
 function updateAuthStateUI(session) {
     const appShell = document.getElementById('appShell');
+    const modalAuth = document.getElementById('modalAuth');
+
     if (session) {
-        closeModal('modalAuth');
+        console.log("🔓 Sesión válida detectada para:", session.user?.email);
+        if (modalAuth) {
+            modalAuth.classList.remove('active');
+            modalAuth.style.display = 'none';
+        }
         if (appShell) {
-            appShell.style.display = 'flex';
+            appShell.style.setProperty('display', 'flex', 'important');
         }
         if (document.getElementById('displayUserName')) {
-            document.getElementById('displayUserName').innerText = session.user.email;
+            document.getElementById('displayUserName').innerText = session.user?.email || 'Admin';
         }
         initInactivityTimer();
     } else {
+        console.log("🔒 Sin sesión válida. Mostrando modal de acceso.");
         if (appShell) {
             appShell.style.display = 'none';
         }
-        openModal('modalAuth');
+        if (modalAuth) {
+            modalAuth.style.display = 'flex';
+            modalAuth.classList.add('active');
+        }
         clearInactivityTimer();
     }
 }
@@ -92,7 +102,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (window.supabaseClient) {
         supabaseClient.auth.onAuthStateChange((event, session) => {
             console.log("🔐 Evento de autenticación Supabase:", event);
-            if (event === 'SIGNED_IN') {
+            if (event === 'SIGNED_IN' && session) {
                 updateAuthStateUI(session);
                 switchView('dashboard');
             } else if (event === 'SIGNED_OUT') {
@@ -365,7 +375,6 @@ function filterProperties() {
     renderProperties();
 }
 
-// Estado activo de filtro CRM
 let crmActiveFilter = 'todos';
 
 function getOrigenBadge(origen) {
@@ -461,12 +470,18 @@ function renderAgents() {
 // ================= MODALS & FORMS =================
 function openModal(id) {
     const modal = document.getElementById(id);
-    if (modal) modal.classList.add('active');
+    if (modal) {
+        modal.style.display = 'flex';
+        modal.classList.add('active');
+    }
 }
 
 function closeModal(id) {
     const modal = document.getElementById(id);
-    if (modal) modal.classList.remove('active');
+    if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+    }
 }
 
 async function openAddPropertyModal() {
@@ -769,42 +784,73 @@ async function handleSupabaseLogin(e) {
         return;
     }
 
-    const email = document.getElementById('authEmail').value;
+    const email = document.getElementById('authEmail').value.trim();
     const password = document.getElementById('authPassword').value;
 
+    console.log("🔐 Intentando iniciar sesión en Supabase para:", email);
+
     if (!window.supabaseClient) {
-        updateAuthStateUI(null);
+        if (errBox) {
+            errBox.innerText = "❌ Cliente de Supabase no inicializado.";
+            errBox.style.display = 'block';
+        }
         return;
     }
 
     const submitBtn = e.target.querySelector('button[type="submit"]');
-    if (submitBtn) submitBtn.disabled = true;
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = "⏳ Verificando credenciales...";
+    }
 
-    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-    
-    if (submitBtn) submitBtn.disabled = false;
+    try {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "🔐 Iniciar Sesión en Supabase";
+        }
 
-    if (error) {
-        loginAttempts++;
-        if (loginAttempts >= MAX_LOGIN_ATTEMPTS) {
-            lockoutUntil = Date.now() + LOCKOUT_DURATION_MS;
+        if (error) {
+            console.error("❌ Error de login Supabase:", error.message);
+            loginAttempts++;
+            if (loginAttempts >= MAX_LOGIN_ATTEMPTS) {
+                lockoutUntil = Date.now() + LOCKOUT_DURATION_MS;
+                loginAttempts = 0;
+                if (errBox) {
+                    errBox.innerText = '🔒 Demasiados intentos fallidos. Bloqueado por 2 minutos.';
+                    errBox.style.display = 'block';
+                }
+            } else {
+                if (errBox) {
+                    errBox.innerText = "❌ Error: " + error.message;
+                    errBox.style.display = 'block';
+                } else alert("Error: " + error.message);
+            }
+        } else if (data && data.session) {
+            console.log("✅ Login exitoso en Supabase:", data.user.email);
             loginAttempts = 0;
+            lockoutUntil = 0;
+            updateAuthStateUI(data.session);
+            invalidateCache();
+            switchView('dashboard');
+        } else {
+            console.warn("⚠️ Login sin sesión retornada:", data);
             if (errBox) {
-                errBox.innerText = '🔒 Demasiados intentos fallidos. Bloqueado por 2 minutos.';
+                errBox.innerText = "⚠️ No se recibió una sesión válida de Supabase.";
                 errBox.style.display = 'block';
             }
-        } else {
-            if (errBox) {
-                errBox.innerText = "Error: " + error.message + ` (${MAX_LOGIN_ATTEMPTS - loginAttempts} intentos restantes)`;
-                errBox.style.display = 'block';
-            } else alert("Error: " + error.message);
         }
-    } else {
-        loginAttempts = 0;
-        lockoutUntil = 0;
-        updateAuthStateUI(data.session);
-        invalidateCache();
-        switchView('dashboard');
+    } catch (catchedErr) {
+        console.error("❌ Excepción en handleSupabaseLogin:", catchedErr);
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "🔐 Iniciar Sesión en Supabase";
+        }
+        if (errBox) {
+            errBox.innerText = "❌ Error: " + catchedErr.message;
+            errBox.style.display = 'block';
+        }
     }
 }
 
