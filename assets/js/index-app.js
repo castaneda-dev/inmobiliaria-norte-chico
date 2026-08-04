@@ -18,7 +18,7 @@ async function cargarPropiedades() {
                 estado: p.estado || 'Disponible',
                 titulo: p.titulo,
                 precio: typeof p.precio === 'number' ? '$' + parseFloat(p.precio).toLocaleString() : (p.precio || '$0'),
-                imagen: p.imagen_url || p.imagen || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80',
+                imagen: p.imagen_url || p.imagen || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=85',
                 area: typeof p.area_m2 === 'number' ? p.area_m2 + ' m²' : (p.area_m2 || p.area || '0 m²'),
                 habitaciones: p.habitaciones || '0',
                 banos: p.banos || '0',

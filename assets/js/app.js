@@ -731,7 +731,7 @@ function previewUploadedImage(event) {
             img.onload = function() {
                 const canvas = document.createElement('canvas');
                 let width = img.width, height = img.height;
-                const maxDim = 600;
+                const maxDim = 1200; // Alta Definición HD (1200px max)
 
                 if (width > maxDim || height > maxDim) {
                     if (width > height) {
@@ -745,9 +745,15 @@ function previewUploadedImage(event) {
                 canvas.width = width;
                 canvas.height = height;
                 const ctx = canvas.getContext('2d');
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
                 ctx.drawImage(img, 0, 0, width, height);
 
-                const base64Data = canvas.toDataURL('image/jpeg', 0.75);
+                // WebP a 0.85 de calidad para nitidez HD sin peso excesivo
+                let base64Data = canvas.toDataURL('image/webp', 0.85);
+                if (!base64Data.startsWith('data:image/webp')) {
+                    base64Data = canvas.toDataURL('image/jpeg', 0.85);
+                }
                 document.getElementById('propImage').value = base64Data;
                 document.getElementById('imagePreviewImg').src = base64Data;
                 document.getElementById('imagePreviewBox').style.display = 'block';
