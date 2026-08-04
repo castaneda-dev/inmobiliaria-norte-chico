@@ -208,6 +208,9 @@ function abrirModal(id) {
 
     modal.classList.add('active');
     body.style.overflow = 'hidden';
+    
+    // Deep Linking: Update URL Hash
+    history.pushState(null, null, '#prop-' + id);
 }
 
 function prellenarCRMPropiedad() {
@@ -249,6 +252,11 @@ function cerrarModal() {
     if (modal) {
         modal.classList.remove('active'); 
         body.style.overflow = ''; 
+        
+        // Deep Linking: Clear URL Hash safely
+        if (window.location.hash.startsWith('#prop-')) {
+            history.pushState(null, null, ' ');
+        }
     }
 }
 
@@ -306,7 +314,12 @@ async function enviarCRM(origenMarca) {
         showToast('✅ ¡Datos recibidos! Un asesor se comunicará pronto.');
 
         // Redirección de WhatsApp opcional con mensaje prellenado
-        const wsMsg = `Hola,%20soy%20${encodeURIComponent(nombre)}.%20Me%20interesa%20información%20sobre%20${encodeURIComponent(interes)}`;
+        let propContext = '';
+        if (window.currentOpenedProperty && interes === 'Inmueble: ' + window.currentOpenedProperty.titulo) {
+            propContext = `%0A%0A📌 *Propiedad de Interés:* ${encodeURIComponent(window.currentOpenedProperty.titulo)}%0A💰 *Precio:* ${encodeURIComponent(window.currentOpenedProperty.precio)}`;
+        }
+        
+        const wsMsg = `Hola,%20soy%20*${encodeURIComponent(nombre)}*.%20Me%20interesa%20recibir%20asesoría%20sobre:%20${encodeURIComponent(interes)}${propContext}`;
         setTimeout(() => {
             window.open(`https://wa.me/56982816844?text=${wsMsg}`, '_blank');
         }, 1000);
@@ -326,6 +339,14 @@ async function initApp() {
     coleccion = await cargarPropiedades();
     renderizarColeccion(coleccion);
     actualizarContadores();
+
+    // Comprobar si hay Deep Link al cargar la página
+    if (window.location.hash && window.location.hash.startsWith('#prop-')) {
+        const hashId = window.location.hash.replace('#prop-', '');
+        if (hashId && !isNaN(hashId)) {
+            setTimeout(() => abrirModal(hashId), 500); // Dar tiempo al renderizado de imagenes
+        }
+    }
 
     // Escuchar actualizaciones en vivo desde Supabase Cloud DB
     if (typeof supabaseClient !== 'undefined' && supabaseClient) {

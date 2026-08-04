@@ -31,7 +31,56 @@
     <link rel="preload" href="assets/css/index.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
     <noscript><link rel="stylesheet" href="assets/css/index.min.css" /></noscript>
 
+    <!-- Schema.org (JSON-LD) para SEO de Inmobiliaria -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "RealEstateAgent",
+      "name": "Norte Chico Properties",
+      "image": "https://banka.cl/PR_PLAZA_HUARAL_desktop.webp",
+      "@id": "https://banka.cl",
+      "url": "https://banka.cl",
+      "telephone": "+56982816844",
+      "priceRange": "$$",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Huaral, Chancay",
+        "addressRegion": "Lima",
+        "addressCountry": "PE"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": -11.4956,
+        "longitude": -77.2064
+      },
+      "openingHoursSpecification": {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ],
+        "opens": "09:00",
+        "closes": "18:00"
+      }
+    }
+    </script>
+
+    <!-- Microsoft Clarity (Heatmaps & Grabación de Sesiones) -->
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "ID_PROYECTO_CLARITY_AQUI");
+    </script>
+
 </head>
+
 
 <body>
     <!-- NAVEGACIÓN -->
