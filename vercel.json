@@ -1,4 +1,11 @@
 {
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/dashboard_admin",
+      "destination": "/dashboard_admin.html"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
