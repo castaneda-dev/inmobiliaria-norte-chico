@@ -279,14 +279,26 @@
         }
 
         .carousel-dot {
-            width: 8px;
-            height: 8px;
+            position: relative;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.4);
             border: none;
             cursor: pointer;
             transition: all 0.3s ease;
         }
+
+        .carousel-dot::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 48px;
+            min-height: 48px;
+        }
+
 
         .carousel-dot.active {
             background: var(--gold-light);

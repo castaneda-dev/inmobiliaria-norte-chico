@@ -370,11 +370,15 @@ const dotsContainer = document.getElementById('carouselDots');
 if (slides.length > 0 && track && dotsContainer) {
     slides.forEach((_, index) => {
         const dot = document.createElement('button');
+        dot.type = 'button';
         dot.classList.add('carousel-dot');
+        dot.setAttribute('aria-label', `Ver imagen ${index + 1} de ${slides.length}`);
+        dot.setAttribute('title', `Ver imagen ${index + 1}`);
         if (index === 0) dot.classList.add('active');
         dot.addEventListener('click', () => goToSlide(index));
         dotsContainer.appendChild(dot);
     });
+
 
     const dots = document.querySelectorAll('.carousel-dot');
 

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Norte Chico Properties | Lotes e Inmuebles en Huaral y Chancay</title>
 
     <!-- SEO & Open Graph -->
@@ -70,69 +70,73 @@
                     <img src="PR_ECOTRULY_PARK_desktop.webp" alt="EcoTruly Park" class="carousel-img" decoding="async" width="1000" height="555">
                     <img src="PR_CHANCAY_desktop.webp" alt="Chancay" class="carousel-img" decoding="async" width="1000" height="555">
                 </div>
-                <button class="carousel-btn prev-btn" onclick="moveCarousel(-1)">&#10094;</button>
-                <button class="carousel-btn next-btn" onclick="moveCarousel(1)">&#10095;</button>
+                <button class="carousel-btn prev-btn" onclick="moveCarousel(-1)" aria-label="Imagen anterior" title="Imagen anterior">&#10094;</button>
+                <button class="carousel-btn next-btn" onclick="moveCarousel(1)" aria-label="Siguiente imagen" title="Siguiente imagen">&#10095;</button>
                 <div class="carousel-dots" id="carouselDots"></div>
             </div>
         </div>
     </header>
 
-    <!-- COLECCIÓN -->
-    <section class="featured-section fade-module" id="portafolio">
-        <h2 class="section-title">Nuestra <span class="text-gradient">Colección Residencial</span></h2>
-        <div class="filter-controls" id="filter-controls">
-            <button class="btn-outline btn-active" id="btn-todos" onclick="filtrarPorCategoria('todos')">Todos <span
-                    class="filter-count" id="count-todos">0</span></button>
-            <button class="btn-outline" id="btn-vivienda" onclick="filtrarPorCategoria('vivienda')">Casas <span
-                    class="filter-count" id="count-vivienda">0</span></button>
-            <button class="btn-outline" id="btn-terreno" onclick="filtrarPorCategoria('terreno')">Lotes de Inversión
-                <span class="filter-count" id="count-terreno">0</span></button>
-        </div>
-        <div class="properties-grid" id="grid-propiedades"></div>
-    </section>
-
-    <!-- CONTACTO / CRM -->
-    <section class="contact-module fade-module" id="contacto">
-        <div class="form-container">
-            <h2>Construye el futuro de <span class="text-gradient">tu Familia</span></h2>
-            <p>Déjenos sus datos para organizar un recorrido por nuestros lotes en Huaral y Chancay.</p>
-            
-            <div id="crm-prop-badge" style="display: none; background: rgba(203, 159, 116, 0.15); border: 1px solid var(--gold-light); color: var(--gold-light); padding: 12px 18px; border-radius: 12px; font-size: 14px; font-weight: 700; margin-bottom: 25px; text-align: center;"></div>
-
-            <div class="form-grid">
-                <input type="text" id="crm-nombre" placeholder="Nombre Completo" required />
-                <input type="email" id="crm-email" placeholder="Correo Electrónico" required />
-                <div class="phone-input-group">
-                    <select id="crm-prefijo" required>
-                        <option value="+51" selected>🇵🇪 +51</option>
-                        <option value="+56">🇨🇱 +56</option>
-                        <option value="+54">🇦🇷 +54</option>
-                        <option value="+57">🇨🇴 +57</option>
-                        <option value="+52">🇲🇽 +52</option>
-                        <option value="+1">🇺🇸 +1</option>
-                        <option value="+34">🇪🇸 +34</option>
-                    </select>
-                    <input type="tel" id="crm-telefono" placeholder="Celular (9 dígitos)" pattern="[0-9]{9}"
-                        maxlength="9" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required />
-                </div>
-                <select id="crm-interes" required>
-                    <option value="" disabled selected>¿Qué estás buscando?</option>
-                    <option value="Casa de Campo">Lote para Mi Vivienda</option>
-                    <option value="Inversion Futuro">Inversión Patrimonial (Asegurar plusvalía)</option>
-                    <option value="Retiro">Mi Vivienda de Retiro / Jubilación tranquila</option>
-                </select>
-                <button class="btn-pill form-full" style="margin-top: 10px;"
-                    onclick="enviarCRM('Norte Chico')">CONTACTAR CON UN ASESOR</button>
+    <!-- PUNTO DE REFERENCIA PRINCIPAL (MAIN) -->
+    <main>
+        <!-- COLECCIÓN -->
+        <section class="featured-section fade-module" id="portafolio">
+            <h2 class="section-title">Nuestra <span class="text-gradient">Colección Residencial</span></h2>
+            <div class="filter-controls" id="filter-controls">
+                <button class="btn-outline btn-active" id="btn-todos" onclick="filtrarPorCategoria('todos')">Todos <span
+                        class="filter-count" id="count-todos">0</span></button>
+                <button class="btn-outline" id="btn-vivienda" onclick="filtrarPorCategoria('vivienda')">Casas <span
+                        class="filter-count" id="count-vivienda">0</span></button>
+                <button class="btn-outline" id="btn-terreno" onclick="filtrarPorCategoria('terreno')">Lotes de Inversión
+                    <span class="filter-count" id="count-terreno">0</span></button>
             </div>
-        </div>
-    </section>
+            <div class="properties-grid" id="grid-propiedades"></div>
+        </section>
+
+        <!-- CONTACTO / CRM -->
+        <section class="contact-module fade-module" id="contacto">
+            <div class="form-container">
+                <h2>Construye el futuro de <span class="text-gradient">tu Familia</span></h2>
+                <p>Déjenos sus datos para organizar un recorrido por nuestros lotes en Huaral y Chancay.</p>
+                
+                <div id="crm-prop-badge" style="display: none; background: rgba(203, 159, 116, 0.15); border: 1px solid var(--gold-light); color: var(--gold-light); padding: 12px 18px; border-radius: 12px; font-size: 14px; font-weight: 700; margin-bottom: 25px; text-align: center;"></div>
+
+                <div class="form-grid">
+                    <input type="text" id="crm-nombre" placeholder="Nombre Completo" required aria-label="Nombre Completo" />
+                    <input type="email" id="crm-email" placeholder="Correo Electrónico" required aria-label="Correo Electrónico" />
+                    <div class="phone-input-group">
+                        <select id="crm-prefijo" required aria-label="Prefijo telefónico de país">
+                            <option value="+51" selected>🇵🇪 +51</option>
+                            <option value="+56">🇨🇱 +56</option>
+                            <option value="+54">🇦🇷 +54</option>
+                            <option value="+57">🇨🇴 +57</option>
+                            <option value="+52">🇲🇽 +52</option>
+                            <option value="+1">🇺🇸 +1</option>
+                            <option value="+34">🇪🇸 +34</option>
+                        </select>
+                        <input type="tel" id="crm-telefono" placeholder="Celular (9 dígitos)" pattern="[0-9]{9}"
+                            maxlength="9" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required aria-label="Número de celular" />
+                    </div>
+                    <select id="crm-interes" required aria-label="Tipo de inmueble o consulta">
+                        <option value="" disabled selected>¿Qué estás buscando?</option>
+                        <option value="Casa de Campo">Lote para Mi Vivienda</option>
+                        <option value="Inversion Futuro">Inversión Patrimonial (Asegurar plusvalía)</option>
+                        <option value="Retiro">Mi Vivienda de Retiro / Jubilación tranquila</option>
+                    </select>
+                    <button class="btn-pill form-full" style="margin-top: 10px;"
+                        onclick="enviarCRM('Norte Chico')">CONTACTAR CON UN ASESOR</button>
+                </div>
+            </div>
+        </section>
+    </main>
 
     <!-- FOOTER -->
     <footer class="fade-module"
         style="background: var(--bg-black); padding: 40px 5% 40px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05);">
         <div class="logo-main" style="font-size: 16px; margin-bottom: 10px;">NORTE CHICO PROPERTIES</div>
-        <p style="font-size: 12px; color: #666;">2026 © Norte Chico S.A.C. Todos los derechos reservados.</p>
+        <p style="font-size: 12px; color: #a3a3a3;">2026 © Norte Chico S.A.C. Todos los derechos reservados.</p>
     </footer>
+
 
     <!-- WHATSAPP FLOATING BUTTON -->
     <a href="https://wa.me/56982816844?text=Hola,%20me%20interesa%20información%20sobre%20sus%20propiedades"
