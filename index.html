@@ -64,11 +64,11 @@
             <div class="hero-video">
                 <div class="carousel-track" id="carouselTrack">
                     <!-- Primera imagen: carga prioritaria para el Largest Contentful Paint -->
-                    <img src="PR_PLAZA_HUARAL_desktop.webp" alt="Plaza de Armas de Huaral" class="carousel-img" fetchpriority="high" decoding="async">
-                    <!-- Imágenes 2, 3, 4: sin lazy (regla README #3 — carrusel horizontal) -->
-                    <img src="PR_PLAZA_CHANCAY_desktop.webp" alt="Plaza de Armas de Chancay" class="carousel-img" decoding="async">
-                    <img src="PR_ECOTRULY_PARK_desktop.webp" alt="EcoTruly Park" class="carousel-img" decoding="async">
-                    <img src="PR_CHANCAY_desktop.webp" alt="Chancay" class="carousel-img" decoding="async">
+                    <img src="PR_PLAZA_HUARAL_desktop.webp" alt="Plaza de Armas de Huaral" class="carousel-img" fetchpriority="high" decoding="async" width="1000" height="555">
+                    <!-- Imágenes 2, 3, 4: dimensiones explícitas para evitar CLS -->
+                    <img src="PR_PLAZA_CHANCAY_desktop.webp" alt="Plaza de Armas de Chancay" class="carousel-img" decoding="async" width="1000" height="555">
+                    <img src="PR_ECOTRULY_PARK_desktop.webp" alt="EcoTruly Park" class="carousel-img" decoding="async" width="1000" height="555">
+                    <img src="PR_CHANCAY_desktop.webp" alt="Chancay" class="carousel-img" decoding="async" width="1000" height="555">
                 </div>
                 <button class="carousel-btn prev-btn" onclick="moveCarousel(-1)">&#10094;</button>
                 <button class="carousel-btn next-btn" onclick="moveCarousel(1)">&#10095;</button>
@@ -174,25 +174,29 @@
     <script src="assets/js/api.obf.js" defer></script>
     <script src="assets/js/index-app.obf.js" defer></script>
 
-    <!-- Meta Pixel Code (Deferred) -->
+    <!-- Meta Pixel Code (Diferido a 3s tras carga para no bloquear hilo principal móvil) -->
     <script>
-        !function (f, b, e, v, n, t, s) {
-            if (f.fbq) return; n = f.fbq = function () {
-                n.callMethod ?
-                    n.callMethod.apply(n, arguments) : n.queue.push(arguments)
-            };
-            if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
-            n.queue = []; t = b.createElement(e); t.async = !0;
-            t.src = v; s = b.getElementsByTagName(e)[0];
-            s.parentNode.insertBefore(t, s)
-        }(window, document, 'script',
-            'https://connect.facebook.net/en_US/fbevents.js');
-        fbq('init', 'TU_ID_DE_PIXEL_AQUI'); // REEMPLAZAR CON TU ID DE META ADS
-        fbq('track', 'PageView');
+        window.addEventListener('load', function () {
+            setTimeout(function () {
+                !function (f, b, e, v, n, t, s) {
+                    if (f.fbq) return; n = f.fbq = function () {
+                        n.callMethod ?
+                            n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+                    };
+                    if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
+                    n.queue = []; t = b.createElement(e); t.async = !0;
+                    t.src = v; s = b.getElementsByTagName(e)[0];
+                    s.parentNode.insertBefore(t, s)
+                }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+                fbq('init', 'TU_ID_DE_PIXEL_AQUI');
+                fbq('track', 'PageView');
+            }, 3000);
+        });
     </script>
     <noscript><img height="1" width="1" style="display:none"
             src="https://www.facebook.com/tr?id=TU_ID_DE_PIXEL_AQUI&ev=PageView&noscript=1" /></noscript>
     <!-- End Meta Pixel Code -->
 </body>
+
 
 </html>
