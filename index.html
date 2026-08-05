@@ -79,6 +79,19 @@
         })(window, document, "clarity", "script", "xx8olz05i8");
     </script>
 
+    <!-- Protección Anti-Scraping / Anti-DevTools -->
+    <script>
+        document.addEventListener('contextmenu', event => event.preventDefault()); // Bloquea clic derecho
+        document.addEventListener('keydown', function(e) {
+            // Bloquea F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+            if (e.key === 'F12' || 
+               (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'i' || e.key === 'j')) || 
+               (e.ctrlKey && (e.key === 'U' || e.key === 'u'))) {
+                e.preventDefault();
+            }
+        });
+    </script>
+
 </head>
 
 
@@ -223,7 +236,7 @@
 
     <!-- Supabase SDK & Config (defer: no bloquea el renderizado del body) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-    <script src="supabase_config.js" defer></script>
+    <script src="supabase_config.obf.js" defer></script>
 
     <!-- JS Ofuscado Nivel B (código protegido, ilegible al inspector) -->
     <script src="assets/js/api.obf.js" defer></script>

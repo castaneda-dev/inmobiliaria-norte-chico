@@ -15,43 +15,48 @@ const JS_DIR = path.join(ROOT, 'assets', 'js');
 
 // Archivos a ofuscar (solo los de la landing pública)
 const targets = [
+    { input: 'supabase_config.js', output: 'supabase_config.obf.js' },
     { input: 'api.js',        output: 'api.obf.js' },
     { input: 'index-app.js',  output: 'index-app.obf.js' },
 ];
 
-// Configuración Nivel B: Máxima ofuscación manteniendo compatibilidad
+// Configuración Nivel A: Máxima Seguridad Militar
 const OBFUSCATOR_CONFIG = {
     compact: true,
-    controlFlowFlattening: true,          // Mezcla el flujo del programa en un switch gigante
-    controlFlowFlatteningThreshold: 0.5,  // 50% del código afectado (balance rendimiento/seguridad)
-    numbersToExpressions: true,            // 42 → (0x2a | 0)
+    controlFlowFlattening: true,          // Mezcla el flujo del programa
+    controlFlowFlatteningThreshold: 1.0,  // 100% del código afectado (Máxima seguridad)
+    numbersToExpressions: true,
     simplify: true,
-    stringArrayShuffle: true,             // Baraja el array de strings
-    splitStrings: true,                   // 'hola' → 'ho' + 'la'
-    splitStringsChunkLength: 5,
-    stringArray: true,                    // Convierte todos los strings a referencias de array
+    stringArrayShuffle: true,
+    splitStrings: true,
+    splitStringsChunkLength: 3,
+    stringArray: true,
     stringArrayCallsTransform: true,
-    stringArrayEncoding: ['base64'],      // Codifica strings en base64
+    stringArrayEncoding: ['base64', 'rc4'], // Doble codificación de textos
     stringArrayIndexShift: true,
     stringArrayRotate: true,
-    stringArrayThreshold: 0.75,           // 75% de strings ofuscados
-    unicodeEscapeSequence: false,         // Evitar unicodes que inflan el tamaño
-    deadCodeInjection: false,             // Desactivado: infla el archivo mucho
-    debugProtection: false,               // Desactivado: puede romper DevTools en desarrollo
-    selfDefending: false,                 // Desactivado: puede crear bucles infinitos
-    identifierNamesGenerator: 'hexadecimal', // Variables: _0x1a2b, _0xc3d4
-    renameGlobals: false,                 // NO renombrar globals (rompe window.api, etc.)
+    stringArrayThreshold: 1.0,           // 100% de strings ofuscados
+    unicodeEscapeSequence: true,         // Oculta completamente caracteres reconocibles
+    deadCodeInjection: true,             // Inyecta código falso para despistar
+    deadCodeInjectionThreshold: 0.4,
+    debugProtection: true,               // Congela el navegador si abren F12 (DevTools)
+    debugProtectionInterval: 2000,
+    selfDefending: true,                 // Autodestruye el código si intentan formatearlo (beautify)
+    identifierNamesGenerator: 'hexadecimal', 
+    renameGlobals: false,                 // NO renombrar globals (rompe window.api, window.supabaseClient)
 };
 
 async function obfuscate() {
     console.log('🔒 Iniciando ofuscación Nivel B...\n');
 
     for (const { input, output } of targets) {
-        const inputPath  = path.join(JS_DIR, input);
-        const outputPath = path.join(JS_DIR, output);
+        // Determinar la ruta: si es supabase_config, está en ROOT, si no, en JS_DIR
+        const isRootFile = input === 'supabase_config.js';
+        const inputPath  = isRootFile ? path.join(ROOT, input) : path.join(JS_DIR, input);
+        const outputPath = isRootFile ? path.join(ROOT, output) : path.join(JS_DIR, output);
 
         if (!fs.existsSync(inputPath)) {
-            console.log(`⚠️  Omitido (no existe): ${input}`);
+            console.log(`⚠️  Omitido (no existe): ${inputPath}`);
             continue;
         }
 
