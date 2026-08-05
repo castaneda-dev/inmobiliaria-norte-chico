@@ -305,6 +305,23 @@ async function enviarCRM(origenMarca) {
     // 1. Guardar en Supabase DB Cloud usando api.js (sin localStorage)
     const success = await api.saveClient(payload);
 
+    // 2. Reportar al Meta CAPI (Server-Side Tracking) para optimizar Ads
+    if (success) {
+        try {
+            // Mandamos los hashes vacíos por ahora (se pueden hashear luego con Web Crypto API)
+            // o delegar la responsabilidad al backend
+            fetch('/api/meta_capi', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    event_name: 'Lead',
+                    user_data: { email_hash: email, phone_hash: telefono },
+                    custom_data: { interest: interes }
+                })
+            }).catch(e => console.log('CAPI Async ignore:', e));
+        } catch(e) {}
+    }
+
     if (btnSubmit) {
         btnSubmit.disabled = false;
         btnSubmit.innerHTML = 'Solicitar Asesoría Personalizada';
