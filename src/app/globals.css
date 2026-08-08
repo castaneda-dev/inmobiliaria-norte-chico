@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: #EFECE6; /* arena */
+  color: #1E2229; /* asfalto */
+}

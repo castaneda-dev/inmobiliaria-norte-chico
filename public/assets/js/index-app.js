@@ -110,7 +110,7 @@ function renderizarColeccion(datos) {
             : '';
 
         gridContenedor.innerHTML += `
-            <article class="property-card" onclick="abrirModal(${prop.id})">
+            <article class="property-card" onclick="window.location.href='/proyecto/${prop.id}'">
                 <div class="property-img">
                     <div class="tag-status">${prop.estado}</div>
                     ${photoBadge}
