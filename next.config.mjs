@@ -6,6 +6,10 @@ const nextConfig = {
         source: '/',
         destination: '/index.html',
       },
+      {
+        source: '/dashboard_admin',
+        destination: '/admin',
+      },
     ];
   },
   async headers() {
