@@ -1,7 +1,9 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { supabase } from '../../supabaseClient';
+import { savePropertyAction, deletePropertyAction } from '../../app/actions/adminActions';
 import { 
   Building2, Users, TrendingUp, ShieldCheck, Plus, Trash2, Edit3, 
   Search, LogOut, Lock, ArrowLeft, RefreshCw, CheckCircle, MessageSquare, PhoneCall
@@ -22,6 +24,7 @@ const normalizeImageUrl = (url) => {
 
 export default function AdminDashboardView() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [sessionToken, setSessionToken] = useState(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState('');
@@ -48,12 +51,26 @@ export default function AdminDashboardView() {
         const { data } = await supabase.auth.getSession();
         if (data?.session) {
           setIsAuthenticated(true);
+          setSessionToken(data.session.access_token);
         }
       } catch (err) {
         console.error("Session check error:", err);
       }
     }
     checkSession();
+
+    // Sincronizar sesión con cookies para el Middleware
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=${session.expires_in}; secure; samesite=lax`;
+      } else {
+        document.cookie = `sb-access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+      }
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
   }, []);
 
   // Supabase Auth Login with Email & Password
@@ -67,19 +84,12 @@ export default function AdminDashboardView() {
       });
 
       if (error) {
-        // Credential fallback for local testing
-        if (
-          (email === 'admin@inmobiliarianortechico.pe' || email === 'admin@nortechico.pe' || email === 'admin@email.com') &&
-          (password === 'nortechico2026' || password === 'admin123')
-        ) {
-          setIsAuthenticated(true);
-          return;
-        }
         throw error;
       }
 
       if (data?.session) {
         setIsAuthenticated(true);
+        setSessionToken(data.session.access_token);
       }
     } catch (err) {
       setAuthError(err.message || 'Correo o contraseña incorrectos');
@@ -132,13 +142,9 @@ export default function AdminDashboardView() {
         estado: propForm.estado
       };
 
-      if (editingProp) {
-        const { error } = await supabase.from('propiedades').update(payload).eq('id', editingProp.id);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.from('propiedades').insert([payload]);
-        if (error) throw error;
-      }
+      const result = await savePropertyAction(sessionToken, payload, !!editingProp, editingProp?.id);
+      
+      if (!result.success) throw new Error(result.error);
 
       setShowPropModal(false);
       setEditingProp(null);
@@ -180,8 +186,8 @@ export default function AdminDashboardView() {
   const handleDeleteProperty = async (id) => {
     if (!confirm("¿Seguro de eliminar este proyecto del catálogo?")) return;
     try {
-      const { error } = await supabase.from('propiedades').delete().eq('id', id);
-      if (error) throw error;
+      const result = await deletePropertyAction(sessionToken, id);
+      if (!result.success) throw new Error(result.error);
       fetchData();
     } catch (err) {
       alert("Error al eliminar: " + err.message);

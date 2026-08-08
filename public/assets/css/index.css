@@ -308,6 +308,10 @@
         .featured-section {
             padding: 80px 5% 100px;
             background: var(--bg-black);
+            width: 100%;
+        }
+
+        .featured-container {
             max-width: 1300px;
             margin: 0 auto;
         }

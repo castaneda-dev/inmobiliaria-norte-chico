@@ -1,4 +1,5 @@
 import './globals.css';
+import '../../public/assets/css/index.min.css';
 import Script from 'next/script';
 import SecurityLayer from '../components/SecurityLayer';
 
