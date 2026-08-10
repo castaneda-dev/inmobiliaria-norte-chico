@@ -5,29 +5,66 @@ import SecurityLayer from '../components/SecurityLayer';
 
 export const metadata = {
   metadataBase: new URL('https://inmobiliarianortechico.pe'),
-  title: 'Norte Chico Properties | Lotes e Inmuebles en Huaral y Chancay',
-  description: 'Invierte en lotes residenciales y terrenos de alta plusvalía en Huaral y Chancay. Grupo Inmobiliario Norte Chico. Agenda una visita hoy.',
-  robots: 'index, follow',
+  title: 'Inmobiliaria Norte Chico | Lotes y Inmuebles en Chancay y Huaral',
+  description: 'Inmobiliaria Norte Chico en Chancay y Huaral. Terrenos y lotes de alta plusvalía e inmuebles residenciales en el Norte Chico de Lima, Perú. Agenda tu visita.',
+  keywords: [
+    'Inmobiliaria Norte Chico',
+    'Norte Chico',
+    'Chancay',
+    'Huaral',
+    'Inmobiliaria Chancay',
+    'Inmobiliaria Huaral',
+    'Lotes en Chancay',
+    'Terrenos en Huaral',
+    'Inmuebles Norte Chico',
+    'Venta de lotes Chancay Huaral',
+  ],
+  alternates: {
+    canonical: 'https://inmobiliarianortechico.pe',
+  },
+  verification: {
+    google: 'UvpZvDJeW4lXppCK7ikkx5gxeJuPFh6XbjiEBpCZdhc',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   openGraph: {
-    title: 'Norte Chico Properties | Lotes en Huaral y Chancay',
-    description: 'Terrenos e inmuebles de alta plusvalía en el Norte Chico del Perú. Asesoría personalizada sin costo.',
+    title: 'Inmobiliaria Norte Chico | Lotes y Inmuebles en Chancay y Huaral',
+    description: 'Terrenos e inmuebles de alta plusvalía en Chancay y Huaral. Inmobiliaria Norte Chico te brinda asesoría personalizada sin costo.',
     type: 'website',
     url: 'https://inmobiliarianortechico.pe',
+    siteName: 'Inmobiliaria Norte Chico',
+    locale: 'es_PE',
     images: [
       {
         url: '/PR_GLORIETA_DELUXE.webp',
         width: 1200,
         height: 630,
-        alt: 'Norte Chico Properties',
+        alt: 'Inmobiliaria Norte Chico - Chancay y Huaral',
       },
     ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Inmobiliaria Norte Chico | Lotes y Inmuebles en Chancay y Huaral',
+    description: 'Terrenos e inmuebles de alta plusvalía en Chancay y Huaral. Inmobiliaria Norte Chico.',
+    images: ['/PR_GLORIETA_DELUXE.webp'],
   },
 };
 
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'RealEstateAgent',
-  'name': 'Norte Chico Properties',
+  '@type': ['RealEstateAgent', 'LocalBusiness'],
+  'name': 'Inmobiliaria Norte Chico',
+  'alternateName': ['Norte Chico', 'Grupo Inmobiliario Norte Chico', 'Inmobiliaria Norte Chico Chancay Huaral'],
   'image': 'https://inmobiliarianortechico.pe/PR_GLORIETA_DELUXE.webp',
   '@id': 'https://inmobiliarianortechico.pe',
   'url': 'https://inmobiliarianortechico.pe',
@@ -35,7 +72,7 @@ const jsonLd = {
   'priceRange': '$$',
   'address': {
     '@type': 'PostalAddress',
-    'addressLocality': 'Huaral, Chancay',
+    'addressLocality': 'Huaral y Chancay',
     'addressRegion': 'Lima',
     'addressCountry': 'PE',
   },
@@ -44,6 +81,20 @@ const jsonLd = {
     'latitude': -11.4956,
     'longitude': -77.2064,
   },
+  'areaServed': [
+    {
+      '@type': 'AdministrativeArea',
+      'name': 'Chancay',
+    },
+    {
+      '@type': 'AdministrativeArea',
+      'name': 'Huaral',
+    },
+    {
+      '@type': 'AdministrativeArea',
+      'name': 'Norte Chico',
+    },
+  ],
   'openingHoursSpecification': {
     '@type': 'OpeningHoursSpecification',
     'dayOfWeek': [

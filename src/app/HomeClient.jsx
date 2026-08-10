@@ -219,14 +219,14 @@ export default function HomeClient({ initialProperties }) {
       <header className="hero hero-initial">
           <div className="hero-grid">
               <div className="hero-text">
-                  <h1>Invierte en tu futuro<br/>y en el de tu<br/>familia</h1>
-                  <span className="sub-heading text-gradient">Descubre tu próximo hogar</span>
+                  <h1>Inmobiliaria Norte Chico<br/><span style={{ fontSize: '0.8em', fontWeight: 600, display: 'block', marginTop: '10px' }}>Lotes e Inmuebles en Chancay y Huaral</span></h1>
+                  <span className="sub-heading text-gradient">Terrenos de Alta Plusvalía y Proyectos Residenciales</span>
                   <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', justifyContent: 'left' }}>
                       <a href="#contacto" className="btn-pill" style={{ fontSize: '13px' }}>Contactar a un asesor</a>
                       <a href="#portafolio" className="btn-outline">Ver Lotes Disponibles</a>
                   </div>
                   <p style={{ marginTop: '20px', fontSize: '12px', color: '#888', textAlign: 'left' }}>
-                      *Terrenos de alta plusvalía ideales para retiro y bienestar familiar.
+                      *Terrenos e inmuebles de alta plusvalía en Chancay y Huaral para inversión y retiro familiar.
                   </p>
               </div>
               
@@ -387,8 +387,8 @@ export default function HomeClient({ initialProperties }) {
 
       {/* FOOTER */}
       <footer className="fade-module" style={{ background: 'var(--bg-black)', padding: '40px 5% 40px', textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-          <div className="logo-main" style={{ fontSize: '16px', marginBottom: '10px' }}>NORTE CHICO PROPERTIES</div>
-          <p style={{ fontSize: '12px', color: '#a3a3a3' }}>2026 © Norte Chico S.A.C. Todos los derechos reservados.</p>
+          <div className="logo-main" style={{ fontSize: '16px', marginBottom: '10px' }}>INMOBILIARIA NORTE CHICO | CHANCAY Y HUARAL</div>
+          <p style={{ fontSize: '12px', color: '#a3a3a3' }}>2026 © Inmobiliaria Norte Chico S.A.C. Todos los derechos reservados.</p>
       </footer>
 
       {/* WHATSAPP FLOATING BUTTON */}
