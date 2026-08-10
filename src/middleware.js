@@ -4,8 +4,13 @@ export function middleware(req) {
   const { pathname } = req.nextUrl;
   const token = req.cookies.get('sb-access-token')?.value;
 
-  // Si intenta acceder a un sub-path protegido sin token, redirigir al CRM principal
-  if ((pathname.startsWith('/crm/') || pathname.startsWith('/dashboard_admin/') || pathname.startsWith('/admin/')) && !token) {
+  // Definir rutas protegidas (admin, dashboard_admin y subrutas de crm, permitiendo /crm para login)
+  const isProtected = 
+    pathname.startsWith('/admin') || 
+    pathname.startsWith('/dashboard_admin') || 
+    (pathname.startsWith('/crm/') && pathname !== '/crm');
+
+  if (isProtected && !token) {
     const url = req.nextUrl.clone();
     url.pathname = '/crm';
     url.searchParams.set('error', 'unauthorized');
@@ -16,5 +21,11 @@ export function middleware(req) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/dashboard_admin/:path*', '/crm/:path*'],
+  matcher: [
+    '/admin/:path*', 
+    '/admin',
+    '/dashboard_admin/:path*', 
+    '/dashboard_admin',
+    '/crm/:path*'
+  ],
 };

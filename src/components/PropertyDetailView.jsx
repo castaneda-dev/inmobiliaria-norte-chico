@@ -4,6 +4,24 @@ import Link from 'next/link';
 import Image from 'next/image';
 import WhatsAppButton from './WhatsAppButton';
 
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Radio de la Tierra en km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+}
+
+function estimateDrivingTime(distanceKm) {
+  const realDistance = distanceKm * 1.3; // Factor de desvío de calles
+  const timeMinutes = Math.round((realDistance / 35) * 60); // 35 km/h velocidad promedio
+  return Math.max(2, timeMinutes);
+}
+
 export default function PropertyDetailView({ initialProperty }) {
   const property = initialProperty;
   
@@ -39,6 +57,16 @@ export default function PropertyDetailView({ initialProperty }) {
   const googleEmbedUrl = `https://maps.google.com/maps?q=${lat},${lng}&hl=es&z=13&output=embed`;
   const googleDirectUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
   const googleRouteMegapuerto = `https://www.google.com/maps/dir/?api=1&origin=${lat},${lng}&destination=-11.5694,-77.2676`;
+
+  // Calcular distancias y tiempos de viaje de forma dinámica
+  const distMegapuerto = useMemo(() => calculateDistance(lat, lng, -11.5830, -77.2680), [lat, lng]);
+  const timeMegapuerto = useMemo(() => estimateDrivingTime(distMegapuerto), [distMegapuerto]);
+
+  const distPlazaChancay = useMemo(() => calculateDistance(lat, lng, -11.5694, -77.2676), [lat, lng]);
+  const timePlazaChancay = useMemo(() => estimateDrivingTime(distPlazaChancay), [distPlazaChancay]);
+
+  const distPlazaHuaral = useMemo(() => calculateDistance(lat, lng, -11.4956, -77.2064), [lat, lng]);
+  const timePlazaHuaral = useMemo(() => estimateDrivingTime(distPlazaHuaral), [distPlazaHuaral]);
 
   const showToast = (msg, type = 'success') => {
     setToastMessage({ msg, type });
@@ -147,9 +175,6 @@ export default function PropertyDetailView({ initialProperty }) {
             <span style={{ background: 'linear-gradient(135deg, #cb9f74, #e2b988)', color: '#000', padding: '4px 14px', borderRadius: '16px', fontSize: '11px', fontWeight: 800, textTransform: 'uppercase' }}>
               {property.tipo_activo || 'Terreno'}
             </span>
-            <span style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', color: '#10b981', padding: '4px 14px', borderRadius: '16px', fontSize: '11px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '5px' }}>
-              ✓ Saneado 100% SUNARP
-            </span>
           </div>
 
           <h1 style={{ fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 800, lineHeight: '1.15', margin: '0 0 10px 0', letterSpacing: '-0.5px' }}>
@@ -210,31 +235,6 @@ export default function PropertyDetailView({ initialProperty }) {
                 ))}
               </div>
             )}
-
-            {/* BLOQUE DE SELLOS DE SEGURIDAD JURÍDICA */}
-            <div style={{ marginTop: '30px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '20px', padding: '24px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ fontSize: '24px' }}>🛡️</div>
-                <div>
-                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#fff' }}>Garantía Registral</div>
-                  <div style={{ fontSize: '11px', color: '#888' }}>Partida e independización limpia en SUNARP</div>
-                </div>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ fontSize: '24px' }}>📜</div>
-                <div>
-                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#fff' }}>Transferencia Inmediata</div>
-                  <div style={{ fontSize: '11px', color: '#888' }}>Sin cargas ni gravámenes pendientes</div>
-                </div>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ fontSize: '24px' }}>⚡</div>
-                <div>
-                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#fff' }}>Servicios Básicos</div>
-                  <div style={{ fontSize: '11px', color: '#888' }}>Factibilidad técnica habilitada</div>
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* COLUMNA DERECHA: CAJA DE PRECIO Y ACCIONES */}
@@ -359,15 +359,21 @@ export default function PropertyDetailView({ initialProperty }) {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px' }}>
               <div style={{ background: 'rgba(255,255,255,0.03)', padding: '12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
                 <div style={{ fontSize: '11px', color: '#888', fontWeight: 600 }}>⚓ Megapuerto Chancay</div>
-                <div style={{ fontSize: '14px', fontWeight: 800, color: '#cb9f74', marginTop: '2px' }}>~10 mins</div>
+                <div style={{ fontSize: '14px', fontWeight: 800, color: '#cb9f74', marginTop: '2px' }}>
+                  {distMegapuerto.toFixed(1)} km (~{timeMegapuerto} min)
+                </div>
               </div>
               <div style={{ background: 'rgba(255,255,255,0.03)', padding: '12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <div style={{ fontSize: '11px', color: '#888', fontWeight: 600 }}>🏙️ Plaza de Armas</div>
-                <div style={{ fontSize: '14px', fontWeight: 800, color: '#fff', marginTop: '2px' }}>~8 mins</div>
+                <div style={{ fontSize: '11px', color: '#888', fontWeight: 600 }}>🏙️ Plaza de Chancay</div>
+                <div style={{ fontSize: '14px', fontWeight: 800, color: '#fff', marginTop: '2px' }}>
+                  {distPlazaChancay.toFixed(1)} km (~{timePlazaChancay} min)
+                </div>
               </div>
               <div style={{ background: 'rgba(255,255,255,0.03)', padding: '12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <div style={{ fontSize: '11px', color: '#888', fontWeight: 600 }}>🌾 Valle Huaral</div>
-                <div style={{ fontSize: '14px', fontWeight: 800, color: '#fff', marginTop: '2px' }}>~12 mins</div>
+                <div style={{ fontSize: '11px', color: '#888', fontWeight: 600 }}>🏙️ Plaza de Huaral</div>
+                <div style={{ fontSize: '14px', fontWeight: 800, color: '#fff', marginTop: '2px' }}>
+                  {distPlazaHuaral.toFixed(1)} km (~{timePlazaHuaral} min)
+                </div>
               </div>
             </div>
 

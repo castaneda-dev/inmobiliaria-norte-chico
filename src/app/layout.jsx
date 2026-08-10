@@ -1,7 +1,6 @@
 import './globals.css';
 import '../../public/assets/css/index.min.css';
 import Script from 'next/script';
-import SecurityLayer from '../components/SecurityLayer';
 
 export const metadata = {
   metadataBase: new URL('https://inmobiliarianortechico.pe'),
@@ -124,7 +123,6 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className="bg-arena text-asfalto antialiased overflow-x-hidden selection:bg-terracota selection:text-arena">
-        <SecurityLayer />
         <div className="noise-overlay"></div>
         {children}
 
