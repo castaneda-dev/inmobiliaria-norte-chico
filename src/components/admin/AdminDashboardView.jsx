@@ -43,7 +43,7 @@ export default function AdminDashboardView() {
   const [editingProp, setEditingProp] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [propForm, setPropForm] = useState({
-    titulo: '', precio: '', area_m2: '', tipo_activo: 'Terreno', zonificacion: 'Residencial', imagen_url: '', descripcion: '', estado: 'Disponible', ubicacion: ''
+    titulo: '', precio: '', area_m2: '', tipo_activo: 'Terreno', zonificacion: 'Residencial', imagen_url: '', descripcion: '', estado: 'Disponible', ubicacion: '', latitud: '', longitud: ''
   });
 
   // Check active Supabase Auth session on mount
@@ -142,7 +142,9 @@ export default function AdminDashboardView() {
         imagen_url: propForm.imagen_url || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=85',
         descripcion: propForm.descripcion,
         estado: propForm.estado,
-        ubicacion: propForm.ubicacion || 'Chancay'
+        ubicacion: propForm.ubicacion || 'Chancay',
+        latitud: propForm.latitud ? parseFloat(propForm.latitud) : null,
+        longitud: propForm.longitud ? parseFloat(propForm.longitud) : null
       };
 
       const result = await savePropertyAction(sessionToken, payload, !!editingProp, editingProp?.id);
@@ -151,7 +153,7 @@ export default function AdminDashboardView() {
 
       setShowPropModal(false);
       setEditingProp(null);
-      setPropForm({ titulo: '', precio: '', area_m2: '', tipo_activo: 'Terreno', zonificacion: 'Residencial', imagen_url: '', descripcion: '', estado: 'Disponible', ubicacion: '' });
+      setPropForm({ titulo: '', precio: '', area_m2: '', tipo_activo: 'Terreno', zonificacion: 'Residencial', imagen_url: '', descripcion: '', estado: 'Disponible', ubicacion: '', latitud: '', longitud: '' });
       fetchData();
     } catch (err) {
       console.error("Internal error saving property:", err);
@@ -409,7 +411,7 @@ export default function AdminDashboardView() {
               <h3 className="font-sans font-black text-xl text-white mb-6">Acciones Rápidas del Administrador</h3>
               <div className="flex flex-wrap gap-4">
                 <button 
-                  onClick={() => { setEditingProp(null); setPropForm({ titulo: '', precio: '', area_m2: '', tipo_activo: 'Terreno', zonificacion: 'Residencial', imagen_url: '', descripcion: '', estado: 'Disponible', ubicacion: '' }); setShowPropModal(true); }}
+                  onClick={() => { setEditingProp(null); setPropForm({ titulo: '', precio: '', area_m2: '', tipo_activo: 'Terreno', zonificacion: 'Residencial', imagen_url: '', descripcion: '', estado: 'Disponible', ubicacion: '', latitud: '', longitud: '' }); setShowPropModal(true); }}
                   className="bg-terracota text-white px-6 py-3.5 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-[#a64b2b] transition-colors shadow-lg"
                 >
                   <Plus size={16} /> Crear Nueva Propiedad
@@ -431,7 +433,7 @@ export default function AdminDashboardView() {
             <div className="flex justify-between items-center">
               <h3 className="font-sans font-black text-2xl text-white">Gestión de Propiedades</h3>
               <button 
-                onClick={() => { setEditingProp(null); setPropForm({ titulo: '', precio: '', area_m2: '', tipo_activo: 'Terreno', zonificacion: 'Residencial', imagen_url: '', descripcion: '', estado: 'Disponible', ubicacion: '' }); setShowPropModal(true); }}
+                onClick={() => { setEditingProp(null); setPropForm({ titulo: '', precio: '', area_m2: '', tipo_activo: 'Terreno', zonificacion: 'Residencial', imagen_url: '', descripcion: '', estado: 'Disponible', ubicacion: '', latitud: '', longitud: '' }); setShowPropModal(true); }}
                 className="bg-terracota text-white px-6 py-3 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-[#a64b2b] transition-colors shadow-lg"
               >
                 <Plus size={16} /> Agregar Propiedad
@@ -487,7 +489,9 @@ export default function AdminDashboardView() {
                                   imagen_url: p.imagen_url || p.imagen || '',
                                   descripcion: p.descripcion || '',
                                   estado: p.estado || 'Disponible',
-                                  ubicacion: p.ubicacion || ''
+                                  ubicacion: p.ubicacion || '',
+                                  latitud: p.latitud !== null && p.latitud !== undefined ? String(p.latitud) : '',
+                                  longitud: p.longitud !== null && p.longitud !== undefined ? String(p.longitud) : ''
                                 });
                                 setShowPropModal(true);
                               }}
@@ -660,6 +664,27 @@ export default function AdminDashboardView() {
                     <option value="Reservado">Reservado</option>
                     <option value="Vendido">Vendido</option>
                   </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-terracota font-bold mb-1">Latitud (Coordenada Maps)</label>
+                  <input 
+                    type="number" step="any"
+                    value={propForm.latitud} onChange={e => setPropForm({...propForm, latitud: e.target.value})}
+                    className="w-full bg-asfalto/80 border border-arena/20 rounded-xl p-3 text-white focus:outline-none focus:border-terracota"
+                    placeholder="Ej. -11.5694"
+                  />
+                </div>
+                <div>
+                  <label className="block text-terracota font-bold mb-1">Longitud (Coordenada Maps)</label>
+                  <input 
+                    type="number" step="any"
+                    value={propForm.longitud} onChange={e => setPropForm({...propForm, longitud: e.target.value})}
+                    className="w-full bg-asfalto/80 border border-arena/20 rounded-xl p-3 text-white focus:outline-none focus:border-terracota"
+                    placeholder="Ej. -77.2676"
+                  />
                 </div>
               </div>
 

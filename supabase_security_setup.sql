@@ -53,6 +53,14 @@ USING (true)
 WITH CHECK (true);
 
 -- =====================================================================
+-- 1.5 AGREGAR COLUMNAS PARA GOOGLE MAPS (COORDENADAS)
+-- =====================================================================
+-- Estas columnas permiten guardar la ubicación GPS exacta de cada proyecto.
+ALTER TABLE propiedades ADD COLUMN IF NOT EXISTS latitud NUMERIC(10, 7);
+ALTER TABLE propiedades ADD COLUMN IF NOT EXISTS longitud NUMERIC(10, 7);
+
+
+-- =====================================================================
 -- 2. CONFIGURACIÓN DEL STORAGE (IMÁGENES DE PROPIEDADES)
 -- =====================================================================
 
