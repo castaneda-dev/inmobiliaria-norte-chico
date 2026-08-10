@@ -1,7 +1,7 @@
 -- ==============================================================================
--- PARCHE DE SEGURIDAD CRÍTICA (ROW LEVEL SECURITY)
+-- PARCHE DE SEGURIDAD CRÍTICA BLINDADA (ROW LEVEL SECURITY V2)
 -- PROYECTO: Norte Chico Properties
--- FECHA: 04 de Agosto de 2026
+-- FECHA: 10 de Agosto de 2026
 -- ==============================================================================
 
 -- INSTRUCCIONES:
@@ -12,38 +12,101 @@
 -- 5. Presiona el botón verde "RUN" (Ejecutar) en la parte inferior derecha.
 
 -- ------------------------------------------------------------------------------
--- 1. SEGURIDAD PARA LA TABLA DE PROPIEDADES (Catálogo)
+-- 1. LIMPIEZA DE POLÍTICAS ANTIGUAS/INSEGURA (SI EXISTEN)
 -- ------------------------------------------------------------------------------
--- Habilitar seguridad
+DROP POLICY IF EXISTS "Permitir edicion solo a admins" ON propiedades;
+DROP POLICY IF EXISTS "Permitir gestion de leads solo a admins" ON clientes;
+DROP POLICY IF EXISTS "Permitir lectura publica de propiedades" ON propiedades;
+DROP POLICY IF EXISTS "Permitir envio de formulario a prospectos" ON clientes;
+DROP POLICY IF EXISTS "propiedades_select_public" ON propiedades;
+DROP POLICY IF EXISTS "propiedades_insert_admin" ON propiedades;
+DROP POLICY IF EXISTS "propiedades_update_admin" ON propiedades;
+DROP POLICY IF EXISTS "propiedades_delete_admin" ON propiedades;
+DROP POLICY IF EXISTS "clientes_insert_public" ON clientes;
+DROP POLICY IF EXISTS "clientes_select_admin" ON clientes;
+DROP POLICY IF EXISTS "clientes_update_admin" ON clientes;
+DROP POLICY IF EXISTS "clientes_delete_admin" ON clientes;
+
+-- ------------------------------------------------------------------------------
+-- 2. SEGURIDAD PARA LA TABLA DE PROPIEDADES (Catálogo)
+-- ------------------------------------------------------------------------------
 ALTER TABLE propiedades ENABLE ROW LEVEL SECURITY;
 
--- Permitir que cualquier visitante de la web (anónimo) pueda VER las propiedades
-CREATE POLICY "Permitir lectura publica de propiedades" 
+-- Permitir lectura pública a cualquier visitante (anónimo o autenticado)
+CREATE POLICY "propiedades_select_public" 
 ON propiedades FOR SELECT 
+TO anon, authenticated 
 USING (true);
 
--- Permitir que SOLO usuarios administradores autenticados puedan crear, editar o borrar
-CREATE POLICY "Permitir edicion solo a admins" 
-ON propiedades FOR ALL 
-USING (auth.role() = 'authenticated');
+-- Permitir INSERT, UPDATE, DELETE solo a usuarios con rol 'admin' en app_metadata
+CREATE POLICY "propiedades_insert_admin" 
+ON propiedades FOR INSERT 
+TO authenticated 
+WITH CHECK (
+  (SELECT (auth.jwt()->'app_metadata'->>'role')::text) = 'admin'
+);
+
+CREATE POLICY "propiedades_update_admin" 
+ON propiedades FOR UPDATE 
+TO authenticated 
+USING (
+  (SELECT (auth.jwt()->'app_metadata'->>'role')::text) = 'admin'
+)
+WITH CHECK (
+  (SELECT (auth.jwt()->'app_metadata'->>'role')::text) = 'admin'
+);
+
+CREATE POLICY "propiedades_delete_admin" 
+ON propiedades FOR DELETE 
+TO authenticated 
+USING (
+  (SELECT (auth.jwt()->'app_metadata'->>'role')::text) = 'admin'
+);
 
 -- ------------------------------------------------------------------------------
--- 2. SEGURIDAD PARA LA TABLA DE CLIENTES (Leads del Formulario CRM)
+-- 3. SEGURIDAD PARA LA TABLA DE CLIENTES (Leads CRM)
 -- ------------------------------------------------------------------------------
--- Habilitar seguridad
 ALTER TABLE clientes ENABLE ROW LEVEL SECURITY;
 
--- Permitir que cualquier visitante de la web pueda INSERTAR sus datos (llamar al formulario)
-CREATE POLICY "Permitir envio de formulario a prospectos" 
+-- Permitir envío público de formularios de prospectos
+CREATE POLICY "clientes_insert_public" 
 ON clientes FOR INSERT 
+TO anon, authenticated 
 WITH CHECK (true);
 
--- Permitir que SOLO usuarios administradores autenticados puedan VER la lista de clientes o borrarla
--- (Los hackers externos quedan totalmente bloqueados de robar la base de datos)
-CREATE POLICY "Permitir gestion de leads solo a admins" 
-ON clientes FOR ALL 
-USING (auth.role() = 'authenticated');
+-- Permitir lectura, edición y eliminación de leads ÚNICAMENTE a administradores
+CREATE POLICY "clientes_select_admin" 
+ON clientes FOR SELECT 
+TO authenticated 
+USING (
+  (SELECT (auth.jwt()->'app_metadata'->>'role')::text) = 'admin'
+);
+
+CREATE POLICY "clientes_update_admin" 
+ON clientes FOR UPDATE 
+TO authenticated 
+USING (
+  (SELECT (auth.jwt()->'app_metadata'->>'role')::text) = 'admin'
+)
+WITH CHECK (
+  (SELECT (auth.jwt()->'app_metadata'->>'role')::text) = 'admin'
+);
+
+CREATE POLICY "clientes_delete_admin" 
+ON clientes FOR DELETE 
+TO authenticated 
+USING (
+  (SELECT (auth.jwt()->'app_metadata'->>'role')::text) = 'admin'
+);
+
+-- ------------------------------------------------------------------------------
+-- 4. CONFIGURAR ROL ADMIN PARA TU USUARIO (REEMPLAZA EL EMAIL)
+-- ------------------------------------------------------------------------------
+-- Ejecuta esto cambiando 'tu_email@ejemplo.com' por el correo de tu cuenta admin en Supabase:
+-- UPDATE auth.users 
+-- SET raw_app_meta_data = raw_app_meta_data || '{"role": "admin"}'::jsonb 
+-- WHERE email = 'admin@inmobiliarianortechico.pe';
 
 -- ==============================================================================
--- ¡LISTO! TU BASE DE DATOS AHORA ESTÁ 100% BLINDADA.
+-- ¡LISTO! TU BASE DE DATOS AHORA TIENE POLÍTICAS RLS SEGURAS Y MODERNAS.
 -- ==============================================================================

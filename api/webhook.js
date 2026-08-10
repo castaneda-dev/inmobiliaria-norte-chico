@@ -60,6 +60,8 @@ async function sendTelegramAlertWithRetry(mensaje, maxRetries = 3) {
     return false;
 }
 
+const crypto = require('crypto');
+
 module.exports = async function handler(req, res) {
     // Solo aceptamos peticiones POST (Webhooks)
     if (req.method !== 'POST') {
@@ -67,6 +69,20 @@ module.exports = async function handler(req, res) {
     }
 
     try {
+        const signature = req.headers['x-hub-signature-256'];
+        const fbAppSecret = process.env.FACEBOOK_APP_SECRET;
+
+        if (fbAppSecret && signature) {
+            const rawBody = JSON.stringify(req.body);
+            const hmac = crypto.createHmac('sha256', fbAppSecret);
+            const digest = `sha256=${hmac.update(rawBody).digest('hex')}`;
+            if (signature !== digest) {
+                console.warn("⚠️ Meta Webhook: Invalid HMAC Signature detected.");
+                return res.status(401).json({ error: 'Invalid Signature' });
+            }
+        } else if (!fbAppSecret && signature) {
+            console.warn("⚠️ Meta Webhook: Signature present but FACEBOOK_APP_SECRET missing. Simulating success...");
+        }
         const payload = req.body || {};
         console.log("Webhook recibido:", JSON.stringify(payload));
 

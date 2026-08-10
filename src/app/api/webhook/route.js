@@ -1,9 +1,28 @@
+import crypto from 'crypto';
 import { NextResponse } from 'next/server';
 import { supabase } from '../../../supabaseClient';
 
 export async function POST(req) {
   try {
-    const body = await req.json();
+    const rawBody = await req.text();
+    
+    // HMAC Signature Validation for Facebook Lead Ads
+    const signature = req.headers.get('x-hub-signature-256');
+    const fbAppSecret = process.env.FACEBOOK_APP_SECRET;
+
+    if (fbAppSecret && signature) {
+      const hmac = crypto.createHmac('sha256', fbAppSecret);
+      const digest = `sha256=${hmac.update(rawBody).digest('hex')}`;
+      
+      if (signature !== digest) {
+        console.warn("⚠️ Meta Webhook: Invalid HMAC Signature detected.");
+        return NextResponse.json({ success: false, error: 'Invalid Signature' }, { status: 401 });
+      }
+    } else if (!fbAppSecret && signature) {
+      console.warn("⚠️ Meta Webhook: Signature present but FACEBOOK_APP_SECRET missing. Simulating success...");
+    }
+
+    const body = JSON.parse(rawBody);
 
     // Multi-format Lead Parser (Facebook Lead Ads / TikTok Ads / Web Form)
     let nombre = body.nombre || body.nombre_completo || body.full_name || 'Lead Anónimo';

@@ -13,7 +13,7 @@ const getProperty = cache(async (id) => {
 });
 
 export async function generateMetadata({ params }) {
-  const { id } = params;
+  const { id } = await params;
   const property = await getProperty(id);
 
   if (property) {
@@ -43,7 +43,7 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function ProyectoPage({ params }) {
-  const { id } = params;
+  const { id } = await params;
   const initialProperty = await getProperty(id);
 
   return <PropertyDetailView initialProperty={initialProperty} />;

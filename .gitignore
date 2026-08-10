@@ -15,3 +15,5 @@ Thumbs.db
 .env*
 .next/
 dist/
+temp_db.json
+

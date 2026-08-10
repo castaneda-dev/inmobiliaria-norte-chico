@@ -40,10 +40,11 @@ export default async function handler(req, res) {
             ]
         };
 
-        const response = await fetch(`https://graph.facebook.com/v19.0/${PIXEL_ID}/events?access_token=${ACCESS_TOKEN}`, {
+        const response = await fetch(`https://graph.facebook.com/v19.0/${PIXEL_ID}/events`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${ACCESS_TOKEN}`
             },
             body: JSON.stringify(payload)
         });

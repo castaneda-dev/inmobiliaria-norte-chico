@@ -151,13 +151,26 @@ export default function AdminDashboardView() {
       setPropForm({ titulo: '', precio: '', area_m2: '', tipo_activo: 'Terreno', zonificacion: 'Residencial', imagen_url: '', descripcion: '', estado: 'Disponible' });
       fetchData();
     } catch (err) {
-      alert("Error al guardar propiedad: " + err.message);
+      console.error("Internal error saving property:", err);
+      alert("Hubo un error al guardar la propiedad. Por favor, intente nuevamente.");
     }
   };
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+    const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      alert('Solo se permiten imágenes JPG, PNG y WebP.');
+      return;
+    }
+    if (file.size > MAX_SIZE) {
+      alert('La imagen no debe superar 5 MB.');
+      return;
+    }
 
     setUploadingImage(true);
     try {
@@ -177,7 +190,8 @@ export default function AdminDashboardView() {
 
       setPropForm({ ...propForm, imagen_url: data.publicUrl });
     } catch (error) {
-      alert('Error al subir imagen: Asegúrate de que el bucket "propiedades" exista en Supabase y sea público. Detalle: ' + error.message);
+      console.error("Internal error uploading image:", error);
+      alert('Hubo un error al subir la imagen. Intente nuevamente.');
     } finally {
       setUploadingImage(false);
     }
@@ -190,7 +204,8 @@ export default function AdminDashboardView() {
       if (!result.success) throw new Error(result.error);
       fetchData();
     } catch (err) {
-      alert("Error al eliminar: " + err.message);
+      console.error("Internal error deleting property:", err);
+      alert("Hubo un error al eliminar. Por favor, intente nuevamente.");
     }
   };
 

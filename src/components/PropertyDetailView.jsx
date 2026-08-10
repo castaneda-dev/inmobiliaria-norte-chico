@@ -364,7 +364,7 @@ export default function PropertyDetailView({ initialProperty }) {
         </section>
 
         {/* SECCIÓN DE CONTACTO IDÉNTICA AL HOME */}
-        <section className="contact-module" id="contacto">
+        <section className="contact-module theme-light-contact" id="contacto">
           <div className="form-container">
             <h2>Consulta <span className="text-gradient">Directa</span></h2>
             <p>Agenda una cita guiada o solicita la minuta legal de la propiedad {property.titulo}.</p>

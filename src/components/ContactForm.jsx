@@ -12,17 +12,14 @@ export default function ContactForm() {
     setStatus('loading');
     
     try {
-      const fullPhone = `${formData.prefijo} ${formData.telefono}`;
-      const { error } = await supabase.from('clientes').insert([{
-        nombre_completo: formData.nombre,
-        email: formData.email,
-        telefono: fullPhone,
-        tipo_interes: formData.mensaje,
-        estado_lead: 'Nuevo',
-        origen: 'Web Next.js (Production Mode)'
-      }]);
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
       
-      if (error) throw error;
+      const result = await response.json();
+      if (!response.ok || !result.success) throw new Error(result.error || 'API Error');
       
       setStatus('success');
       setFormData({ nombre: '', email: '', telefono: '', prefijo: '+51', mensaje: '' });
