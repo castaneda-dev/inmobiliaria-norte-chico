@@ -43,7 +43,7 @@ export default function AdminDashboardView() {
   const [editingProp, setEditingProp] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [propForm, setPropForm] = useState({
-    titulo: '', precio: '', area_m2: '', tipo_activo: 'Terreno', zonificacion: 'Residencial', imagen_url: '', descripcion: '', estado: 'Disponible'
+    titulo: '', precio: '', area_m2: '', tipo_activo: 'Terreno', zonificacion: 'Residencial', imagen_url: '', descripcion: '', estado: 'Disponible', ubicacion: ''
   });
 
   // Check active Supabase Auth session on mount
@@ -141,7 +141,8 @@ export default function AdminDashboardView() {
         zonificacion: propForm.zonificacion,
         imagen_url: propForm.imagen_url || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=85',
         descripcion: propForm.descripcion,
-        estado: propForm.estado
+        estado: propForm.estado,
+        ubicacion: propForm.ubicacion || 'Chancay'
       };
 
       const result = await savePropertyAction(sessionToken, payload, !!editingProp, editingProp?.id);
@@ -150,7 +151,7 @@ export default function AdminDashboardView() {
 
       setShowPropModal(false);
       setEditingProp(null);
-      setPropForm({ titulo: '', precio: '', area_m2: '', tipo_activo: 'Terreno', zonificacion: 'Residencial', imagen_url: '', descripcion: '', estado: 'Disponible' });
+      setPropForm({ titulo: '', precio: '', area_m2: '', tipo_activo: 'Terreno', zonificacion: 'Residencial', imagen_url: '', descripcion: '', estado: 'Disponible', ubicacion: '' });
       fetchData();
     } catch (err) {
       console.error("Internal error saving property:", err);
@@ -408,7 +409,7 @@ export default function AdminDashboardView() {
               <h3 className="font-sans font-black text-xl text-white mb-6">Acciones Rápidas del Administrador</h3>
               <div className="flex flex-wrap gap-4">
                 <button 
-                  onClick={() => { setEditingProp(null); setPropForm({ titulo: '', precio: '', area_m2: '', tipo_activo: 'Terreno', zonificacion: 'Residencial', imagen_url: '', descripcion: '', estado: 'Disponible' }); setShowPropModal(true); }}
+                  onClick={() => { setEditingProp(null); setPropForm({ titulo: '', precio: '', area_m2: '', tipo_activo: 'Terreno', zonificacion: 'Residencial', imagen_url: '', descripcion: '', estado: 'Disponible', ubicacion: '' }); setShowPropModal(true); }}
                   className="bg-terracota text-white px-6 py-3.5 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-[#a64b2b] transition-colors shadow-lg"
                 >
                   <Plus size={16} /> Crear Nueva Propiedad
@@ -430,7 +431,7 @@ export default function AdminDashboardView() {
             <div className="flex justify-between items-center">
               <h3 className="font-sans font-black text-2xl text-white">Gestión de Propiedades</h3>
               <button 
-                onClick={() => { setEditingProp(null); setPropForm({ titulo: '', precio: '', area_m2: '', tipo_activo: 'Terreno', zonificacion: 'Residencial', imagen_url: '', descripcion: '', estado: 'Disponible' }); setShowPropModal(true); }}
+                onClick={() => { setEditingProp(null); setPropForm({ titulo: '', precio: '', area_m2: '', tipo_activo: 'Terreno', zonificacion: 'Residencial', imagen_url: '', descripcion: '', estado: 'Disponible', ubicacion: '' }); setShowPropModal(true); }}
                 className="bg-terracota text-white px-6 py-3 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-[#a64b2b] transition-colors shadow-lg"
               >
                 <Plus size={16} /> Agregar Propiedad
@@ -485,7 +486,8 @@ export default function AdminDashboardView() {
                                   zonificacion: p.zonificacion || 'Residencial',
                                   imagen_url: p.imagen_url || p.imagen || '',
                                   descripcion: p.descripcion || '',
-                                  estado: p.estado || 'Disponible'
+                                  estado: p.estado || 'Disponible',
+                                  ubicacion: p.ubicacion || ''
                                 });
                                 setShowPropModal(true);
                               }}
@@ -627,7 +629,7 @@ export default function AdminDashboardView() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <div>
                   <label className="block text-terracota font-bold mb-1">Tipo de Activo</label>
                   <select 
@@ -638,6 +640,15 @@ export default function AdminDashboardView() {
                     <option value="Casa">Casa</option>
                     <option value="Macrolote">Macrolote</option>
                   </select>
+                </div>
+                <div>
+                  <label className="block text-terracota font-bold mb-1">Ubicación (Distrito / Dir.)</label>
+                  <input 
+                    required type="text"
+                    value={propForm.ubicacion} onChange={e => setPropForm({...propForm, ubicacion: e.target.value})}
+                    className="w-full bg-asfalto/80 border border-arena/20 rounded-xl p-3 text-white focus:outline-none focus:border-terracota"
+                    placeholder="Chancay"
+                  />
                 </div>
                 <div>
                   <label className="block text-terracota font-bold mb-1">Estado</label>
