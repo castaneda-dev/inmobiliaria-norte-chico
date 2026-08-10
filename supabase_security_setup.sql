@@ -8,6 +8,12 @@
 ALTER TABLE propiedades ENABLE ROW LEVEL SECURITY;
 ALTER TABLE clientes ENABLE ROW LEVEL SECURITY;
 
+-- Limpiar políticas previas si ya existen para evitar errores de ejecución
+DROP POLICY IF EXISTS "Permitir lectura publica de propiedades" ON propiedades;
+DROP POLICY IF EXISTS "Permitir edicion solo a admins autenticados" ON propiedades;
+DROP POLICY IF EXISTS "Permitir registro de leads desde la web" ON clientes;
+DROP POLICY IF EXISTS "Permitir gestion de leads solo a admins autenticados" ON clientes;
+
 -- ==========================================
 -- POLÍTICAS PARA LA TABLA 'PROPIEDADES'
 -- ==========================================
