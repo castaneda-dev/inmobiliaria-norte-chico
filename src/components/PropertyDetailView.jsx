@@ -157,46 +157,57 @@ export default function PropertyDetailView({ initialProperty }) {
   return (
     <div style={{ backgroundColor: '#080808', color: '#fff', minHeight: '100vh', fontFamily: 'Montserrat, sans-serif', overflowX: 'hidden' }}>
       
-      {/* ENCABEZADO SUPERIOR LIMPIO */}
-      <header className="w-full bg-[#0d0d0d] border-b border-white/10 px-6 py-4 flex justify-between items-center sticky top-0 z-50 backdrop-blur-md bg-opacity-90">
-        <Link href="/" className="flex flex-col text-decoration-none">
-          <span className="font-sans font-black text-lg tracking-widest text-white leading-none">NORTE CHICO</span>
-          <span className="font-sans font-bold text-[10px] tracking-wider text-terracota mt-1">GRUPO INMOBILIARIO</span>
-        </Link>
-        <div className="flex gap-4 items-center">
-          <Link href="/#portafolio" className="text-xs font-semibold text-arena hover:text-white transition-colors hidden sm:inline text-decoration-none">Lotes Residenciales</Link>
-          <a href="#contacto-ficha" className="px-4 py-2 text-xs font-bold bg-terracota hover:bg-[#a64b2b] text-white rounded-full transition-colors text-decoration-none">Agendar Visita</a>
-        </div>
-      </header>
+      {/* HERO BACKDROP HEADER DE LUJO CON FONDO DE PR_GLORIETA_DELUXE */}
+      <div 
+        className="relative w-full border-b border-white/10"
+        style={{ 
+          backgroundImage: `linear-gradient(to bottom, rgba(8,8,8,0.7) 0%, rgba(8,8,8,0.96) 100%), url('/PR_GLORIETA_DELUXE.webp')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}
+      >
+        {/* ENCABEZADO SUPERIOR CON GLASSMORPHISM */}
+        <header className="w-full max-w-7xl mx-auto px-6 py-5 flex justify-between items-center z-50">
+          <Link href="/" className="flex flex-col text-decoration-none">
+            <span className="font-sans font-black text-xl tracking-widest text-white leading-none">NORTE CHICO</span>
+            <span className="font-sans font-bold text-[10px] tracking-wider text-terracota mt-1">GRUPO INMOBILIARIO</span>
+          </Link>
+          <div className="flex gap-4 items-center">
+            <Link href="/#portafolio" className="text-xs font-semibold text-arena hover:text-white transition-colors hidden sm:inline text-decoration-none">Lotes Residenciales</Link>
+            <a href="#contacto-ficha" className="px-5 py-2.5 text-xs font-bold bg-terracota hover:bg-[#a64b2b] text-white rounded-full transition-all shadow-lg text-decoration-none">Agendar Visita</a>
+          </div>
+        </header>
 
-      {/* MIGA DE PAN (BREADCRUMB) */}
-      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '24px 5% 0 5%', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#888', flexWrap: 'wrap' }}>
-        <Link href="/" style={{ color: '#aaa', textDecoration: 'none' }}>Inicio</Link>
-        <span>/</span>
-        <Link href="/#portafolio" style={{ color: '#aaa', textDecoration: 'none' }}>Colección Residencial</Link>
-        <span>/</span>
-        <span style={{ color: 'var(--gold-light, #cb9f74)', fontWeight: 600 }}>{property.titulo}</span>
-      </div>
+        {/* BREADCRUMB & HEADER TITLE DENTRO DEL HERO BANNER */}
+        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px 5% 40px 5%' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#aaa', flexWrap: 'wrap', marginBottom: '20px' }}>
+            <Link href="/" style={{ color: '#ccc', textDecoration: 'none' }}>Inicio</Link>
+            <span>/</span>
+            <Link href="/#portafolio" style={{ color: '#ccc', textDecoration: 'none' }}>Colección Residencial</Link>
+            <span>/</span>
+            <span style={{ color: 'var(--gold-light, #cb9f74)', fontWeight: 600 }}>{property.titulo}</span>
+          </div>
 
-      <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px 5% 60px 5%', width: '100%', boxSizing: 'border-box' }}>
-        
-        {/* CABECERA PRINCIPAL CON TÍTULO Y BADGES */}
-        <div style={{ marginBottom: '30px' }}>
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '12px' }}>
             <span style={{ background: 'linear-gradient(135deg, #cb9f74, #e2b988)', color: '#000', padding: '4px 14px', borderRadius: '16px', fontSize: '11px', fontWeight: 800, textTransform: 'uppercase' }}>
               {property.tipo_activo || 'Terreno'}
             </span>
-            <span style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', color: '#10b981', padding: '4px 14px', borderRadius: '16px', fontSize: '11px', fontWeight: 800 }}>
+            <span style={{ background: 'rgba(16, 185, 129, 0.2)', border: '1px solid #10b981', color: '#10b981', padding: '4px 14px', borderRadius: '16px', fontSize: '11px', fontWeight: 800, backdropFilter: 'blur(4px)' }}>
               ✓ Saneado 100% SUNARP
             </span>
           </div>
 
-          <h1 style={{ fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 800, lineHeight: '1.15', margin: '0 0 10px 0', letterSpacing: '-0.5px' }}>
+          <h1 style={{ fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 800, lineHeight: '1.15', margin: '0 0 10px 0', letterSpacing: '-0.5px', textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>
             {property.titulo}
           </h1>
-          <p style={{ color: '#aaa', fontSize: '14px', margin: 0 }}>📍 Chancay - Huaral, Norte Chico, Lima, Perú</p>
+          <p style={{ color: '#ddd', fontSize: '14px', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span>📍</span> Chancay - Huaral, Norte Chico, Lima, Perú
+          </p>
         </div>
+      </div>
 
+      <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '30px 5% 60px 5%', width: '100%', boxSizing: 'border-box' }}>
+        
         {/* ESTRUCTURA ASIMÉTRICA 65% / 35% */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-10 items-start">
           
