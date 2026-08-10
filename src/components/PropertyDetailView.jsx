@@ -1,15 +1,8 @@
 "use client";
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import WhatsAppButton from './WhatsAppButton';
-import dynamic from 'next/dynamic';
-
-const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
-const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
-const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
-const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
-const Polyline = dynamic(() => import('react-leaflet').then(mod => mod.Polyline), { ssr: false });
 
 export default function PropertyDetailView({ initialProperty }) {
   const property = initialProperty;
@@ -38,36 +31,14 @@ export default function PropertyDetailView({ initialProperty }) {
   const [formData, setFormData] = useState({ nombre: '', email: '', celular: '', paisCode: '+51', mensaje: '' });
   const [formStatus, setFormStatus] = useState('idle'); // 'idle' | 'loading' | 'success' | 'error'
   const [toastMessage, setToastMessage] = useState(null);
-  
-  // Lazy loading para Leaflet Map mediante IntersectionObserver
-  const [mapVisible, setMapVisible] = useState(false);
-  const mapRef = useRef(null);
 
-  useEffect(() => {
-    if (!mapRef.current) return;
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setMapVisible(true);
-        observer.disconnect();
-      }
-    }, { rootMargin: '150px' });
-    
-    observer.observe(mapRef.current);
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (mapVisible) {
-      import('leaflet').then(L => {
-        delete L.Icon.Default.prototype._getIconUrl;
-        L.Icon.Default.mergeOptions({
-          iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-          iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-          shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-        });
-      });
-    }
-  }, [mapVisible]);
+  // Coordenadas para Google Maps (por defecto Huaral / Chancay)
+  const lat = property?.latitud || property?.lat || -11.53;
+  const lng = property?.longitud || property?.lng || -77.24;
+  const mapSearchQuery = encodeURIComponent(`${property?.titulo || 'Terrenos Chancay Huaral'} Chancay Huaral Peru`);
+  const googleEmbedUrl = `https://maps.google.com/maps?q=${lat},${lng}&hl=es&z=13&output=embed`;
+  const googleDirectUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+  const googleRouteMegapuerto = `https://www.google.com/maps/dir/?api=1&origin=${lat},${lng}&destination=-11.5694,-77.2676`;
 
   const showToast = (msg, type = 'success') => {
     setToastMessage({ msg, type });
@@ -318,7 +289,7 @@ export default function PropertyDetailView({ initialProperty }) {
 
         </div>
 
-        {/* SECCIÓN 2: ESPECIFICACIONES TÉCNICAS Y MAPA INTERACTIVO */}
+        {/* SECCIÓN 2: ESPECIFICACIONES TÉCNICAS Y GOOGLE MAPS INTERACTIVO */}
         <div style={{ marginTop: '60px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '40px' }}>
           
           {/* ESPECIFICACIONES TÉCNICAS */}
@@ -347,30 +318,68 @@ export default function PropertyDetailView({ initialProperty }) {
             </div>
           </div>
 
-          {/* MAPA LOGÍSTICO DIFERIDO (LAZY LEAFLET) */}
-          <div ref={mapRef} style={{ background: 'rgba(18, 18, 18, 0.7)', borderRadius: '24px', padding: 0, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)', minHeight: '360px', position: 'relative' }}>
-            {!mapVisible ? (
-              <div style={{ display: 'flex', height: '100%', minHeight: '360px', alignItems: 'center', justifyContent: 'center', color: '#888', fontSize: '13px' }}>
-                🗺️ Cargar mapa de ubicación referencial...
+          {/* MÓDULO GOOGLE MAPS PLATFORM INTERACTIVO */}
+          <div style={{ background: 'rgba(18, 18, 18, 0.7)', borderRadius: '24px', padding: '24px', border: '1px solid rgba(203, 159, 116, 0.3)', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '10px' }}>
+              <div>
+                <h2 style={{ fontSize: '22px', fontWeight: 800, margin: 0, color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  🗺️ Google Maps | Eje Logístico
+                </h2>
+                <p style={{ fontSize: '12px', color: '#cb9f74', margin: '4px 0 0 0', fontWeight: 700 }}>
+                  Ubicación Estratégica en Chancay - Huaral
+                </p>
               </div>
-            ) : (
-              <div style={{ position: 'relative', height: '100%', minHeight: '360px', width: '100%' }}>
-                <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', padding: '24px', background: 'linear-gradient(to bottom, rgba(8,8,8,0.9), transparent)', zIndex: 2, pointerEvents: 'none' }}>
-                  <h2 style={{ fontSize: '20px', fontWeight: 800, margin: 0, color: '#fff' }}>Ubicación y Eje Logístico</h2>
-                  <p style={{ fontSize: '11px', color: '#cb9f74', margin: 0, fontWeight: 700, textTransform: 'uppercase' }}>Cercanía al Megapuerto de Chancay y Valle Huaral</p>
-                </div>
-                <MapContainer center={[-11.53, -77.24]} zoom={12} style={{ height: '100%', width: '100%' }}>
-                  <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" attribution='&copy; CARTO' />
-                  <Marker position={[-11.5694, -77.2676]}>
-                    <Popup><strong style={{ color: '#cb9f74' }}>Megapuerto de Chancay</strong></Popup>
-                  </Marker>
-                  <Marker position={[-11.4939, -77.2078]}>
-                    <Popup><strong>{property.titulo}</strong></Popup>
-                  </Marker>
-                  <Polyline positions={[[-11.5694, -77.2676], [-11.4939, -77.2078]]} pathOptions={{ color: '#cb9f74', weight: 4, dashArray: '8, 8' }} />
-                </MapContainer>
+
+              {/* Botón directo a Google Maps App */}
+              <a 
+                href={googleDirectUrl} 
+                target="_blank" 
+                rel="noreferrer"
+                style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', padding: '8px 14px', borderRadius: '12px', fontSize: '12px', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}
+              >
+                📍 Abrir en Google Maps
+              </a>
+            </div>
+
+            {/* EMBED GOOGLE MAPS IFRAME FLUIDO */}
+            <div style={{ width: '100%', height: '280px', borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', background: '#111' }}>
+              <iframe
+                title="Google Maps Ubicación del Proyecto"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                loading="lazy"
+                allowFullScreen
+                src={googleEmbedUrl}
+              ></iframe>
+            </div>
+
+            {/* MÉTRICAS DEL EJE LOGÍSTICO Y RUTAS RÁPIDAS */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px' }}>
+              <div style={{ background: 'rgba(255,255,255,0.03)', padding: '12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ fontSize: '11px', color: '#888', fontWeight: 600 }}>⚓ Megapuerto Chancay</div>
+                <div style={{ fontSize: '14px', fontWeight: 800, color: '#cb9f74', marginTop: '2px' }}>~10 mins</div>
               </div>
-            )}
+              <div style={{ background: 'rgba(255,255,255,0.03)', padding: '12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ fontSize: '11px', color: '#888', fontWeight: 600 }}>🏙️ Plaza de Armas</div>
+                <div style={{ fontSize: '14px', fontWeight: 800, color: '#fff', marginTop: '2px' }}>~8 mins</div>
+              </div>
+              <div style={{ background: 'rgba(255,255,255,0.03)', padding: '12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ fontSize: '11px', color: '#888', fontWeight: 600 }}>🌾 Valle Huaral</div>
+                <div style={{ fontSize: '14px', fontWeight: 800, color: '#fff', marginTop: '2px' }}>~12 mins</div>
+              </div>
+            </div>
+
+            <a 
+              href={googleRouteMegapuerto}
+              target="_blank"
+              rel="noreferrer"
+              style={{ textAlign: 'center', background: 'rgba(203, 159, 116, 0.15)', border: '1px solid #cb9f74', color: '#cb9f74', padding: '12px', borderRadius: '12px', fontSize: '12px', fontWeight: 800, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.5px' }}
+            >
+              🚗 Ver Ruta Directa al Megapuerto en Google Maps
+            </a>
+
           </div>
 
         </div>
