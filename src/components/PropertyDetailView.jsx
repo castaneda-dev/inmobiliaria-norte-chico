@@ -157,7 +157,7 @@ export default function PropertyDetailView({ initialProperty }) {
   return (
     <div style={{ backgroundColor: '#080808', color: '#fff', minHeight: '100vh', fontFamily: 'Montserrat, sans-serif', overflowX: 'hidden' }}>
       
-      {/* NAVEGACIÓN SUPERIOR IDÉNTICA A LA HOME PAGE */}
+      {/* NAVEGACIÓN SUPERIOR CON SOPORTE RESPONSIVO */}
       <nav className="hero-initial">
         <div className="logo-container">
           <span className="logo-main">NORTE CHICO</span>
@@ -169,13 +169,13 @@ export default function PropertyDetailView({ initialProperty }) {
         </div>
       </nav>
 
-      {/* HERO PRINCIPAL AL MISMO ANCHO Y CON FONDO DE PR_GLORIETA_DELUXE QUE LA HOME PAGE */}
-      <header className="hero hero-initial">
-        <div className="hero-grid">
+      {/* HERO PRINCIPAL ADAPTADO A CELULAR Y WEB */}
+      <header className="hero hero-initial" style={{ minHeight: 'auto', padding: '130px 5% 40px' }}>
+        <div className="hero-grid" style={{ gap: '30px' }}>
           
           {/* INFORMACIÓN PRINCIPAL DEL INMUEBLE */}
-          <div className="hero-text">
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '16px' }}>
+          <div className="hero-text" style={{ textAlign: 'left' }}>
+            <div className="flex flex-wrap gap-2 items-center mb-3">
               <span style={{ background: 'linear-gradient(135deg, #cb9f74, #e2b988)', color: '#000', padding: '4px 14px', borderRadius: '16px', fontSize: '11px', fontWeight: 800, textTransform: 'uppercase' }}>
                 {property.tipo_activo || 'Terreno'}
               </span>
@@ -184,29 +184,33 @@ export default function PropertyDetailView({ initialProperty }) {
               </span>
             </div>
 
-            <h1 style={{ fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 900, lineHeight: '1.1', marginBottom: '15px' }}>
+            <h1 style={{ fontSize: 'clamp(24px, 5.5vw, 52px)', fontWeight: 900, lineHeight: '1.15', marginBottom: '12px' }}>
               {property.titulo}
             </h1>
             
-            <span className="sub-heading text-gradient" style={{ fontSize: 'clamp(28px, 3.5vw, 42px)', marginBottom: '20px' }}>
+            <div className="sub-heading text-gradient" style={{ fontSize: 'clamp(26px, 4vw, 42px)', marginBottom: '16px', fontWeight: 900 }}>
               {precioFormat}
-            </span>
+            </div>
 
-            <p style={{ color: '#ccc', fontSize: '14px', lineHeight: '1.6', marginBottom: '25px', maxWidth: '580px' }}>
+            <p style={{ color: '#ccc', fontSize: '13px', lineHeight: '1.6', marginBottom: '20px', maxWidth: '580px' }}>
               {property.descripcion || 'Lote e inmueble estratégico en el corredor de alta plusvalía de Chancay y Huaral. Excelente proyección patrimonial y residencial.'}
             </p>
 
-            <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', marginBottom: '20px' }}>
+            <div className="flex flex-col sm:flex-row gap-3 mb-4">
               <a 
                 href={`https://wa.me/56982816844?text=${encodeURIComponent(whatsappMsg)}`}
                 target="_blank"
                 rel="noreferrer"
-                className="btn-pill" 
-                style={{ fontSize: '13px', background: '#25d366', color: '#fff', boxShadow: '0 4px 20px rgba(37, 211, 102, 0.35)' }}
+                className="btn-pill w-full sm:w-auto text-center justify-center" 
+                style={{ fontSize: '12px', padding: '14px 24px', background: '#25d366', color: '#fff', boxShadow: '0 4px 20px rgba(37, 211, 102, 0.35)' }}
               >
                 💬 Consultar Disponibilidad
               </a>
-              <a href="#contacto-ficha" className="btn-outline">
+              <a 
+                href="#contacto-ficha" 
+                className="btn-outline w-full sm:w-auto text-center justify-center"
+                style={{ fontSize: '12px', padding: '14px 24px' }}
+              >
                 📅 Agendar Visita
               </a>
             </div>
@@ -216,9 +220,9 @@ export default function PropertyDetailView({ initialProperty }) {
             </p>
           </div>
 
-          {/* GALERÍA DE FOTOS DENTRO DE HERO-VIDEO */}
-          <div>
-            <div className="hero-video" style={{ position: 'relative', width: '100%', aspectRatio: '16/9', minHeight: '320px', borderRadius: '24px', overflow: 'hidden', border: '4px solid var(--gold-dark, #957051)', boxShadow: '0 10px 30px rgba(0,0,0,0.8)' }}>
+          {/* GALERÍA DE FOTOS RESPONSIVA DENTRO DE HERO-VIDEO */}
+          <div style={{ width: '100%' }}>
+            <div className="hero-video" style={{ position: 'relative', width: '100%', aspectRatio: '16/9', borderRadius: '20px', overflow: 'hidden', border: '3px solid var(--gold-dark, #957051)', boxShadow: '0 10px 30px rgba(0,0,0,0.8)', background: '#111' }}>
               <Image 
                 src={imagenesList[activeImgIdx]} 
                 alt={`${property.titulo} - Vista ${activeImgIdx + 1}`} 
@@ -231,35 +235,35 @@ export default function PropertyDetailView({ initialProperty }) {
               {/* Botón Pantalla Completa */}
               <button 
                 onClick={() => setLightboxOpen(true)}
-                style={{ position: 'absolute', top: '16px', right: '16px', background: 'rgba(0,0,0,0.7)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '8px 14px', borderRadius: '20px', fontSize: '12px', cursor: 'pointer', backdropFilter: 'blur(8px)', zIndex: 5 }}
+                style={{ position: 'absolute', top: '12px', right: '12px', background: 'rgba(0,0,0,0.75)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '6px 12px', borderRadius: '16px', fontSize: '11px', cursor: 'pointer', backdropFilter: 'blur(8px)', zIndex: 5 }}
               >
                 🔍 Pantalla Completa
               </button>
 
               {/* Contador */}
-              <div style={{ position: 'absolute', bottom: '16px', left: '16px', background: 'rgba(0,0,0,0.75)', color: '#fff', padding: '4px 12px', borderRadius: '12px', fontSize: '11px', fontWeight: 600, backdropFilter: 'blur(6px)' }}>
+              <div style={{ position: 'absolute', bottom: '12px', left: '12px', background: 'rgba(0,0,0,0.75)', color: '#fff', padding: '4px 10px', borderRadius: '10px', fontSize: '10px', fontWeight: 600, backdropFilter: 'blur(6px)' }}>
                 📷 {activeImgIdx + 1} / {imagenesList.length}
               </div>
 
               {/* Flechas del Carrusel */}
               {imagenesList.length > 1 && (
                 <>
-                  <button className="carousel-btn prev-btn" style={{ background: 'rgba(0,0,0,0.6)', borderColor: '#cb9f74' }} onClick={() => moveCarousel(-1)}>&#10094;</button>
-                  <button className="carousel-btn next-btn" style={{ background: 'rgba(0,0,0,0.6)', borderColor: '#cb9f74' }} onClick={() => moveCarousel(1)}>&#10095;</button>
+                  <button className="carousel-btn prev-btn" style={{ background: 'rgba(0,0,0,0.6)', borderColor: '#cb9f74', width: '36px', height: '36px', fontSize: '16px' }} onClick={() => moveCarousel(-1)}>&#10094;</button>
+                  <button className="carousel-btn next-btn" style={{ background: 'rgba(0,0,0,0.6)', borderColor: '#cb9f74', width: '36px', height: '36px', fontSize: '16px' }} onClick={() => moveCarousel(1)}>&#10095;</button>
                 </>
               )}
             </div>
 
-            {/* Miniaturas (Thumbnails) */}
+            {/* Miniaturas (Thumbnails) para Touch Scroll */}
             {imagenesList.length > 1 && (
-              <div style={{ display: 'flex', gap: '12px', overflowX: 'auto', padding: '16px 0', scrollbarWidth: 'thin' }}>
+              <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', padding: '12px 0', scrollbarWidth: 'none' }}>
                 {imagenesList.map((img, idx) => (
                   <div 
                     key={idx} 
                     onClick={() => setActiveImgIdx(idx)}
-                    style={{ position: 'relative', width: '90px', height: '60px', borderRadius: '12px', overflow: 'hidden', border: idx === activeImgIdx ? '2px solid #cb9f74' : '2px solid transparent', opacity: idx === activeImgIdx ? 1 : 0.55, cursor: 'pointer', transition: 'all 0.2s ease', flexShrink: 0 }}
+                    style={{ position: 'relative', width: '75px', height: '50px', borderRadius: '10px', overflow: 'hidden', border: idx === activeImgIdx ? '2px solid #cb9f74' : '2px solid transparent', opacity: idx === activeImgIdx ? 1 : 0.55, cursor: 'pointer', transition: 'all 0.2s ease', flexShrink: 0 }}
                   >
-                    <Image src={img} alt={`${property.titulo} miniatura ${idx + 1}`} fill sizes="90px" style={{ objectFit: 'cover' }} />
+                    <Image src={img} alt={`${property.titulo} miniatura ${idx + 1}`} fill sizes="75px" style={{ objectFit: 'cover' }} />
                   </div>
                 ))}
               </div>
@@ -269,10 +273,10 @@ export default function PropertyDetailView({ initialProperty }) {
         </div>
       </header>
 
-      <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px 5% 60px 5%', width: '100%', boxSizing: 'border-box' }}>
+      <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '15px 5% 80px 5%', width: '100%', boxSizing: 'border-box' }}>
         
         {/* MIGA DE PAN (BREADCRUMB) */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#888', flexWrap: 'wrap', marginBottom: '40px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: '#888', flexWrap: 'wrap', marginBottom: '30px' }}>
           <Link href="/" style={{ color: '#aaa', textDecoration: 'none' }}>Inicio</Link>
           <span>/</span>
           <Link href="/#portafolio" style={{ color: '#aaa', textDecoration: 'none' }}>Colección Residencial</Link>
@@ -281,43 +285,43 @@ export default function PropertyDetailView({ initialProperty }) {
         </div>
 
         {/* SECCIÓN 2: ESPECIFICACIONES TÉCNICAS Y GOOGLE MAPS INTERACTIVO */}
-        <div style={{ marginTop: '60px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '40px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: '30px' }}>
           
           {/* ESPECIFICACIONES TÉCNICAS */}
-          <div style={{ background: 'rgba(18, 18, 18, 0.7)', borderRadius: '24px', padding: '32px', border: '1px solid rgba(255,255,255,0.08)' }}>
-            <h2 style={{ fontSize: '24px', fontWeight: 800, marginBottom: '24px', color: '#fff' }}>
+          <div style={{ background: 'rgba(18, 18, 18, 0.7)', borderRadius: '20px', padding: '24px 20px', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <h2 style={{ fontSize: '20px', fontWeight: 800, marginBottom: '20px', color: '#fff' }}>
               Especificaciones Técnicas
             </h2>
             
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '14px' }}>
-                <span style={{ color: '#888', fontSize: '13px', fontWeight: 600 }}>Área Total:</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '12px', fontSize: '13px' }}>
+                <span style={{ color: '#888', fontWeight: 600 }}>Área Total:</span>
                 <span style={{ fontWeight: 800, color: '#cb9f74' }}>{property.area_m2 || property.area || 'Consultar'} m²</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '14px' }}>
-                <span style={{ color: '#888', fontSize: '13px', fontWeight: 600 }}>Zonificación:</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '12px', fontSize: '13px' }}>
+                <span style={{ color: '#888', fontWeight: 600 }}>Zonificación:</span>
                 <span style={{ fontWeight: 700, color: '#fff' }}>{property.zonificacion || 'Residencial / Comercio'}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '14px' }}>
-                <span style={{ color: '#888', fontSize: '13px', fontWeight: 600 }}>Estado del Proyecto:</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '12px', fontSize: '13px' }}>
+                <span style={{ color: '#888', fontWeight: 600 }}>Estado del Proyecto:</span>
                 <span style={{ fontWeight: 700, color: '#10b981' }}>{property.estado || 'Disponible'}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '10px' }}>
-                <span style={{ color: '#888', fontSize: '13px', fontWeight: 600 }}>Parámetros de Construcción:</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '6px', fontSize: '13px' }}>
+                <span style={{ color: '#888', fontWeight: 600 }}>Parámetros:</span>
                 <span style={{ fontWeight: 700, color: '#fff' }}>{property.parametros || 'Estándar Municipal'}</span>
               </div>
             </div>
           </div>
 
           {/* MÓDULO GOOGLE MAPS PLATFORM INTERACTIVO */}
-          <div style={{ background: 'rgba(18, 18, 18, 0.7)', borderRadius: '24px', padding: '24px', border: '1px solid rgba(203, 159, 116, 0.3)', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ background: 'rgba(18, 18, 18, 0.7)', borderRadius: '20px', padding: '20px', border: '1px solid rgba(203, 159, 116, 0.3)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
             
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '10px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
               <div>
-                <h2 style={{ fontSize: '22px', fontWeight: 800, margin: 0, color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h2 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: '#fff', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   🗺️ Google Maps | Eje Logístico
                 </h2>
-                <p style={{ fontSize: '12px', color: '#cb9f74', margin: '4px 0 0 0', fontWeight: 700 }}>
+                <p style={{ fontSize: '11px', color: '#cb9f74', margin: '2px 0 0 0', fontWeight: 700 }}>
                   Ubicación Estratégica en Chancay - Huaral
                 </p>
               </div>
@@ -327,14 +331,14 @@ export default function PropertyDetailView({ initialProperty }) {
                 href={googleDirectUrl} 
                 target="_blank" 
                 rel="noreferrer"
-                style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', padding: '8px 14px', borderRadius: '12px', fontSize: '12px', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}
+                style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', padding: '6px 12px', borderRadius: '10px', fontSize: '11px', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}
               >
-                📍 Abrir en Google Maps
+                📍 Google Maps App
               </a>
             </div>
 
             {/* EMBED GOOGLE MAPS IFRAME FLUIDO */}
-            <div style={{ width: '100%', height: '280px', borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', background: '#111' }}>
+            <div style={{ width: '100%', height: '220px', borderRadius: '14px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', background: '#111' }}>
               <iframe
                 title="Google Maps Ubicación del Proyecto"
                 width="100%"
@@ -348,23 +352,23 @@ export default function PropertyDetailView({ initialProperty }) {
             </div>
 
             {/* MÉTRICAS DEL EJE LOGÍSTICO Y RUTAS RÁPIDAS */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px' }}>
-              <div style={{ background: 'rgba(255,255,255,0.03)', padding: '12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <div style={{ fontSize: '11px', color: '#888', fontWeight: 600 }}>⚓ Megapuerto Chancay</div>
-                <div style={{ fontSize: '14px', fontWeight: 800, color: '#cb9f74', marginTop: '2px' }}>
-                  {distMegapuerto.toFixed(1)} km (~{timeMegapuerto} min)
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '8px' }}>
+              <div style={{ background: 'rgba(255,255,255,0.03)', padding: '10px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ fontSize: '10px', color: '#888', fontWeight: 600 }}>⚓ Megapuerto</div>
+                <div style={{ fontSize: '12px', fontWeight: 800, color: '#cb9f74', marginTop: '2px' }}>
+                  {distMegapuerto.toFixed(1)} km (~{timeMegapuerto} m)
                 </div>
               </div>
-              <div style={{ background: 'rgba(255,255,255,0.03)', padding: '12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <div style={{ fontSize: '11px', color: '#888', fontWeight: 600 }}>🏙️ Plaza de Chancay</div>
-                <div style={{ fontSize: '14px', fontWeight: 800, color: '#fff', marginTop: '2px' }}>
-                  {distPlazaChancay.toFixed(1)} km (~{timePlazaChancay} min)
+              <div style={{ background: 'rgba(255,255,255,0.03)', padding: '10px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ fontSize: '10px', color: '#888', fontWeight: 600 }}>🏙️ Plaza Chancay</div>
+                <div style={{ fontSize: '12px', fontWeight: 800, color: '#fff', marginTop: '2px' }}>
+                  {distPlazaChancay.toFixed(1)} km (~{timePlazaChancay} m)
                 </div>
               </div>
-              <div style={{ background: 'rgba(255,255,255,0.03)', padding: '12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <div style={{ fontSize: '11px', color: '#888', fontWeight: 600 }}>🏙️ Plaza de Huaral</div>
-                <div style={{ fontSize: '14px', fontWeight: 800, color: '#fff', marginTop: '2px' }}>
-                  {distPlazaHuaral.toFixed(1)} km (~{timePlazaHuaral} min)
+              <div style={{ background: 'rgba(255,255,255,0.03)', padding: '10px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ fontSize: '10px', color: '#888', fontWeight: 600 }}>🏙️ Plaza Huaral</div>
+                <div style={{ fontSize: '12px', fontWeight: 800, color: '#fff', marginTop: '2px' }}>
+                  {distPlazaHuaral.toFixed(1)} km (~{timePlazaHuaral} m)
                 </div>
               </div>
             </div>
@@ -373,9 +377,9 @@ export default function PropertyDetailView({ initialProperty }) {
               href={googleRouteMegapuerto}
               target="_blank"
               rel="noreferrer"
-              style={{ textAlign: 'center', background: 'rgba(203, 159, 116, 0.15)', border: '1px solid #cb9f74', color: '#cb9f74', padding: '12px', borderRadius: '12px', fontSize: '12px', fontWeight: 800, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.5px' }}
+              style={{ textAlign: 'center', background: 'rgba(203, 159, 116, 0.15)', border: '1px solid #cb9f74', color: '#cb9f74', padding: '10px', borderRadius: '10px', fontSize: '11px', fontWeight: 800, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.5px' }}
             >
-              🚗 Ver Ruta Directa al Megapuerto en Google Maps
+              🚗 Ruta al Megapuerto en Maps
             </a>
 
           </div>
@@ -383,10 +387,10 @@ export default function PropertyDetailView({ initialProperty }) {
         </div>
 
         {/* SECCIÓN 3: FORMULARIO DE CAPTACIÓN CENTRALIZADO */}
-        <section className="contact-module fade-module" id="contacto-ficha" style={{ marginTop: '60px' }}>
+        <section className="contact-module fade-module" id="contacto-ficha" style={{ marginTop: '40px' }}>
           <div className="form-container">
-            <h2>Solicitar Información de <span className="text-gradient">este Inmueble</span></h2>
-            <p>Déjenos sus datos para enviarle la ficha legal, planos y agendar un recorrido presencial en {property.titulo}.</p>
+            <h2 style={{ fontSize: 'clamp(24px, 5vw, 40px)' }}>Solicitar Información de <span className="text-gradient">este Inmueble</span></h2>
+            <p style={{ fontSize: '14px' }}>Déjenos sus datos para enviarle la ficha legal, planos y agendar un recorrido presencial en {property.titulo}.</p>
             
             <form onSubmit={handleSubmit} className="form-grid">
               <input 
@@ -440,7 +444,7 @@ export default function PropertyDetailView({ initialProperty }) {
                 type="submit" 
                 disabled={formStatus === 'loading'}
                 className="btn-pill form-full" 
-                style={{ marginTop: '10px' }}
+                style={{ marginTop: '10px', fontSize: '13px', padding: '16px 20px' }}
               >
                 {formStatus === 'loading' ? 'ENVIANDO SOLICITUD...' : 'SOLICITAR FICHA LEGAL Y DISPONIBILIDAD'}
               </button>
@@ -452,15 +456,15 @@ export default function PropertyDetailView({ initialProperty }) {
 
       {/* LIGHTBOX MODAL PANTALLA COMPLETA */}
       {lightboxOpen && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.95)', zIndex: 9999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.95)', zIndex: 9999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '15px' }}>
           <button 
             onClick={() => setLightboxOpen(false)}
-            style={{ position: 'absolute', top: '20px', right: '20px', background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: '28px', width: '48px', height: '48px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            style={{ position: 'absolute', top: '15px', right: '15px', background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: '24px', width: '40px', height: '40px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
             ×
           </button>
           
-          <div style={{ position: 'relative', width: '90vw', height: '80vh' }}>
+          <div style={{ position: 'relative', width: '95vw', height: '75vh' }}>
             <Image 
               src={imagenesList[activeImgIdx]} 
               alt={`${property.titulo} en alta resolución`} 
@@ -469,10 +473,10 @@ export default function PropertyDetailView({ initialProperty }) {
             />
           </div>
 
-          <div style={{ marginTop: '15px', color: '#aaa', fontSize: '13px', display: 'flex', gap: '20px', alignItems: 'center' }}>
-            <button onClick={() => moveCarousel(-1)} style={{ background: 'none', border: '1px solid #555', color: '#fff', padding: '6px 16px', borderRadius: '12px', cursor: 'pointer' }}>‹ Anterior</button>
+          <div style={{ marginTop: '12px', color: '#aaa', fontSize: '12px', display: 'flex', gap: '15px', alignItems: 'center' }}>
+            <button onClick={() => moveCarousel(-1)} style={{ background: 'none', border: '1px solid #555', color: '#fff', padding: '6px 14px', borderRadius: '10px', cursor: 'pointer' }}>‹ Anterior</button>
             <span>📷 Foto {activeImgIdx + 1} de {imagenesList.length}</span>
-            <button onClick={() => moveCarousel(1)} style={{ background: 'none', border: '1px solid #555', color: '#fff', padding: '6px 16px', borderRadius: '12px', cursor: 'pointer' }}>Siguiente ›</button>
+            <button onClick={() => moveCarousel(1)} style={{ background: 'none', border: '1px solid #555', color: '#fff', padding: '6px 14px', borderRadius: '10px', cursor: 'pointer' }}>Siguiente ›</button>
           </div>
         </div>
       )}
@@ -485,6 +489,16 @@ export default function PropertyDetailView({ initialProperty }) {
           </div>
         </div>
       )}
+
+      {/* BARRA FIXA BOTTOM PARA CELULARES */}
+      <a 
+        href={`https://wa.me/56982816844?text=${encodeURIComponent(whatsappMsg)}`}
+        target="_blank"
+        rel="noreferrer"
+        className="mobile-sticky-cta"
+      >
+        💬 Consultar por WhatsApp
+      </a>
 
       {/* BOTÓN WHATSAPP FLOTANTE */}
       <WhatsAppButton />
