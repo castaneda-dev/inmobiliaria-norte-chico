@@ -2,7 +2,7 @@
 
 > [!IMPORTANT]
 > **ENTORNO DE PRODUCCIÓN Y REPOSITORIO GITHUB**
-> Este repositorio corresponde al **ambiente de Producción** del proyecto (`PRODUCCION WEB INMOBILIARIA`), conectado a GitHub (`castaneda-dev/inmobiliaria-norte-chico`) y desplegado en Vercel (`banka.cl`). **Las variables y credenciales sensibles (tokens de Telegram, claves de Supabase, etc.) deben gestionarse exclusivamente mediante Variables de Entorno en Vercel / `.env.local` y NUNCA ser commiteadas en código duro.**
+> Este repositorio corresponde al **ambiente de Producción** del proyecto (`PRODUCCION WEB INMOBILIARIA`), conectado a GitHub (`castaneda-dev/inmobiliaria-norte-chico`) y desplegado en Vercel (`inmobiliarianortechico.pe`). **Las variables y credenciales sensibles (tokens de Telegram, claves de Supabase, etc.) deben gestionarse exclusivamente mediante Variables de Entorno en Vercel / `.env.local` y NUNCA ser commiteadas en código duro.**
 
 ---
 

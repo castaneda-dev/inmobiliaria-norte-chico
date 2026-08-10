@@ -7,7 +7,7 @@ Plataforma inmobiliaria integral para la gestión de lotes residenciales, depart
 - **Dashboard de Control CRM**: `/crm` o `/admin` (`src/app/crm/page.jsx`)
 - **Base de Datos & Autenticación**: Supabase Cloud PostgreSQL
 - **Webhook de Leads (Serverless)**: `api/webhook.js` — Recibe leads automáticamente de Facebook Lead Ads, TikTok Ads y formularios externos
-- **Despliegue Continuo**: Vercel con Dominio `banka.cl`
+- **Despliegue Continuo**: Vercel con Dominio `inmobiliarianortechico.pe`
 
 ## 🔑 Variables de Entorno (Vercel)
 

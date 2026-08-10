@@ -11,7 +11,7 @@ export const metadata = {
     title: 'Norte Chico Properties | Lotes en Huaral y Chancay',
     description: 'Terrenos e inmuebles de alta plusvalía en el Norte Chico del Perú. Asesoría personalizada sin costo.',
     type: 'website',
-    url: 'https://banka.cl',
+    url: 'https://inmobiliarianortechico.pe',
     images: [
       {
         url: '/PR_GLORIETA_DELUXE.webp',
@@ -27,9 +27,9 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'RealEstateAgent',
   'name': 'Norte Chico Properties',
-  'image': 'https://banka.cl/PR_GLORIETA_DELUXE.webp',
-  '@id': 'https://banka.cl',
-  'url': 'https://banka.cl',
+  'image': 'https://inmobiliarianortechico.pe/PR_GLORIETA_DELUXE.webp',
+  '@id': 'https://inmobiliarianortechico.pe',
+  'url': 'https://inmobiliarianortechico.pe',
   'telephone': '+56982816844',
   'priceRange': '$$',
   'address': {
