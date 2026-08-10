@@ -53,6 +53,76 @@ export default function HomeClient({ initialProperties }) {
   const [selectedProp, setSelectedProp] = useState(null);
   const [modalCurrentImgIdx, setModalCurrentImgIdx] = useState(0);
 
+  // Form states for Lead submission
+  const [formData, setFormData] = useState({
+    nombre: '',
+    email: '',
+    paisCode: '+51',
+    celular: '',
+    interes: ''
+  });
+  const [formStatus, setFormStatus] = useState('idle'); // 'idle' | 'submitting' | 'success' | 'error'
+  const [toast, setToast] = useState(null); // { message: '', type: 'success' | 'error' }
+
+  const showToast = (message, type) => {
+    setToast({ message, type });
+    setTimeout(() => {
+      setToast(null);
+    }, 4000);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    if (formStatus === 'submitting') return;
+    
+    setFormStatus('submitting');
+    try {
+      const payload = {
+        nombre: formData.nombre,
+        email: formData.email,
+        telefono: `${formData.paisCode}${formData.celular}`,
+        origen: 'Formulario Web Landing',
+        notas: formData.interes ? `Interés: ${formData.interes}` : 'Lead desde formulario de contacto'
+      };
+
+      const res = await fetch('/api/webhook', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setFormStatus('success');
+        showToast('¡Datos enviados con éxito! Un asesor se contactará contigo.', 'success');
+        setFormData({
+          nombre: '',
+          email: '',
+          paisCode: '+51',
+          celular: '',
+          interes: ''
+        });
+      } else {
+        setFormStatus('error');
+        showToast('Hubo un error al enviar el formulario. Intenta nuevamente.', 'error');
+      }
+    } catch (err) {
+      console.error("Form submission error:", err);
+      setFormStatus('error');
+      showToast('Hubo un error de red al enviar el formulario.', 'error');
+    }
+  };
+
   // Carousel Hero state
   const [heroIdx, setHeroIdx] = useState(0);
   const heroImgs = [
@@ -223,24 +293,64 @@ export default function HomeClient({ initialProperties }) {
                   <h2>Construye el futuro de <span className="text-gradient">tu Familia</span></h2>
                   <p>Déjenos sus datos para organizar un recorrido por nuestros lotes en Huaral y Chancay.</p>
                   
-                  <div className="form-grid">
-                      <input type="text" placeholder="Nombre Completo" required />
-                      <input type="email" placeholder="Correo Electrónico" required />
+                  <form onSubmit={handleFormSubmit} className="form-grid">
+                      <input 
+                          type="text" 
+                          name="nombre"
+                          placeholder="Nombre Completo" 
+                          value={formData.nombre}
+                          onChange={handleInputChange}
+                          required 
+                      />
+                      <input 
+                          type="email" 
+                          name="email"
+                          placeholder="Correo Electrónico" 
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          required 
+                      />
                       <div className="phone-input-group">
-                          <select required defaultValue="+51">
+                          <select 
+                              name="paisCode"
+                              value={formData.paisCode}
+                              onChange={handleInputChange}
+                              required
+                          >
                               <option value="+51">🇵🇪 +51</option>
                               <option value="+56">🇨🇱 +56</option>
                               <option value="+54">🇦🇷 +54</option>
                           </select>
-                          <input type="tel" placeholder="Celular (9 dígitos)" pattern="[0-9]{9}" maxLength="9" required />
+                          <input 
+                              type="tel" 
+                              name="celular"
+                              placeholder="Celular (9 dígitos)" 
+                              pattern="[0-9]{9}" 
+                              maxLength="9" 
+                              value={formData.celular}
+                              onChange={handleInputChange}
+                              required 
+                          />
                       </div>
-                      <select required defaultValue="">
+                      <select 
+                          name="interes"
+                          value={formData.interes}
+                          onChange={handleInputChange}
+                          required
+                      >
                           <option value="" disabled>¿Qué estás buscando?</option>
                           <option value="Casa de Campo">Lote para Mi Vivienda</option>
                           <option value="Inversion Futuro">Inversión Patrimonial</option>
                       </select>
-                      <button className="btn-pill form-full" style={{ marginTop: '10px' }}>CONTACTAR CON UN ASESOR</button>
-                  </div>
+                      <button 
+                          type="submit" 
+                          disabled={formStatus === 'submitting'}
+                          className="btn-pill form-full" 
+                          style={{ marginTop: '10px' }}
+                      >
+                          {formStatus === 'submitting' ? 'ENVIANDO...' : 'CONTACTAR CON UN ASESOR'}
+                      </button>
+                  </form>
               </div>
           </section>
       </main>
@@ -305,6 +415,14 @@ export default function HomeClient({ initialProperties }) {
                     </div>
                 </div>
             </div>
+        </div>
+      )}
+      {/* Toast Notification */}
+      {toast && (
+        <div className="toast-container">
+          <div className="toast" style={{ borderLeft: toast.type === 'success' ? '4px solid #10b981' : '4px solid #ef4444' }}>
+            {toast.message}
+          </div>
         </div>
       )}
     </div>
