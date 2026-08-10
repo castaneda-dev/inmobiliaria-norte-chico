@@ -31,7 +31,7 @@ export default function Catalog() {
           }
 
           if (!imagenesList.length) {
-            imagenesList = ['https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=85'];
+            imagenesList = ['/PR_GLORIETA_DELUXE.webp'];
           }
           
           return {

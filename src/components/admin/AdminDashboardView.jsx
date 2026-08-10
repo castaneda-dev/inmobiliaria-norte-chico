@@ -139,7 +139,7 @@ export default function AdminDashboardView() {
         area_m2: parseFloat(propForm.area_m2) || 0,
         tipo_activo: propForm.tipo_activo,
         zonificacion: propForm.zonificacion,
-        imagen_url: propForm.imagen_url || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=85',
+        imagen_url: propForm.imagen_url || '/PR_GLORIETA_DELUXE.webp',
         descripcion: propForm.descripcion,
         estado: propForm.estado,
         ubicacion: propForm.ubicacion || 'Chancay',
@@ -193,10 +193,11 @@ export default function AdminDashboardView() {
         .from('propiedades')
         .getPublicUrl(filePath);
 
-      setPropForm({ ...propForm, imagen_url: data.publicUrl });
+      // Usar callback funcional para prevenir perdida de estado
+      setPropForm(prev => ({ ...prev, imagen_url: data.publicUrl }));
     } catch (error) {
       console.error("Internal error uploading image:", error);
-      alert(`Hubo un error al subir la imagen: ${error.message || 'Error desconocido'}. Intente nuevamente o asegúrese de que el bucket 'propiedades' en Supabase existe y tiene políticas públicas habilitadas.`);
+      alert(`Hubo un error al subir la imagen: ${error.message || 'Error desconocido'}. Intente nuevamente.`);
     } finally {
       setUploadingImage(false);
     }
@@ -689,20 +690,32 @@ export default function AdminDashboardView() {
               </div>
 
               <div>
-                <label className="block text-terracota font-bold mb-1">Imagen HD (Sube una foto)</label>
-                <div className="flex items-center gap-3">
+                <label className="block text-terracota font-bold mb-1">Imagen HD (Subir foto o pegar enlace)</label>
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-3">
+                    <input 
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      disabled={uploadingImage}
+                      className="w-full bg-asfalto/80 border border-arena/20 rounded-xl p-2 text-white focus:outline-none focus:border-terracota file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-terracota file:text-white hover:file:bg-[#a64b2b] transition-colors"
+                    />
+                    {uploadingImage && <span className="text-xs text-arena animate-pulse">Subiendo...</span>}
+                  </div>
                   <input 
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    disabled={uploadingImage}
-                    className="w-full bg-asfalto/80 border border-arena/20 rounded-xl p-2 text-white focus:outline-none focus:border-terracota file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-terracota file:text-white hover:file:bg-[#a64b2b] transition-colors"
+                    type="text"
+                    value={propForm.imagen_url}
+                    onChange={e => setPropForm(prev => ({ ...prev, imagen_url: e.target.value }))}
+                    placeholder="URL de la imagen (se genera automáticamente al subir)"
+                    className="w-full bg-asfalto/80 border border-arena/20 rounded-xl p-3 text-white focus:outline-none focus:border-terracota font-mono text-xs"
                   />
-                  {uploadingImage && <span className="text-xs text-arena animate-pulse">Subiendo...</span>}
                 </div>
                 {propForm.imagen_url && (
-                  <div className="mt-3 relative w-32 h-20 rounded-lg overflow-hidden border border-arena/20">
-                    <img src={normalizeImageUrl(propForm.imagen_url)} alt="Preview" className="w-full h-full object-cover" />
+                  <div className="mt-3 flex items-center gap-3">
+                    <div className="relative w-32 h-20 rounded-lg overflow-hidden border border-arena/20 bg-black/40">
+                      <img src={normalizeImageUrl(propForm.imagen_url)} alt="Preview" className="w-full h-full object-cover" />
+                    </div>
+                    <span className="text-xs text-emerald-400 font-bold">✓ Imagen Vinculada</span>
                   </div>
                 )}
               </div>
