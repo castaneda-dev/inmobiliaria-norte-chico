@@ -6,7 +6,8 @@ import { supabase } from '../../supabaseClient';
 import { savePropertyAction, deletePropertyAction } from '../../app/actions/adminActions';
 import { 
   Building2, Users, TrendingUp, ShieldCheck, Plus, Trash2, Edit3, 
-  Search, LogOut, Lock, ArrowLeft, RefreshCw, CheckCircle, MessageSquare, PhoneCall
+  Search, LogOut, Lock, ArrowLeft, RefreshCw, CheckCircle, MessageSquare, PhoneCall,
+  Eye, EyeOff
 } from 'lucide-react';
 
 const normalizeImageUrl = (url) => {
@@ -28,6 +29,7 @@ export default function AdminDashboardView() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState('kpis'); // 'kpis' | 'propiedades' | 'clientes'
 
   // Supabase Data States
@@ -256,14 +258,24 @@ export default function AdminDashboardView() {
             </div>
             <div>
               <label className="block text-terracota font-bold mb-1 uppercase tracking-wider">Contraseña</label>
-              <input 
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••••••"
-                className="w-full bg-asfalto/80 border border-arena/20 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-terracota"
-                required
-              />
+              <div className="relative">
+                <input 
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••••••"
+                  className="w-full bg-asfalto/80 border border-arena/20 rounded-xl pl-4 pr-12 py-3.5 text-white focus:outline-none focus:border-terracota"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-arena hover:text-white focus:outline-none opacity-60 hover:opacity-100 transition-opacity"
+                  title={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
             {authError && <div className="text-red-400 text-center font-mono text-xs mt-1">{authError}</div>}
             <button 
