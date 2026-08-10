@@ -12,34 +12,6 @@ html, body {
   color: #1E2229; /* asfalto */
 }
 
-/* Clases para forzar diseño blanco, limpio y claro en formularios de contacto */
-.theme-light-contact {
-  background-color: #ffffff !important;
-  color: #1a1a1a !important;
-}
-.theme-light-contact h2 {
-  color: #1a1a1a !important;
-}
-.theme-light-contact p {
-  color: #555555 !important;
-}
-.theme-light-contact input,
-.theme-light-contact select {
-  background-color: #F9FAFB !important;
-  border: 1px solid #E5E7EB !important;
-  color: #111827 !important;
-}
-.theme-light-contact input::placeholder {
-  color: #9CA3AF !important;
-}
-.theme-light-contact input:focus,
-.theme-light-contact select:focus {
-  border-color: #CB9F74 !important;
-}
-.theme-light-contact select option {
-  background-color: #ffffff !important;
-  color: #111827 !important;
-}
 
 /* ==========================================================================
    OPTIMIZACIONES MÓVILES Y RESPONSIVE (UX/UI AUDIT FIXES)

@@ -317,7 +317,7 @@ export default function HomeClient({ initialProperties }) {
           </section>
 
           {/* CONTACTO / CRM */}
-          <section className="contact-module fade-module theme-light-contact" id="contacto">
+          <section className="contact-module fade-module" id="contacto">
               <div className="form-container">
                   <h2>Construye el futuro de <span className="text-gradient">tu Familia</span></h2>
                   <p>Déjenos sus datos para organizar un recorrido por nuestros lotes en Huaral y Chancay.</p>
