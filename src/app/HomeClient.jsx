@@ -73,6 +73,21 @@ export default function HomeClient({ initialProperties }) {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    
+    // Regla: El campo de Nombre permite un máximo de 100 caracteres.
+    if (name === 'nombre' && value.length > 100) return;
+    
+    // Regla: El celular solo acepta números y máximo de 9 dígitos.
+    if (name === 'celular') {
+      const numbersOnly = value.replace(/[^0-9]/g, '');
+      if (numbersOnly.length > 9) return;
+      setFormData(prev => ({
+        ...prev,
+        celular: numbersOnly
+      }));
+      return;
+    }
+
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -82,6 +97,12 @@ export default function HomeClient({ initialProperties }) {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (formStatus === 'submitting') return;
+    
+    // Regla: El campo de Teléfono solo acepta números de exactamente 9 dígitos.
+    if (formData.celular.length !== 9) {
+      showToast('El celular debe tener exactamente 9 dígitos.', 'error');
+      return;
+    }
     
     setFormStatus('submitting');
     try {
@@ -101,7 +122,15 @@ export default function HomeClient({ initialProperties }) {
         body: JSON.stringify(payload)
       });
 
-      const data = await res.json();
+      // Intentar leer la respuesta. Si no es exitosa o no es JSON válido,
+      // lanzamos un error que sea capturado en el catch.
+      let data = {};
+      try {
+        data = await res.json();
+      } catch (jsonErr) {
+        throw new Error("Respuesta inválida del servidor");
+      }
+
       if (res.ok && data.success) {
         setFormStatus('success');
         showToast('¡Datos enviados con éxito! Un asesor se contactará contigo.', 'success');
@@ -114,7 +143,7 @@ export default function HomeClient({ initialProperties }) {
         });
       } else {
         setFormStatus('error');
-        showToast('Hubo un error al enviar el formulario. Intenta nuevamente.', 'error');
+        showToast(data.error || 'Hubo un error al enviar el formulario. Intenta nuevamente.', 'error');
       }
     } catch (err) {
       console.error("Form submission error:", err);
@@ -298,6 +327,7 @@ export default function HomeClient({ initialProperties }) {
                           type="text" 
                           name="nombre"
                           placeholder="Nombre Completo" 
+                          maxLength={100}
                           value={formData.nombre}
                           onChange={handleInputChange}
                           required 
