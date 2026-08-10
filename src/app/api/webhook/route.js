@@ -24,12 +24,12 @@ export async function POST(req) {
 
     // Insert into Supabase 'clientes' table
     const { data, error } = await supabase.from('clientes').insert([{
-      nombre: nombre,
+      nombre_completo: nombre,
       telefono: telefono,
       email: email,
       origen: origen,
-      notas: notas,
-      estado: 'Nuevo'
+      tipo_interes: notas,
+      estado_lead: 'Nuevo'
     }]).select();
 
     if (error) {

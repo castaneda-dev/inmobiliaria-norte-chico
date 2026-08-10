@@ -14,11 +14,11 @@ export default function ContactForm() {
     try {
       const fullPhone = `${formData.prefijo} ${formData.telefono}`;
       const { error } = await supabase.from('clientes').insert([{
-        nombre: formData.nombre,
+        nombre_completo: formData.nombre,
         email: formData.email,
         telefono: fullPhone,
-        notas: formData.mensaje,
-        estado: 'Nuevo',
+        tipo_interes: formData.mensaje,
+        estado_lead: 'Nuevo',
         origen: 'Web Next.js (Production Mode)'
       }]);
       

@@ -82,11 +82,11 @@ export default function PropertyDetailView({ initialProperty }) {
     try {
       const fullPhone = `${formData.prefijo} ${formData.telefono}`;
       const { error } = await supabase.from('clientes').insert([{
-        nombre: formData.nombre,
+        nombre_completo: formData.nombre,
         email: formData.email,
         telefono: fullPhone,
-        notas: `[Consulta Proyecto ID-${property.id}: ${property.titulo}] ${formData.mensaje}`,
-        estado: 'Nuevo',
+        tipo_interes: `[Consulta Proyecto ID-${property.id}: ${property.titulo}] ${formData.mensaje}`,
+        estado_lead: 'Nuevo',
         origen: `Web Ficha Proyecto ID-${property.id}`
       }]);
       

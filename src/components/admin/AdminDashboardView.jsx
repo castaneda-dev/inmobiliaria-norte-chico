@@ -207,7 +207,7 @@ export default function AdminDashboardView() {
   // CRM Operation: Update Client Status
   const handleUpdateClientStatus = async (id, status) => {
     try {
-      const { error } = await supabase.from('clientes').update({ estado: status }).eq('id', id);
+      const { error } = await supabase.from('clientes').update({ estado_lead: status }).eq('id', id);
       if (error) throw error;
       fetchData();
     } catch (err) {
