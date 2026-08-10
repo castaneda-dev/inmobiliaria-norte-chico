@@ -1,14 +1,26 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  async rewrites() {
+  async redirects() {
     return [
       {
-        source: '/',
-        destination: '/index.html',
+        source: '/admin',
+        destination: '/crm',
+        permanent: true,
+      },
+      {
+        source: '/admin.html',
+        destination: '/crm',
+        permanent: true,
       },
       {
         source: '/dashboard_admin',
-        destination: '/admin',
+        destination: '/crm',
+        permanent: true,
+      },
+      {
+        source: '/dashboard_admin.html',
+        destination: '/crm',
+        permanent: true,
       },
     ];
   },

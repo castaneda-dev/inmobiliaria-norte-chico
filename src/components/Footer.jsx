@@ -1,5 +1,6 @@
 "use client";
 import React from 'react';
+import Link from 'next/link';
 
 export default function Footer() {
   return (
@@ -8,6 +9,11 @@ export default function Footer() {
         <div>
           <div className="font-sans font-black text-lg text-white mb-1">INMOBILIARIA NORTE CHICO</div>
           <p className="text-xs opacity-60">2026 © Inmobiliaria Norte Chico S.A.C. Todos los derechos reservados.</p>
+        </div>
+        <div>
+          <Link href="/crm" className="text-xs text-terracota hover:underline flex items-center gap-1 font-mono">
+            🔐 Acceso CRM
+          </Link>
         </div>
       </div>
     </footer>
