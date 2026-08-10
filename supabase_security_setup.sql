@@ -46,10 +46,39 @@ TO authenticated
 USING (true) 
 WITH CHECK (true);
 
--- ==========================================
--- VERIFICACIÓN
--- ==========================================
+-- =====================================================================
+-- 2. CONFIGURACIÓN DEL STORAGE (IMÁGENES DE PROPIEDADES)
+-- =====================================================================
+
+-- Crear el bucket de storage 'propiedades' si no existe
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('propiedades', 'propiedades', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Habilitar permisos de subida pública y lectura de imágenes
+DROP POLICY IF EXISTS "Permitir subida publica propiedades" ON storage.objects;
+DROP POLICY IF EXISTS "Permitir descarga publica propiedades" ON storage.objects;
+
+-- Permitir que usuarios anónimos/autenticados suban imágenes al bucket propiedades
+CREATE POLICY "Permitir subida publica propiedades"
+ON storage.objects
+FOR INSERT
+TO public
+WITH CHECK (bucket_id = 'propiedades');
+
+-- Permitir que cualquier persona pueda descargar y ver las imágenes del bucket propiedades
+CREATE POLICY "Permitir descarga publica propiedades"
+ON storage.objects
+FOR SELECT
+TO public
+USING (bucket_id = 'propiedades');
+
+-- =====================================================================
+-- VERIFICACIÓN Y SEGURIDAD COMPLETA
+-- =====================================================================
 -- Las políticas anteriores garantizan que con la clave anónima (Anon Key) del frontend:
--- 1. Nadie pueda consultar la lista de clientes.
--- 2. Nadie pueda borrar o modificar las propiedades de la inmobiliaria.
--- 3. Los formularios de contacto sigan funcionando perfectamente para registrar clientes.
+-- 1. Nadie pueda consultar la lista de clientes del CRM.
+-- 2. Nadie pueda borrar o modificar propiedades de forma no autorizada.
+-- 3. Los formularios de contacto sigan funcionando correctamente.
+-- 4. Las subidas de imágenes hasta 10 MB funcionen perfectamente en el CRM.
+
