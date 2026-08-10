@@ -1,10 +1,9 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import WhatsAppButton from './WhatsAppButton';
-import { supabase } from '../supabaseClient';
 import dynamic from 'next/dynamic';
-import 'leaflet/dist/leaflet.css';
 
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
 const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
@@ -15,392 +14,473 @@ const Polyline = dynamic(() => import('react-leaflet').then(mod => mod.Polyline)
 export default function PropertyDetailView({ initialProperty }) {
   const property = initialProperty;
   
-  let imagenesList = [];
-  if (property) {
+  // Memorizar la extracción de lista de imágenes para optimización de rendimiento
+  const imagenesList = useMemo(() => {
+    if (!property) return ['/PR_GLORIETA_DELUXE.webp'];
     const rawImg = property.imagen_url || property.imagen || '';
+    let list = [];
     try {
       if (rawImg && typeof rawImg === 'string' && rawImg.startsWith('[')) {
-        imagenesList = JSON.parse(rawImg);
+        list = JSON.parse(rawImg);
       } else if (property.imagenes && Array.isArray(property.imagenes)) {
-        imagenesList = property.imagenes;
+        list = property.imagenes;
       } else if (rawImg) {
-        imagenesList = [rawImg];
+        list = [rawImg];
       }
     } catch (e) {
-      if (rawImg) imagenesList = [rawImg];
+      if (rawImg) list = [rawImg];
     }
-  }
-  if (!imagenesList.length) {
-    imagenesList = ['https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=85'];
-  }
+    return list.length ? list : ['/PR_GLORIETA_DELUXE.webp'];
+  }, [property]);
 
   const [activeImgIdx, setActiveImgIdx] = useState(0);
-  const [formData, setFormData] = useState({ nombre: '', email: '', telefono: '', prefijo: '+51', mensaje: '' });
-  const [status, setStatus] = useState('idle');
-  const [mounted, setMounted] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [formData, setFormData] = useState({ nombre: '', email: '', celular: '', paisCode: '+51', mensaje: '' });
+  const [formStatus, setFormStatus] = useState('idle'); // 'idle' | 'loading' | 'success' | 'error'
+  const [toastMessage, setToastMessage] = useState(null);
+  
+  // Lazy loading para Leaflet Map mediante IntersectionObserver
+  const [mapVisible, setMapVisible] = useState(false);
+  const mapRef = useRef(null);
 
   useEffect(() => {
-    setMounted(true);
-    import('leaflet').then(L => {
-      delete L.Icon.Default.prototype._getIconUrl;
-      L.Icon.Default.mergeOptions({
-        iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-        iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-      });
-    });
+    if (!mapRef.current) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setMapVisible(true);
+        observer.disconnect();
+      }
+    }, { rootMargin: '150px' });
+    
+    observer.observe(mapRef.current);
+    return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    if (mapVisible) {
+      import('leaflet').then(L => {
+        delete L.Icon.Default.prototype._getIconUrl;
+        L.Icon.Default.mergeOptions({
+          iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+          iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+          shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+        });
+      });
+    }
+  }, [mapVisible]);
+
+  const showToast = (msg, type = 'success') => {
+    setToastMessage({ msg, type });
+    setTimeout(() => setToastMessage(null), 4500);
+  };
+
   const moveCarousel = (dir) => {
-    setActiveImgIdx(prev => {
-      let next = prev + dir;
-      if (next < 0) return imagenesList.length - 1;
-      if (next >= imagenesList.length) return 0;
-      return next;
-    });
+    setActiveImgIdx(prev => (prev + dir + imagenesList.length) % imagenesList.length);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    if (name === 'celular') {
+      const numbersOnly = value.replace(/[^0-9]/g, '');
+      if (numbersOnly.length > 9) return;
+      setFormData(prev => ({ ...prev, celular: numbersOnly }));
+      return;
+    }
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (formStatus === 'loading') return;
+
+    if (formData.celular.length !== 9) {
+      showToast('El teléfono celular debe contener 9 dígitos exactos.', 'error');
+      return;
+    }
+
+    setFormStatus('loading');
+    try {
+      const payload = {
+        nombre: formData.nombre.trim(),
+        email: formData.email.trim(),
+        telefono: `${formData.paisCode}${formData.celular}`,
+        origen: `Web Ficha Proyecto ID-${property?.id || 'General'}`,
+        notas: `Interés en: ${property?.titulo || 'Propiedad'} - ${formData.mensaje ? `Mensaje: ${formData.mensaje}` : 'Consulta de disponibilidad'}`
+      };
+
+      const res = await fetch('/api/webhook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setFormStatus('success');
+        showToast('¡Solicitud registrada con éxito! Un asesor patrimonial te contactará.', 'success');
+        setFormData({ nombre: '', email: '', celular: '', paisCode: '+51', mensaje: '' });
+      } else {
+        throw new Error(data.error || 'Error al enviar');
+      }
+    } catch (err) {
+      console.error("Form error:", err);
+      setFormStatus('error');
+      showToast('Ocurrió un inconveniente al enviar la consulta. Intenta nuevamente.', 'error');
+    }
   };
 
   if (!property) {
     return (
-      <main style={{ backgroundColor: 'var(--bg-black)', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
-        <link rel="stylesheet" href="/assets/css/index.min.css" />
-        <div style={{ textAlign: 'center' }}>
-          <h1>Proyecto No Encontrado</h1>
-          <Link href="/" className="btn-pill" style={{ marginTop: '20px' }}>Volver al Portafolio</Link>
+      <main style={{ backgroundColor: '#080808', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontFamily: 'Montserrat, sans-serif' }}>
+        <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+          <h1 style={{ fontSize: '32px', marginBottom: '16px' }}>Inmueble No Encontrado</h1>
+          <p style={{ color: '#888', marginBottom: '24px' }}>El proyecto solicitado no se encuentra disponible actualmente.</p>
+          <Link href="/" className="btn-pill">Volver al Catálogo Principal</Link>
         </div>
       </main>
     );
   }
 
   const precioFormat = typeof property.precio === 'number' ? '$' + parseFloat(property.precio).toLocaleString() : (property.precio || '$0');
-  
-  const whatsappMsg = `Hola, me interesa asegurar capital en el proyecto ID-${property.id}: ${property.titulo}. Quisiera más información sobre la disponibilidad y forma de pago.`;
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setStatus('loading');
-    try {
-      const fullPhone = `${formData.prefijo} ${formData.telefono}`;
-      const { error } = await supabase.from('clientes').insert([{
-        nombre_completo: formData.nombre,
-        email: formData.email,
-        telefono: fullPhone,
-        tipo_interes: `[Consulta Proyecto ID-${property.id}: ${property.titulo}] ${formData.mensaje}`,
-        estado_lead: 'Nuevo',
-        origen: `Web Ficha Proyecto ID-${property.id}`
-      }]);
-      
-      if (error) throw error;
-      setStatus('success');
-      setFormData({ nombre: '', email: '', telefono: '', prefijo: '+51', mensaje: '' });
-      setTimeout(() => setStatus('idle'), 4000);
-    } catch (err) {
-      console.error("Error saving lead:", err);
-      setStatus('error');
-      setTimeout(() => setStatus('idle'), 4000);
-    }
-  };
+  const whatsappMsg = `Hola Inmobiliaria Norte Chico, me interesa información y disponibilidad del proyecto ID-${property.id}: ${property.titulo}.`;
 
   return (
-    <>
-      <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet" />
-      <link rel="stylesheet" href="/assets/css/index.min.css" />
-      <style>{`
-        body { background-color: var(--bg-black); color: var(--text-white); }
-
-
-        .ficha-grid-main {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 40px;
-          margin-bottom: 60px;
-          width: 100%;
-        }
-
-        @media (min-width: 992px) {
-          .ficha-grid-main {
-            grid-template-columns: 1.8fr 1.2fr;
-            gap: 60px;
-          }
-        }
-
-        .ficha-gallery-main {
-          position: relative;
-          width: 100%;
-          height: 50vh;
-          border-radius: 24px;
-          overflow: hidden;
-          border: 1px solid rgba(203, 159, 116, 0.4);
-          box-shadow: 0 25px 50px rgba(0,0,0,0.8);
-          background-color: var(--bg-black);
-        }
-
-        @media (min-width: 992px) {
-          .ficha-gallery-main { height: 75vh; min-height: 600px; }
-        }
-
-        .ficha-gallery-img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          transition: transform 0.4s ease;
-        }
-
-        .ficha-thumbnails {
-          display: flex;
-          gap: 15px;
-          overflow-x: auto;
-          padding: 25px 0;
-          scrollbar-width: none;
-        }
-        
-        .ficha-thumbnails::-webkit-scrollbar { display: none; }
-
-        .ficha-thumb {
-          width: 120px;
-          height: 90px;
-          border-radius: 16px;
-          overflow: hidden;
-          border: 2px solid transparent;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          flex-shrink: 0;
-          opacity: 0.6;
-          box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-        }
-
-        .ficha-thumb.active {
-          border-color: var(--gold-light);
-          opacity: 1;
-          transform: scale(1.05);
-        }
-
-        /* Glassmorphism para que luzca épico sobre el fondo */
-        .ficha-details-card {
-          background-color: rgba(12, 12, 12, 0.7);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
-          border-radius: 24px;
-          padding: 50px;
-          border: 1px solid rgba(255,255,255,0.08);
-          display: flex;
-          flex-direction: column;
-          box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-        }
-
-        .specs-grid {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 40px;
-          width: 100%;
-        }
-        
-        @media (min-width: 992px) {
-          .specs-grid { grid-template-columns: 1fr 1fr; gap: 60px; }
-        }
-
-        .leaflet-container { z-index: 1 !important; border-radius: 24px; }
-      `}</style>
+    <div style={{ backgroundColor: '#080808', color: '#fff', minHeight: '100vh', fontFamily: 'Montserrat, sans-serif', overflowX: 'hidden' }}>
       
-      {/* NAVEGACIÓN EXACTA AL INICIO */}
+      {/* NAVEGACIÓN SUPERIOR */}
       <nav className="hero-initial">
         <div className="logo-container">
           <span className="logo-main">NORTE CHICO</span>
           <span className="logo-sub">GRUPO INMOBILIARIO</span>
         </div>
         <div className="nav-links">
-          <Link href="/">Casas</Link>
-          <Link href="/">Lotes Residenciales</Link>
-          <Link href="/" style={{ color: 'var(--gold-light)' }}>← Volver al Inicio</Link>
+          <Link href="/#portafolio">Lotes Residenciales</Link>
+          <Link href="/#contacto" className="btn-pill" style={{ padding: '8px 20px', fontSize: '12px' }}>Agendar Visita</Link>
         </div>
       </nav>
 
-      <main style={{ 
-        background: `linear-gradient(to top, rgba(8, 8, 8, 1) 0%, rgba(8, 8, 8, 0.4) 30%, rgba(8, 8, 8, 0.8) 100%), url('/PR_GLORIETA_DELUXE.webp') center/cover fixed`,
-        width: '100%',
-        minHeight: '100vh'
-      }}>
-        <section style={{ padding: '140px 5% 60px 5%', width: '100%' }}>
-          
-          {/* FICHA PRINCIPAL (Galería + Detalles) */}
-          <div className="ficha-grid-main">
-            
-            {/* LADO IZQUIERDO: GALERÍA */}
-            <div>
-              <div className="ficha-gallery-main">
-                <img src={imagenesList[activeImgIdx]} alt={property.titulo} className="ficha-gallery-img" />
-                
-                {/* Botón de estado flotante */}
-                <div style={{ position: 'absolute', top: '20px', left: '20px', background: 'var(--gold-gradient)', color: 'white', padding: '6px 16px', borderRadius: '20px', fontSize: '11px', fontWeight: '900', textTransform: 'uppercase', boxShadow: '0 4px 15px rgba(0,0,0,0.5)' }}>
-                  {property.estado || 'Disponible'}
-                </div>
+      {/* MIGA DE PAN (BREADCRUMB) */}
+      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '100px 5% 0 5%', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#888', flexWrap: 'wrap' }}>
+        <Link href="/" style={{ color: '#aaa', textDecoration: 'none' }}>Inicio</Link>
+        <span>/</span>
+        <Link href="/#portafolio" style={{ color: '#aaa', textDecoration: 'none' }}>Colección Residencial</Link>
+        <span>/</span>
+        <span style={{ color: 'var(--gold-light, #cb9f74)', fontWeight: 600 }}>{property.titulo}</span>
+      </div>
 
-                {/* Flechas del Carrusel */}
-                {imagenesList.length > 1 && (
-                  <>
-                    <button className="carousel-btn prev-btn" style={{ background: 'rgba(8,8,8,0.7)', borderColor: 'var(--gold-light)' }} onClick={() => moveCarousel(-1)}>&#10094;</button>
-                    <button className="carousel-btn next-btn" style={{ background: 'rgba(8,8,8,0.7)', borderColor: 'var(--gold-light)' }} onClick={() => moveCarousel(1)}>&#10095;</button>
-                  </>
-                )}
+      <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px 5% 60px 5%', width: '100%', boxSizing: 'border-box' }}>
+        
+        {/* CABECERA PRINCIPAL CON TÍTULO Y BADGES */}
+        <div style={{ marginBottom: '30px' }}>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '12px' }}>
+            <span style={{ background: 'linear-gradient(135deg, #cb9f74, #e2b988)', color: '#000', padding: '4px 14px', borderRadius: '16px', fontSize: '11px', fontWeight: 800, textTransform: 'uppercase' }}>
+              {property.tipo_activo || 'Terreno'}
+            </span>
+            <span style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', color: '#10b981', padding: '4px 14px', borderRadius: '16px', fontSize: '11px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '5px' }}>
+              ✓ Saneado 100% SUNARP
+            </span>
+          </div>
+
+          <h1 style={{ fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 800, lineHeight: '1.15', margin: '0 0 10px 0', letterSpacing: '-0.5px' }}>
+            {property.titulo}
+          </h1>
+          <p style={{ color: '#aaa', fontSize: '14px', margin: 0 }}>📍 Chancay - Huaral, Norte Chico, Lima, Perú</p>
+        </div>
+
+        {/* ESTRUCTURA EN DOS COLUMNAS */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '40px', alignItems: 'start' }}>
+          
+          {/* COLUMNA IZQUIERDA: GALERÍA HD */}
+          <div style={{ width: '100%' }}>
+            <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9', minHeight: '320px', maxHeight: '560px', borderRadius: '20px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: '#111', boxShadow: '0 20px 40px rgba(0,0,0,0.6)' }}>
+              
+              <Image 
+                src={imagenesList[activeImgIdx]} 
+                alt={`${property.titulo} - Vista ${activeImgIdx + 1}`} 
+                fill 
+                priority 
+                sizes="(max-width: 768px) 100vw, 60vw"
+                style={{ objectFit: 'cover' }} 
+              />
+              
+              {/* Botón Pantalla Completa */}
+              <button 
+                onClick={() => setLightboxOpen(true)}
+                style={{ position: 'absolute', top: '16px', right: '16px', background: 'rgba(0,0,0,0.7)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '8px 14px', borderRadius: '20px', fontSize: '12px', cursor: 'pointer', backdropFilter: 'blur(8px)', zIndex: 5, display: 'flex', alignItems: 'center', gap: '6px' }}
+              >
+                🔍 Pantalla Completa HD
+              </button>
+
+              {/* Contadores e Indicadores */}
+              <div style={{ position: 'absolute', bottom: '16px', left: '16px', background: 'rgba(0,0,0,0.75)', color: '#fff', padding: '4px 12px', borderRadius: '12px', fontSize: '11px', fontWeight: 600, backdropFilter: 'blur(6px)' }}>
+                📷 {activeImgIdx + 1} / {imagenesList.length}
               </div>
 
-              {/* Miniaturas (Thumbnails) */}
+              {/* Flechas del Carrusel */}
               {imagenesList.length > 1 && (
-                <div className="ficha-thumbnails">
-                  {imagenesList.map((img, idx) => (
-                    <div 
-                      key={idx} 
-                      className={`ficha-thumb ${activeImgIdx === idx ? 'active' : ''}`}
-                      onClick={() => setActiveImgIdx(idx)}
-                    >
-                      <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    </div>
-                  ))}
-                </div>
+                <>
+                  <button className="carousel-btn prev-btn" style={{ background: 'rgba(0,0,0,0.6)', borderColor: '#cb9f74' }} onClick={() => moveCarousel(-1)}>&#10094;</button>
+                  <button className="carousel-btn next-btn" style={{ background: 'rgba(0,0,0,0.6)', borderColor: '#cb9f74' }} onClick={() => moveCarousel(1)}>&#10095;</button>
+                </>
               )}
             </div>
 
-            {/* LADO DERECHO: DETALLES DE LA PROPIEDAD */}
-            <div className="ficha-details-card">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <span className="text-gradient" style={{ fontSize: '12px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                  {(property.tipo_activo || 'Terreno')}
-                </span>
-                <span style={{ fontSize: '12px', color: '#888', fontWeight: '700' }}>Saneado 100%</span>
+            {/* Miniaturas (Thumbnails) */}
+            {imagenesList.length > 1 && (
+              <div style={{ display: 'flex', gap: '12px', overflowX: 'auto', padding: '16px 0', scrollbarWidth: 'thin' }}>
+                {imagenesList.map((img, idx) => (
+                  <div 
+                    key={idx} 
+                    onClick={() => setActiveImgIdx(idx)}
+                    style={{ position: 'relative', width: '100px', height: '70px', borderRadius: '12px', overflow: 'hidden', border: idx === activeImgIdx ? '2px solid #cb9f74' : '2px solid transparent', opacity: idx === activeImgIdx ? 1 : 0.55, cursor: 'pointer', transition: 'all 0.2s ease', flexShrink: 0 }}
+                  >
+                    <Image src={img} alt={`${property.titulo} miniatura ${idx + 1}`} fill sizes="100px" style={{ objectFit: 'cover' }} />
+                  </div>
+                ))}
               </div>
+            )}
 
-              <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(36px, 4vw, 54px)', lineHeight: '1.1', marginBottom: '30px', color: 'var(--text-white)' }}>
-                {property.titulo}
-              </h1>
-
-              {/* Caja de Precio Resaltado */}
-              <div style={{ background: 'rgba(255,255,255,0.05)', borderLeft: '4px solid var(--gold-light)', padding: '30px', borderRadius: '16px', marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: 'inset 0 0 20px rgba(0,0,0,0.5)' }}>
+            {/* BLOQUE DE SELLOS DE SEGURIDAD JURÍDICA */}
+            <div style={{ marginTop: '30px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '20px', padding: '24px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ fontSize: '24px' }}>🛡️</div>
                 <div>
-                  <div style={{ fontSize: '12px', color: '#AAA', fontWeight: '900', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '1px' }}>Precio de Inversión</div>
-                  <div className="text-gradient" style={{ fontSize: '42px', fontWeight: '900', lineHeight: '1' }}>{precioFormat}</div>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '12px', color: '#AAA', fontWeight: '900', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '1px' }}>Ubicación</div>
-                  <div style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-white)' }}>Chancay - Huaral</div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#fff' }}>Garantía Registral</div>
+                  <div style={{ fontSize: '11px', color: '#888' }}>Partida e independización limpia en SUNARP</div>
                 </div>
               </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ fontSize: '24px' }}>📜</div>
+                <div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#fff' }}>Transferencia Inmediata</div>
+                  <div style={{ fontSize: '11px', color: '#888' }}>Sin cargas ni gravámenes pendientes</div>
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ fontSize: '24px' }}>⚡</div>
+                <div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#fff' }}>Servicios Básicos</div>
+                  <div style={{ fontSize: '11px', color: '#888' }}>Factibilidad técnica habilitada</div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-              <p style={{ fontSize: '16px', color: '#DDD', lineHeight: '1.8', marginBottom: '50px', flexGrow: 1, textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
-                {property.descripcion || 'Inmueble de alta plusvalía posicionado estratégicamente en el eje logístico del Megapuerto. Excelente oportunidad de inversión o desarrollo residencial. Cuenta con todos los documentos en regla.'}
-              </p>
+          {/* COLUMNA DERECHA: CAJA DE PRECIO Y ACCIONES */}
+          <div style={{ width: '100%' }}>
+            <div style={{ background: 'rgba(18, 18, 18, 0.85)', backdropFilter: 'blur(16px)', borderRadius: '24px', padding: '32px', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }}>
+              
+              <div style={{ fontSize: '11px', color: '#888', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '6px' }}>
+                Precio Promocional de Inversión
+              </div>
+              <div style={{ fontSize: 'clamp(36px, 3.5vw, 48px)', fontWeight: 900, background: 'linear-gradient(135deg, #fff, #cb9f74)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: '24px', lineHeight: '1' }}>
+                {precioFormat}
+              </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div style={{ fontSize: '14px', color: '#ccc', lineHeight: '1.7', marginBottom: '30px' }}>
+                {property.descripcion || 'Inmueble residencial y de inversión ubicado estratégicamente en el corredor de alta plusvalía de Chancay y Huaral. Ideal para desarrollo familiar, casa de campo o reserva patrimonial.'}
+              </div>
+
+              {/* BOTONES DE ACCIÓN DE ALTA CONVERSIÓN */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '30px' }}>
                 <a 
                   href={`https://wa.me/56982816844?text=${encodeURIComponent(whatsappMsg)}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="btn-pill" style={{ width: '100%', padding: '24px', fontSize: '15px' }}
+                  className="btn-pill" 
+                  style={{ width: '100%', textAlign: 'center', padding: '18px 24px', fontSize: '14px', background: '#25d366', color: '#fff', boxShadow: '0 4px 20px rgba(37, 211, 102, 0.35)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}
                 >
-                  Hablar con un Asesor por WhatsApp
+                  💬 Consultar Disponibilidad por WhatsApp
                 </a>
-                <a href="#contacto" className="btn-outline" style={{ textAlign: 'center', width: '100%', fontSize: '14px', padding: '20px' }}>
-                  Agendar una Cita Guiada
+                <a 
+                  href="#contacto-ficha" 
+                  className="btn-outline" 
+                  style={{ textAlign: 'center', width: '100%', fontSize: '13px', padding: '16px 20px' }}
+                >
+                  📅 Agendar Recorrido Guiado
                 </a>
+              </div>
+
+              {/* TARJETA DE ASESOR PATRIMONIAL DEDICADO */}
+              <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <div style={{ position: 'relative', width: '54px', height: '54px', borderRadius: '50%', overflow: 'hidden', background: '#cb9f74', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>
+                  👨‍💼
+                </div>
+                <div>
+                  <div style={{ fontSize: '13px', fontWeight: 800, color: '#fff' }}>Asesor Inmobiliario Senior</div>
+                  <div style={{ fontSize: '11px', color: '#cb9f74' }}>Grupo Inmobiliario Norte Chico</div>
+                  <div style={{ fontSize: '11px', color: '#888', marginTop: '2px' }}>Atención inmediata en Huaral y Chancay</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        {/* SECCIÓN 2: ESPECIFICACIONES TÉCNICAS Y MAPA INTERACTIVO */}
+        <div style={{ marginTop: '60px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '40px' }}>
+          
+          {/* ESPECIFICACIONES TÉCNICAS */}
+          <div style={{ background: 'rgba(18, 18, 18, 0.7)', borderRadius: '24px', padding: '32px', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <h2 style={{ fontSize: '24px', fontWeight: 800, marginBottom: '24px', color: '#fff' }}>
+              Especificaciones Técnicas
+            </h2>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '14px' }}>
+                <span style={{ color: '#888', fontSize: '13px', fontWeight: 600 }}>Área Total:</span>
+                <span style={{ fontWeight: 800, color: '#cb9f74' }}>{property.area_m2 || property.area || 'Consultar'} m²</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '14px' }}>
+                <span style={{ color: '#888', fontSize: '13px', fontWeight: 600 }}>Zonificación:</span>
+                <span style={{ fontWeight: 700, color: '#fff' }}>{property.zonificacion || 'Residencial / Comercio'}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '14px' }}>
+                <span style={{ color: '#888', fontSize: '13px', fontWeight: 600 }}>Estado del Proyecto:</span>
+                <span style={{ fontWeight: 700, color: '#10b981' }}>{property.estado || 'Disponible'}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '10px' }}>
+                <span style={{ color: '#888', fontSize: '13px', fontWeight: 600 }}>Parámetros de Construcción:</span>
+                <span style={{ fontWeight: 700, color: '#fff' }}>{property.parametros || 'Estándar Municipal'}</span>
               </div>
             </div>
           </div>
 
-          <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.05)', margin: '60px 0' }} />
-
-          {/* SEGUNDA SECCIÓN: ESPECIFICACIONES Y MAPA */}
-          <div className="specs-grid">
-            {/* Especificaciones */}
-            <div className="ficha-details-card" style={{ border: '1px solid rgba(203, 159, 116, 0.4)' }}>
-              <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '32px', fontWeight: '700', marginBottom: '40px', color: 'var(--text-white)' }}>
-                Especificaciones Técnicas
-              </h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '25px', fontSize: '16px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '20px' }}>
-                  <span style={{ color: '#CCC', fontWeight: '700', textTransform: 'uppercase', fontSize: '14px', letterSpacing: '1px' }}>Superficie Total:</span>
-                  <span style={{ fontWeight: '900', color: 'var(--gold-light)' }}>{property.area_m2 || property.area || 'N/A'} m²</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '20px' }}>
-                  <span style={{ color: '#CCC', fontWeight: '700', textTransform: 'uppercase', fontSize: '14px', letterSpacing: '1px' }}>Zonificación:</span>
-                  <span style={{ fontWeight: '700', color: 'white' }}>{property.zonificacion || 'Residencial'}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '20px' }}>
-                  <span style={{ color: '#CCC', fontWeight: '700', textTransform: 'uppercase', fontSize: '14px', letterSpacing: '1px' }}>Estado Registral:</span>
-                  <span style={{ fontWeight: '700', color: 'white' }}>Saneado en SUNARP</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
-                  <span style={{ color: '#CCC', fontWeight: '700', textTransform: 'uppercase', fontSize: '14px', letterSpacing: '1px' }}>Parámetros:</span>
-                  <span style={{ fontWeight: '700', color: 'white' }}>{property.parametros || 'Residencial / Comercial'}</span>
-                </div>
+          {/* MAPA LOGÍSTICO DIFERIDO (LAZY LEAFLET) */}
+          <div ref={mapRef} style={{ background: 'rgba(18, 18, 18, 0.7)', borderRadius: '24px', padding: 0, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)', minHeight: '360px', position: 'relative' }}>
+            {!mapVisible ? (
+              <div style={{ display: 'flex', height: '100%', minHeight: '360px', alignItems: 'center', justifyContent: 'center', color: '#888', fontSize: '13px' }}>
+                🗺️ Cargar mapa de ubicación referencial...
               </div>
-            </div>
-
-            {/* Mapa Logístico */}
-            <div className="ficha-details-card" style={{ padding: 0, overflow: 'hidden', border: '1px solid rgba(203, 159, 116, 0.4)' }}>
-              {!mounted ? (
-                <div style={{ display: 'flex', height: '100%', minHeight: '400px', alignItems: 'center', justifyContent: 'center', color: '#888' }}>Cargando mapa interactivo...</div>
-              ) : (
-                <div style={{ position: 'relative', height: '100%', minHeight: '400px', width: '100%' }}>
-                  <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', padding: '30px', background: 'linear-gradient(to bottom, rgba(8,8,8,0.9), transparent)', zIndex: 2, pointerEvents: 'none' }}>
-                    <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '28px', fontWeight: '700', margin: 0, color: 'white' }}>Análisis Logístico</h3>
-                    <p style={{ fontSize: '13px', color: 'var(--gold-light)', margin: 0, textTransform: 'uppercase', fontWeight: '900', letterSpacing: '1px' }}>Distancia Referencial a Megapuerto</p>
-                  </div>
-                  <MapContainer center={[-11.53, -77.24]} zoom={12} style={{ height: '100%', width: '100%' }}>
-                    <TileLayer
-                      url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-                      attribution='&copy; CARTO'
-                    />
-                    <Marker position={[-11.5694, -77.2676]}>
-                      <Popup><strong style={{ color: '#cb9f74' }}>Plaza de Armas / Megapuerto</strong><br/>Chancay</Popup>
-                    </Marker>
-                    <Marker position={[-11.4939, -77.2078]}>
-                      <Popup><strong>{property.titulo}</strong><br/>Ubicación Referencial</Popup>
-                    </Marker>
-                    <Polyline positions={[[-11.5694, -77.2676], [-11.4939, -77.2078]]} pathOptions={{ color: '#cb9f74', weight: 4, dashArray: '10, 10' }} />
-                  </MapContainer>
+            ) : (
+              <div style={{ position: 'relative', height: '100%', minHeight: '360px', width: '100%' }}>
+                <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', padding: '24px', background: 'linear-gradient(to bottom, rgba(8,8,8,0.9), transparent)', zIndex: 2, pointerEvents: 'none' }}>
+                  <h2 style={{ fontSize: '20px', fontWeight: 800, margin: 0, color: '#fff' }}>Ubicación y Eje Logístico</h2>
+                  <p style={{ fontSize: '11px', color: '#cb9f74', margin: 0, fontWeight: 700, textTransform: 'uppercase' }}>Cercanía al Megapuerto de Chancay y Valle Huaral</p>
                 </div>
-              )}
-            </div>
+                <MapContainer center={[-11.53, -77.24]} zoom={12} style={{ height: '100%', width: '100%' }}>
+                  <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" attribution='&copy; CARTO' />
+                  <Marker position={[-11.5694, -77.2676]}>
+                    <Popup><strong style={{ color: '#cb9f74' }}>Megapuerto de Chancay</strong></Popup>
+                  </Marker>
+                  <Marker position={[-11.4939, -77.2078]}>
+                    <Popup><strong>{property.titulo}</strong></Popup>
+                  </Marker>
+                  <Polyline positions={[[-11.5694, -77.2676], [-11.4939, -77.2078]]} pathOptions={{ color: '#cb9f74', weight: 4, dashArray: '8, 8' }} />
+                </MapContainer>
+              </div>
+            )}
           </div>
-        </section>
 
-        {/* SECCIÓN DE CONTACTO IDÉNTICA AL HOME */}
-        <section className="contact-module" id="contacto">
+        </div>
+
+        {/* SECCIÓN 3: FORMULARIO DE CAPTACIÓN CENTRALIZADO */}
+        <section className="contact-module fade-module" id="contacto-ficha" style={{ marginTop: '60px' }}>
           <div className="form-container">
-            <h2>Consulta <span className="text-gradient">Directa</span></h2>
-            <p>Agenda una cita guiada o solicita la minuta legal de la propiedad {property.titulo}.</p>
-            <form className="form-grid" onSubmit={handleSubmit}>
-              <div className="form-full">
-                <input required type="text" placeholder="Nombre completo *" value={formData.nombre} onChange={e => setFormData({...formData, nombre: e.target.value})} />
-              </div>
+            <h2>Solicitar Información de <span className="text-gradient">este Inmueble</span></h2>
+            <p>Déjenos sus datos para enviarle la ficha legal, planos y agendar un recorrido presencial en {property.titulo}.</p>
+            
+            <form onSubmit={handleSubmit} className="form-grid">
+              <input 
+                type="text" 
+                name="nombre"
+                placeholder="Nombre Completo *" 
+                maxLength={100}
+                value={formData.nombre}
+                onChange={handleInputChange}
+                required 
+              />
+              <input 
+                type="email" 
+                name="email"
+                placeholder="Correo Electrónico *" 
+                value={formData.email}
+                onChange={handleInputChange}
+                required 
+              />
               <div className="phone-input-group">
-                <select value={formData.prefijo} onChange={e => setFormData({...formData, prefijo: e.target.value})}>
+                <select 
+                  name="paisCode"
+                  value={formData.paisCode}
+                  onChange={handleInputChange}
+                  required
+                >
                   <option value="+51">🇵🇪 +51</option>
                   <option value="+56">🇨🇱 +56</option>
                   <option value="+54">🇦🇷 +54</option>
-                  <option value="+57">🇨🇴 +57</option>
-                  <option value="+52">🇲🇽 +52</option>
                   <option value="+1">🇺🇸 +1</option>
-                  <option value="+34">🇪🇸 +34</option>
                 </select>
-                <input required type="tel" placeholder="Número de celular *" value={formData.telefono} onChange={e => setFormData({...formData, telefono: e.target.value})} />
+                <input 
+                  type="tel" 
+                  name="celular"
+                  placeholder="Celular (9 dígitos) *" 
+                  pattern="[0-9]{9}" 
+                  maxLength="9" 
+                  value={formData.celular}
+                  onChange={handleInputChange}
+                  required 
+                />
               </div>
-              <input required type="email" placeholder="Correo electrónico *" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
-              <div className="form-full">
-                <input type="text" placeholder="Mensaje adicional (Opcional)" value={formData.mensaje} onChange={e => setFormData({...formData, mensaje: e.target.value})} />
-              </div>
-              <div className="form-full" style={{ textAlign: 'center', marginTop: '20px' }}>
-                <button type="submit" className="btn-pill" disabled={status === 'loading'} style={{ width: '100%', maxWidth: '300px', cursor: status === 'loading' ? 'not-allowed' : 'pointer' }}>
-                  {status === 'loading' ? 'ENVIANDO...' : 'SOLICITAR INFORMACIÓN'}
-                </button>
-                {status === 'success' && <p style={{ color: '#10B981', marginTop: '20px', fontWeight: 'bold' }}>¡Solicitud enviada con éxito! Nos pondremos en contacto muy pronto.</p>}
-              </div>
+              <input 
+                type="text"
+                name="mensaje"
+                placeholder="Consulta adicional (Opcional)"
+                value={formData.mensaje}
+                onChange={handleInputChange}
+              />
+              <button 
+                type="submit" 
+                disabled={formStatus === 'loading'}
+                className="btn-pill form-full" 
+                style={{ marginTop: '10px' }}
+              >
+                {formStatus === 'loading' ? 'ENVIANDO SOLICITUD...' : 'SOLICITAR FICHA LEGAL Y DISPONIBILIDAD'}
+              </button>
             </form>
           </div>
         </section>
+
       </main>
-      
-      {/* WhatsApp flotante idéntico al Home */}
+
+      {/* LIGHTBOX MODAL PANTALLA COMPLETA */}
+      {lightboxOpen && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.95)', zIndex: 9999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+          <button 
+            onClick={() => setLightboxOpen(false)}
+            style={{ position: 'absolute', top: '20px', right: '20px', background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: '28px', width: '48px', height: '48px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            ×
+          </button>
+          
+          <div style={{ position: 'relative', width: '90vw', height: '80vh' }}>
+            <Image 
+              src={imagenesList[activeImgIdx]} 
+              alt={`${property.titulo} en alta resolución`} 
+              fill 
+              style={{ objectFit: 'contain' }} 
+            />
+          </div>
+
+          <div style={{ marginTop: '15px', color: '#aaa', fontSize: '13px', display: 'flex', gap: '20px', alignItems: 'center' }}>
+            <button onClick={() => moveCarousel(-1)} style={{ background: 'none', border: '1px solid #555', color: '#fff', padding: '6px 16px', borderRadius: '12px', cursor: 'pointer' }}>‹ Anterior</button>
+            <span>📷 Foto {activeImgIdx + 1} de {imagenesList.length}</span>
+            <button onClick={() => moveCarousel(1)} style={{ background: 'none', border: '1px solid #555', color: '#fff', padding: '6px 16px', borderRadius: '12px', cursor: 'pointer' }}>Siguiente ›</button>
+          </div>
+        </div>
+      )}
+
+      {/* NOTIFICACIONES TOAST */}
+      {toastMessage && (
+        <div className="toast-container">
+          <div className="toast" style={{ borderLeft: toastMessage.type === 'success' ? '4px solid #10b981' : '4px solid #ef4444' }}>
+            {toastMessage.msg}
+          </div>
+        </div>
+      )}
+
+      {/* BOTÓN WHATSAPP FLOTANTE */}
       <WhatsAppButton />
-    </>
+    </div>
   );
 }

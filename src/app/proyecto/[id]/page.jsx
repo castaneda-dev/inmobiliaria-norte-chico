@@ -25,20 +25,34 @@ export async function generateMetadata({ params }) {
       }
     } catch (e) {}
 
+    const titleStr = `${property.titulo} en Chancay y Huaral | Inmobiliaria Norte Chico`;
+    const descStr = property.descripcion ? property.descripcion.slice(0, 160) : `Lote e inmueble en venta: ${property.titulo} en Chancay y Huaral. Inmobiliaria Norte Chico.`;
+
     return {
-      title: `${property.titulo} | Inmobiliaria Norte Chico`,
-      description: property.descripcion || `Conoce las especificaciones de ${property.titulo} en Chancay-Huaral.`,
+      title: titleStr,
+      description: descStr,
+      alternates: {
+        canonical: `https://inmobiliarianortechico.pe/proyecto/${id}`,
+      },
       openGraph: {
-        title: `${property.titulo} | Inmobiliaria Norte Chico`,
-        description: property.descripcion || `Conoce las especificaciones de ${property.titulo} en Chancay-Huaral.`,
-        images: [{ url: mainImg }],
+        title: titleStr,
+        description: descStr,
+        url: `https://inmobiliarianortechico.pe/proyecto/${id}`,
+        siteName: 'Inmobiliaria Norte Chico',
+        images: [{ url: mainImg, alt: property.titulo }],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: titleStr,
+        description: descStr,
+        images: [mainImg],
       },
     };
   }
 
   return {
     title: 'Proyecto | Inmobiliaria Norte Chico',
-    description: 'Especificaciones e información técnica del lote o vivienda.',
+    description: 'Especificaciones e información técnica del lote o vivienda en Chancay y Huaral.',
   };
 }
 
@@ -46,5 +60,51 @@ export default async function ProyectoPage({ params }) {
   const { id } = await params;
   const initialProperty = await getProperty(id);
 
-  return <PropertyDetailView initialProperty={initialProperty} />;
+  let jsonLd = null;
+  if (initialProperty) {
+    let mainImg = initialProperty.imagen_url || initialProperty.imagen || 'https://inmobiliarianortechico.pe/PR_GLORIETA_DELUXE.webp';
+    try {
+      if (typeof mainImg === 'string' && mainImg.startsWith('[')) {
+        const parsed = JSON.parse(mainImg);
+        if (parsed.length) mainImg = parsed[0];
+      }
+    } catch (e) {}
+
+    const numericPrice = typeof initialProperty.precio === 'number' ? initialProperty.precio : parseFloat(String(initialProperty.precio).replace(/[^0-9.]/g, '')) || 0;
+
+    jsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'RealEstateListing',
+      'name': initialProperty.titulo,
+      'description': initialProperty.descripcion || `Lote o inmueble en Chancay y Huaral: ${initialProperty.titulo}`,
+      'url': `https://inmobiliarianortechico.pe/proyecto/${id}`,
+      'image': mainImg,
+      'datePosted': new Date().toISOString(),
+      'offers': {
+        '@type': 'Offer',
+        'price': numericPrice,
+        'priceCurrency': 'USD',
+        'availability': initialProperty.estado === 'Vendido' ? 'https://schema.org/Sold' : 'https://schema.org/InStock',
+        'validFrom': new Date().toISOString(),
+      },
+      'address': {
+        '@type': 'PostalAddress',
+        'addressLocality': 'Chancay, Huaral',
+        'addressRegion': 'Lima',
+        'addressCountry': 'PE',
+      },
+    };
+  }
+
+  return (
+    <>
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
+      <PropertyDetailView initialProperty={initialProperty} />
+    </>
+  );
 }
