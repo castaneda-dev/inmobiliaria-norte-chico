@@ -163,14 +163,14 @@ export default function AdminDashboardView() {
     if (!file) return;
 
     const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-    const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+    const MAX_SIZE = 10 * 1024 * 1024; // 10MB
 
     if (!ALLOWED_TYPES.includes(file.type)) {
       alert('Solo se permiten imágenes JPG, PNG y WebP.');
       return;
     }
     if (file.size > MAX_SIZE) {
-      alert('La imagen no debe superar 5 MB.');
+      alert('La imagen no debe superar 10 MB.');
       return;
     }
 
@@ -193,7 +193,7 @@ export default function AdminDashboardView() {
       setPropForm({ ...propForm, imagen_url: data.publicUrl });
     } catch (error) {
       console.error("Internal error uploading image:", error);
-      alert('Hubo un error al subir la imagen. Intente nuevamente.');
+      alert(`Hubo un error al subir la imagen: ${error.message || 'Error desconocido'}. Intente nuevamente o asegúrese de que el bucket 'propiedades' en Supabase existe y tiene políticas públicas habilitadas.`);
     } finally {
       setUploadingImage(false);
     }
