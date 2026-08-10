@@ -4,6 +4,7 @@ import Script from 'next/script';
 import SecurityLayer from '../components/SecurityLayer';
 
 export const metadata = {
+  metadataBase: new URL('https://inmobiliarianortechico.pe'),
   title: 'Norte Chico Properties | Lotes e Inmuebles en Huaral y Chancay',
   description: 'Invierte en lotes residenciales y terrenos de alta plusvalía en Huaral y Chancay. Grupo Inmobiliario Norte Chico. Agenda una visita hoy.',
   robots: 'index, follow',
