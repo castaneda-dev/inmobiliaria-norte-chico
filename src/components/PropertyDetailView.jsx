@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import WhatsAppButton from './WhatsAppButton';
@@ -53,10 +53,21 @@ export default function PropertyDetailView({ initialProperty }) {
   // Coordenadas para Google Maps (por defecto Huaral / Chancay)
   const lat = property?.latitud || property?.lat || -11.53;
   const lng = property?.longitud || property?.lng || -77.24;
-  const mapSearchQuery = encodeURIComponent(`${property?.titulo || 'Terrenos Chancay Huaral'} Chancay Huaral Peru`);
   const googleEmbedUrl = `https://maps.google.com/maps?q=${lat},${lng}&hl=es&z=13&output=embed`;
   const googleDirectUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
   const googleRouteMegapuerto = `https://www.google.com/maps/dir/?api=1&origin=${lat},${lng}&destination=-11.5694,-77.2676`;
+
+  // Navegación por teclado en Lightbox
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!lightboxOpen) return;
+      if (e.key === 'Escape') setLightboxOpen(false);
+      if (e.key === 'ArrowLeft') moveCarousel(-1);
+      if (e.key === 'ArrowRight') moveCarousel(1);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [lightboxOpen, imagenesList.length]);
 
   // Calcular distancias y tiempos de viaje de forma dinámica
   const distMegapuerto = useMemo(() => calculateDistance(lat, lng, -11.5830, -77.2680), [lat, lng]);
@@ -100,11 +111,11 @@ export default function PropertyDetailView({ initialProperty }) {
     setFormStatus('loading');
     try {
       const payload = {
-        nombre: formData.nombre.trim(),
-        email: formData.email.trim(),
+        nombre: formData.nombre.trim().replace(/<[^>]*>?/gm, ''),
+        email: formData.email.trim().replace(/<[^>]*>?/gm, ''),
         telefono: `${formData.paisCode}${formData.celular}`,
         origen: `Web Ficha Proyecto ID-${property?.id || 'General'}`,
-        notas: `Interés en: ${property?.titulo || 'Propiedad'} - ${formData.mensaje ? `Mensaje: ${formData.mensaje}` : 'Consulta de disponibilidad'}`
+        notas: `Interés en: ${property?.titulo || 'Propiedad'} - ${formData.mensaje ? `Mensaje: ${formData.mensaje.replace(/<[^>]*>?/gm, '')}` : 'Consulta de disponibilidad'}`
       };
 
       const res = await fetch('/api/webhook', {
@@ -146,20 +157,20 @@ export default function PropertyDetailView({ initialProperty }) {
   return (
     <div style={{ backgroundColor: '#080808', color: '#fff', minHeight: '100vh', fontFamily: 'Montserrat, sans-serif', overflowX: 'hidden' }}>
       
-      {/* NAVEGACIÓN SUPERIOR */}
-      <nav className="hero-initial">
-        <div className="logo-container">
-          <span className="logo-main">NORTE CHICO</span>
-          <span className="logo-sub">GRUPO INMOBILIARIO</span>
+      {/* ENCABEZADO SUPERIOR LIMPIO */}
+      <header className="w-full bg-[#0d0d0d] border-b border-white/10 px-6 py-4 flex justify-between items-center sticky top-0 z-50 backdrop-blur-md bg-opacity-90">
+        <Link href="/" className="flex flex-col text-decoration-none">
+          <span className="font-sans font-black text-lg tracking-widest text-white leading-none">NORTE CHICO</span>
+          <span className="font-sans font-bold text-[10px] tracking-wider text-terracota mt-1">GRUPO INMOBILIARIO</span>
+        </Link>
+        <div className="flex gap-4 items-center">
+          <Link href="/#portafolio" className="text-xs font-semibold text-arena hover:text-white transition-colors hidden sm:inline text-decoration-none">Lotes Residenciales</Link>
+          <a href="#contacto-ficha" className="px-4 py-2 text-xs font-bold bg-terracota hover:bg-[#a64b2b] text-white rounded-full transition-colors text-decoration-none">Agendar Visita</a>
         </div>
-        <div className="nav-links">
-          <Link href="/#portafolio">Lotes Residenciales</Link>
-          <Link href="/#contacto" className="btn-pill" style={{ padding: '8px 20px', fontSize: '12px' }}>Agendar Visita</Link>
-        </div>
-      </nav>
+      </header>
 
       {/* MIGA DE PAN (BREADCRUMB) */}
-      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '100px 5% 0 5%', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#888', flexWrap: 'wrap' }}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '24px 5% 0 5%', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#888', flexWrap: 'wrap' }}>
         <Link href="/" style={{ color: '#aaa', textDecoration: 'none' }}>Inicio</Link>
         <span>/</span>
         <Link href="/#portafolio" style={{ color: '#aaa', textDecoration: 'none' }}>Colección Residencial</Link>
@@ -175,6 +186,9 @@ export default function PropertyDetailView({ initialProperty }) {
             <span style={{ background: 'linear-gradient(135deg, #cb9f74, #e2b988)', color: '#000', padding: '4px 14px', borderRadius: '16px', fontSize: '11px', fontWeight: 800, textTransform: 'uppercase' }}>
               {property.tipo_activo || 'Terreno'}
             </span>
+            <span style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', color: '#10b981', padding: '4px 14px', borderRadius: '16px', fontSize: '11px', fontWeight: 800 }}>
+              ✓ Saneado 100% SUNARP
+            </span>
           </div>
 
           <h1 style={{ fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 800, lineHeight: '1.15', margin: '0 0 10px 0', letterSpacing: '-0.5px' }}>
@@ -183,19 +197,19 @@ export default function PropertyDetailView({ initialProperty }) {
           <p style={{ color: '#aaa', fontSize: '14px', margin: 0 }}>📍 Chancay - Huaral, Norte Chico, Lima, Perú</p>
         </div>
 
-        {/* ESTRUCTURA EN DOS COLUMNAS */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '40px', alignItems: 'start' }}>
+        {/* ESTRUCTURA ASIMÉTRICA 65% / 35% */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-10 items-start">
           
-          {/* COLUMNA IZQUIERDA: GALERÍA HD */}
+          {/* COLUMNA IZQUIERDA: GALERÍA HD (65%) */}
           <div style={{ width: '100%' }}>
             <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9', minHeight: '320px', maxHeight: '560px', borderRadius: '20px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: '#111', boxShadow: '0 20px 40px rgba(0,0,0,0.6)' }}>
               
               <Image 
                 src={imagenesList[activeImgIdx]} 
-                alt={`${property.titulo} - Vista ${activeImgIdx + 1}`} 
+                alt={`${property.titulo} - Terreno en venta en Chancay Huaral - Vista ${activeImgIdx + 1}`} 
                 fill 
                 priority 
-                sizes="(max-width: 768px) 100vw, 60vw"
+                sizes="(max-width: 768px) 100vw, 65vw"
                 style={{ objectFit: 'cover' }} 
               />
               
@@ -350,6 +364,7 @@ export default function PropertyDetailView({ initialProperty }) {
                 height="100%"
                 style={{ border: 0 }}
                 loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
                 allowFullScreen
                 src={googleEmbedUrl}
               ></iframe>

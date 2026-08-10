@@ -93,6 +93,11 @@ export default async function ProyectoPage({ params }) {
         'addressRegion': 'Lima',
         'addressCountry': 'PE',
       },
+      'geo': {
+        '@type': 'GeoCoordinates',
+        'latitude': initialProperty.latitud || initialProperty.lat || -11.53,
+        'longitude': initialProperty.longitud || initialProperty.lng || -77.24
+      }
     };
   }
 
