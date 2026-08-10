@@ -3,8 +3,8 @@
 Plataforma inmobiliaria integral para la gestión de lotes residenciales, departamentos y terrenos con CRM de prospectos en tiempo real.
 
 ## 🚀 Arquitectura
-- **Landing Page Pública**: `index.html`
-- **Dashboard de Control CRM**: `dashboard_admin.html`
+- **Landing Page Pública**: `/` (`src/app/page.jsx`)
+- **Dashboard de Control CRM**: `/crm` o `/admin` (`src/app/crm/page.jsx`)
 - **Base de Datos & Autenticación**: Supabase Cloud PostgreSQL
 - **Webhook de Leads (Serverless)**: `api/webhook.js` — Recibe leads automáticamente de Facebook Lead Ads, TikTok Ads y formularios externos
 - **Despliegue Continuo**: Vercel con Dominio `banka.cl`

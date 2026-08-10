@@ -1,8 +1,8 @@
 # 📘 Manual Técnico, Arquitectura Modular y Guía de Seguridad — Norte Chico
 
-> [!CAUTION]
-> **USO EXCLUSIVO E INTERNO EN DISPOSITIVO LOCAL**
-> Este documento contiene la arquitectura privada del sistema, esquemas de datos y fragmentos de código sensibles. **POR NINGÚN MOTIVO DEBE DESPLEGARSE O SUBIRSE A REPOSITORIOS PÚBLICOS COMO GITHUB O SERVICIOS EN LA NUBE COMO VERCEL.**
+> [!IMPORTANT]
+> **ENTORNO DE PRODUCCIÓN Y REPOSITORIO GITHUB**
+> Este repositorio corresponde al **ambiente de Producción** del proyecto (`PRODUCCION WEB INMOBILIARIA`), conectado a GitHub (`castaneda-dev/inmobiliaria-norte-chico`) y desplegado en Vercel (`banka.cl`). **Las variables y credenciales sensibles (tokens de Telegram, claves de Supabase, etc.) deben gestionarse exclusivamente mediante Variables de Entorno en Vercel / `.env.local` y NUNCA ser commiteadas en código duro.**
 
 ---
 
@@ -26,7 +26,7 @@ El proyecto está diseñado bajo una **arquitectura modular estricta**, donde ca
 > [!IMPORTANT]
 > ### 🏆 Regla de Oro para Futuros Desarrollos
 > Cualquier código, función o nueva característica que se agregue al proyecto en el futuro **deberá respetar estrictamente esta separación modular**.
-> *Ejemplo*: Si se implementa un nuevo módulo de pagos, facturación o reportes avanzados, **NO debe acoplarse en módulos ya existentes** (como `app.js` o `api.js`) a menos que sea una refactorización o mejora específica de ese módulo. Se debe crear su propio espacio o controlador dedicado.
+> *Ejemplo*: Si se implementa un nuevo módulo de pagos, facturación o reportes avanzados, **NO debe acoplarse en módulos ya existentes** a menos que sea una refactorización o mejora específica de ese módulo. Se debe crear su propio espacio o controlador dedicado.
 
 ---
 
@@ -36,12 +36,12 @@ A continuación se detalla cada módulo del sistema, su responsabilidad y los bl
 
 ### 2.1. Módulo Core / Configuración Global
 - **Responsabilidad**: Inicialización centralizada de servicios base (Supabase) y provisión del cliente global para toda la aplicación.
-- **Ubicación**: [supabase_config.js](file:///c:/Users/Usuario/OneDrive/Escritorio/PRUEBAS%20WEB/supabase_config.js)
+- **Ubicación**: `supabase_config.js` / `src/lib/supabaseClient.js`
 
 ```javascript
-// Ruta de archivo: c:\Users\Usuario\OneDrive\Escritorio\PRUEBAS WEB\supabase_config.js
-const SUPABASE_URL = "https://jlgnqiedkagkcqoakmom.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
+// Ruta de archivo: PRODUCCION WEB INMOBILIARIA / supabase_config.js
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://jlgnqiedkagkcqoakmom.supabase.co";
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
 
 window.supabaseClient = null;
 
@@ -55,10 +55,10 @@ if (typeof supabase !== 'undefined' && SUPABASE_URL !== "TU_SUPABASE_URL_AQUI") 
 
 ### 2.2. Módulo de Capa de Datos / DAO (Data Access Object)
 - **Responsabilidad**: Encapsular todas las llamadas a la base de datos (CRUD) para propiedades, clientes, agentes e interacciones. Aislar la lógica de red del renderizado visual.
-- **Ubicación**: [assets/js/api.js](file:///c:/Users/Usuario/OneDrive/Escritorio/PRUEBAS%20WEB/assets/js/api.js)
+- **Ubicación**: `assets/js/api.js`
 
 ```javascript
-// Ruta de archivo: c:\Users\Usuario\OneDrive\Escritorio\PRUEBAS WEB\assets\js\api.js
+// Ruta de archivo: PRODUCCION WEB INMOBILIARIA / assets/js/api.js
 window.api = {
     async fetchProperties() {
         if (!supabaseClient) return [];
@@ -102,10 +102,10 @@ window.api = {
 
 ### 2.3. Módulo Landing Page Pública
 - **Responsabilidad**: Presentación pública del catálogo de bienes raíces, carrusel visual HD, filtros de búsqueda para compradores y captura directa de leads.
-- **Ubicación**: [index.html](file:///c:/Users/Usuario/OneDrive/Escritorio/PRUEBAS%20WEB/index.html) y [assets/js/index-app.js](file:///c:/Users/Usuario/OneDrive/Escritorio/PRUEBAS%20WEB/assets/js/index-app.js)
+- **Ubicación**: `index.html` y `assets/js/index-app.js`
 
 ```javascript
-// Ruta de archivo: c:\Users\Usuario\OneDrive\Escritorio\PRUEBAS WEB\assets\js\index-app.js
+// Ruta de archivo: PRODUCCION WEB INMOBILIARIA / assets/js/index-app.js
 document.addEventListener('DOMContentLoaded', async () => {
     // Carga de inventario publico usando el modulo DAO
     const propiedades = await api.fetchProperties();
@@ -117,15 +117,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 ### 2.4. Módulo Dashboard de Administración / Estructura Modular Frontend
 - **Responsabilidad**: Gestión privada del CRM desglosada en sub-módulos especializados bajo `assets/js/modules/` con `app.js` actuando como orquestador ligero:
-  - **[toast.module.js](file:///c:/Users/Usuario/OneDrive/Escritorio/PRUEBAS%20WEB/assets/js/modules/toast.module.js)**: Notificaciones flotantes estilo glassmorphism (`Toast.success`, `Toast.error`, etc.).
-  - **[auth.module.js](file:///c:/Users/Usuario/OneDrive/Escritorio/PRUEBAS%20WEB/assets/js/modules/auth.module.js)**: Auth Guard, Rate Limiting y temporizador debounced de 10 minutos.
-  - **[router.module.js](file:///c:/Users/Usuario/OneDrive/Escritorio/PRUEBAS%20WEB/assets/js/modules/router.module.js)**: Navegación optimista entre vistas y control responsive de sidebar.
-  - **[renderers.module.js](file:///c:/Users/Usuario/OneDrive/Escritorio/PRUEBAS%20WEB/assets/js/modules/renderers.module.js)**: Renderizado de KPIs, gráficos SVG, tarjetas de inventario y sanitización XSS.
-  - **[modals.module.js](file:///c:/Users/Usuario/OneDrive/Escritorio/PRUEBAS%20WEB/assets/js/modules/modals.module.js)**: Controladores CRUD para formularios y modales con compresión de imágenes HD.
-- **Ubicación Orquestadora**: [assets/js/app.js](file:///c:/Users/Usuario/OneDrive/Escritorio/PRUEBAS%20WEB/assets/js/app.js)
+  - **`assets/js/modules/toast.module.js`**: Notificaciones flotantes estilo glassmorphism (`Toast.success`, `Toast.error`, etc.).
+  - **`assets/js/modules/auth.module.js`**: Auth Guard, Rate Limiting y temporizador debounced de 10 minutos.
+  - **`assets/js/modules/router.module.js`**: Navegación optimista entre vistas y control responsive de sidebar.
+  - **`assets/js/modules/renderers.module.js`**: Renderizado de KPIs, gráficos SVG, tarjetas de inventario y sanitización XSS.
+  - **`assets/js/modules/modals.module.js`**: Controladores CRUD para formularios y modales con compresión de imágenes HD.
+- **Ubicación Orquestadora**: `assets/js/app.js`
 
 ```javascript
-// Ruta de archivo: c:\Users\Usuario\OneDrive\Escritorio\PRUEBAS WEB\assets\js\app.js
+// Ruta de archivo: PRODUCCION WEB INMOBILIARIA / assets/js/app.js
 // Orquestador ligero que delega la ejecucion a los sub-modulos especializados
 window.switchView = (viewId, element) => window.RouterModule?.switchView(viewId, element);
 window.checkSupabaseSession = () => window.AuthModule?.checkSupabaseSession();
@@ -138,10 +138,10 @@ window.openModal = (id) => window.ModalsModule?.openModal(id);
 
 ### 2.5. Módulo Backend Serverless (Webhooks & Notificaciones)
 - **Responsabilidad**: Endpoint HTTP POST en la nube que ingesta webhooks de publicidad (Facebook Lead Ads, TikTok Ads, JSON), registra los clientes en Supabase y dispara notificaciones instantáneas a Telegram.
-- **Ubicación**: [api/webhook.js](file:///c:/Users/Usuario/OneDrive/Escritorio/PRUEBAS%20WEB/api/webhook.js)
+- **Ubicación**: `api/webhook.js`
 
 ```javascript
-// Ruta de archivo: c:\Users\Usuario\OneDrive\Escritorio\PRUEBAS WEB\api\webhook.js
+// Ruta de archivo: PRODUCCION WEB INMOBILIARIA / api/webhook.js
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
@@ -171,10 +171,10 @@ module.exports = async function handler(req, res) {
 
 ### 2.6. Módulo de Base de Datos & Seguridad RLS
 - **Responsabilidad**: Definición de tablas, relaciones, índices y políticas granulares de acceso Row Level Security (RLS) para proteger los datos contra lecturas no autorizadas.
-- **Ubicación**: [inmobiliaria_crm.sql](file:///c:/Users/Usuario/OneDrive/Escritorio/PRUEBAS%20WEB/inmobiliaria_crm.sql)
+- **Ubicación**: `inmobiliaria_crm.sql`
 
 ```sql
--- Ruta de archivo: c:\Users\Usuario\OneDrive\Escritorio\PRUEBAS WEB\inmobiliaria_crm.sql
+-- Ruta de archivo: PRODUCCION WEB INMOBILIARIA / inmobiliaria_crm.sql
 ALTER TABLE propiedades ENABLE ROW LEVEL SECURITY;
 ALTER TABLE clientes ENABLE ROW LEVEL SECURITY;
 
@@ -191,12 +191,12 @@ CREATE POLICY "Permitir insercion publica de leads" ON clientes FOR INSERT TO an
 ### 2.7. Módulo de Build, Optimizaciones & Asset Pipeline
 - **Responsabilidad**: Automatización de tareas de compilación: minificación de CSS/JS, optimización HD de imágenes WebP y ofuscación Nivel B del código de producción.
 - **Ubicaciones**:
-  - [minify_assets.py](file:///c:/Users/Usuario/OneDrive/Escritorio/PRUEBAS%20WEB/minify_assets.py)
-  - [scripts/optimize_images.py](file:///c:/Users/Usuario/OneDrive/Escritorio/PRUEBAS%20WEB/scripts/optimize_images.py)
-  - [scripts/obfuscate.js](file:///c:/Users/Usuario/OneDrive/Escritorio/PRUEBAS%20WEB/scripts/obfuscate.js)
+  - `minify_assets.py`
+  - `scripts/optimize_images.py`
+  - `scripts/obfuscate.js`
 
 ```python
-# Ruta de archivo: c:\Users\Usuario\OneDrive\Escritorio\PRUEBAS WEB\minify_assets.py
+# Ruta de archivo: PRODUCCION WEB INMOBILIARIA / minify_assets.py
 import csscompressor, jsmin
 
 def minificar_archivos():
@@ -232,8 +232,8 @@ graph TD
 
 El sistema comparte dos recursos globales centralizados que sirven de cimiento para todos los módulos:
 
-1. **`window.supabaseClient` ([supabase_config.js](file:///c:/Users/Usuario/OneDrive/Escritorio/PRUEBAS%20WEB/supabase_config.js))**: Instancia singleton compartida que permite la conexión autenticada a la infraestructura en la nube.
-2. **`window.api` ([assets/js/api.js](file:///c:/Users/Usuario/OneDrive/Escritorio/PRUEBAS%20WEB/assets/js/api.js))**: Capa DAO unificada de donde leen tanto la Landing Page como el Dashboard Admin.
+1. **`window.supabaseClient` (`supabase_config.js`)**: Instancia singleton compartida que permite la conexión autenticada a la infraestructura en la nube.
+2. **`window.api` (`assets/js/api.js`)**: Capa DAO unificada de donde leen tanto la Landing Page como el Dashboard Admin.
 
 ---
 
@@ -250,7 +250,7 @@ El Dashboard Admin implementa las siguientes capas internas de protección y ren
 
 ## 6. Backend Serverless: Webhook CRM & Telegram
 
-El módulo serverless [api/webhook.js](file:///c:/Users/Usuario/OneDrive/Escritorio/PRUEBAS%20WEB/api/webhook.js) cuenta con resiliencia de datos:
+El módulo serverless `api/webhook.js` cuenta con resiliencia de datos:
 - Detecta automáticamente la estructura de la carga útil (Payload) sea de Facebook Lead Ads (matriz `field_data`), TikTok Ads o JSON genérico.
 - Extrae dinámicamente: `nombre`, `telefono`, `email`, `origen` e `interés`.
 - Genera una alerta formateada en Markdown hacia la API oficial de Telegram.
@@ -261,7 +261,7 @@ El módulo serverless [api/webhook.js](file:///c:/Users/Usuario/OneDrive/Escrito
 
 1. **Navegación Optimista**: Transición inmediata entre pestañas visuales (< 50ms) sin esperar las respuestas de red.
 2. **Caché en Memoria (TTL 30s)**: Previene solicitudes redundantes a Supabase si el usuario navega frecuentemente entre pestañas.
-3. **Optimización de Imágenes HD ([scripts/optimize_images.py](file:///c:/Users/Usuario/OneDrive/Escritorio/PRUEBAS%20WEB/scripts/optimize_images.py))**:
+3. **Optimización de Imágenes HD (`scripts/optimize_images.py`)**:
    - Presets WebP con muestreo Lanczos para resolución 4K/Retina.
    - Reducción del peso de imágenes entre **90% y 95%**.
    - Aceleración gráfica en CSS mediante `image-rendering: -webkit-optimize-contrast`.
