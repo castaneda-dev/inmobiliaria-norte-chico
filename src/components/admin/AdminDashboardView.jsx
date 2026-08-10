@@ -154,7 +154,7 @@ export default function AdminDashboardView() {
       fetchData();
     } catch (err) {
       console.error("Internal error saving property:", err);
-      alert("Hubo un error al guardar la propiedad. Por favor, intente nuevamente.");
+      alert("Hubo un error al guardar la propiedad: " + (err.message || err) + ". Por favor, intente nuevamente.");
     }
   };
 
