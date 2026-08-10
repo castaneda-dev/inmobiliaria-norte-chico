@@ -12,6 +12,13 @@ html, body {
   color: #1E2229; /* asfalto */
 }
 
+/* Asegurar contraste claro en los textos del módulo de contacto (fondo oscuro) */
+.contact-module h2 {
+  color: #ffffff !important;
+}
+.contact-module p {
+  color: #e5e7eb !important;
+}
 
 /* ==========================================================================
    OPTIMIZACIONES MÓVILES Y RESPONSIVE (UX/UI AUDIT FIXES)
