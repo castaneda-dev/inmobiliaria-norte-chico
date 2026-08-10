@@ -16,6 +16,5 @@ Thumbs.db
 .next/
 dist/
 temp_db.json
-package-lock.json
 
 
