@@ -157,82 +157,86 @@ export default function PropertyDetailView({ initialProperty }) {
   return (
     <div style={{ backgroundColor: '#080808', color: '#fff', minHeight: '100vh', fontFamily: 'Montserrat, sans-serif', overflowX: 'hidden' }}>
       
-      {/* HERO BACKDROP HEADER DE LUJO CON FONDO DE PR_GLORIETA_DELUXE */}
-      <div 
-        className="relative w-full border-b border-white/10"
-        style={{ 
-          backgroundImage: `linear-gradient(to bottom, rgba(8,8,8,0.7) 0%, rgba(8,8,8,0.96) 100%), url('/PR_GLORIETA_DELUXE.webp')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center'
-        }}
-      >
-        {/* ENCABEZADO SUPERIOR CON GLASSMORPHISM */}
-        <header className="w-full max-w-7xl mx-auto px-6 py-5 flex justify-between items-center z-50">
-          <Link href="/" className="flex flex-col text-decoration-none">
-            <span className="font-sans font-black text-xl tracking-widest text-white leading-none">NORTE CHICO</span>
-            <span className="font-sans font-bold text-[10px] tracking-wider text-terracota mt-1">GRUPO INMOBILIARIO</span>
-          </Link>
-          <div className="flex gap-4 items-center">
-            <Link href="/#portafolio" className="text-xs font-semibold text-arena hover:text-white transition-colors hidden sm:inline text-decoration-none">Lotes Residenciales</Link>
-            <a href="#contacto-ficha" className="px-5 py-2.5 text-xs font-bold bg-terracota hover:bg-[#a64b2b] text-white rounded-full transition-all shadow-lg text-decoration-none">Agendar Visita</a>
-          </div>
-        </header>
-
-        {/* BREADCRUMB & HEADER TITLE DENTRO DEL HERO BANNER */}
-        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px 5% 40px 5%' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#aaa', flexWrap: 'wrap', marginBottom: '20px' }}>
-            <Link href="/" style={{ color: '#ccc', textDecoration: 'none' }}>Inicio</Link>
-            <span>/</span>
-            <Link href="/#portafolio" style={{ color: '#ccc', textDecoration: 'none' }}>Colección Residencial</Link>
-            <span>/</span>
-            <span style={{ color: 'var(--gold-light, #cb9f74)', fontWeight: 600 }}>{property.titulo}</span>
-          </div>
-
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '12px' }}>
-            <span style={{ background: 'linear-gradient(135deg, #cb9f74, #e2b988)', color: '#000', padding: '4px 14px', borderRadius: '16px', fontSize: '11px', fontWeight: 800, textTransform: 'uppercase' }}>
-              {property.tipo_activo || 'Terreno'}
-            </span>
-            <span style={{ background: 'rgba(16, 185, 129, 0.2)', border: '1px solid #10b981', color: '#10b981', padding: '4px 14px', borderRadius: '16px', fontSize: '11px', fontWeight: 800, backdropFilter: 'blur(4px)' }}>
-              ✓ Saneado 100% SUNARP
-            </span>
-          </div>
-
-          <h1 style={{ fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 800, lineHeight: '1.15', margin: '0 0 10px 0', letterSpacing: '-0.5px', textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>
-            {property.titulo}
-          </h1>
-          <p style={{ color: '#ddd', fontSize: '14px', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span>📍</span> Chancay - Huaral, Norte Chico, Lima, Perú
-          </p>
+      {/* NAVEGACIÓN SUPERIOR IDÉNTICA A LA HOME PAGE */}
+      <nav className="hero-initial">
+        <div className="logo-container">
+          <span className="logo-main">NORTE CHICO</span>
+          <span className="logo-sub">GRUPO INMOBILIARIO</span>
         </div>
-      </div>
+        <div className="nav-links">
+          <Link href="/#portafolio">Lotes Residenciales</Link>
+          <a href="#contacto-ficha" className="btn-pill" style={{ padding: '8px 20px', fontSize: '12px' }}>Agendar Visita</a>
+        </div>
+      </nav>
 
-      <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '30px 5% 60px 5%', width: '100%', boxSizing: 'border-box' }}>
-        
-        {/* ESTRUCTURA ASIMÉTRICA 65% / 35% */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-10 items-start">
+      {/* HERO PRINCIPAL AL MISMO ANCHO Y CON FONDO DE PR_GLORIETA_DELUXE QUE LA HOME PAGE */}
+      <header className="hero hero-initial">
+        <div className="hero-grid">
           
-          {/* COLUMNA IZQUIERDA: GALERÍA HD (65%) */}
-          <div style={{ width: '100%' }}>
-            <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9', minHeight: '320px', maxHeight: '560px', borderRadius: '20px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: '#111', boxShadow: '0 20px 40px rgba(0,0,0,0.6)' }}>
-              
+          {/* INFORMACIÓN PRINCIPAL DEL INMUEBLE */}
+          <div className="hero-text">
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '16px' }}>
+              <span style={{ background: 'linear-gradient(135deg, #cb9f74, #e2b988)', color: '#000', padding: '4px 14px', borderRadius: '16px', fontSize: '11px', fontWeight: 800, textTransform: 'uppercase' }}>
+                {property.tipo_activo || 'Terreno'}
+              </span>
+              <span style={{ background: 'rgba(16, 185, 129, 0.2)', border: '1px solid #10b981', color: '#10b981', padding: '4px 14px', borderRadius: '16px', fontSize: '11px', fontWeight: 800, backdropFilter: 'blur(4px)' }}>
+                ✓ Saneado 100% SUNARP
+              </span>
+            </div>
+
+            <h1 style={{ fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 900, lineHeight: '1.1', marginBottom: '15px' }}>
+              {property.titulo}
+            </h1>
+            
+            <span className="sub-heading text-gradient" style={{ fontSize: 'clamp(28px, 3.5vw, 42px)', marginBottom: '20px' }}>
+              {precioFormat}
+            </span>
+
+            <p style={{ color: '#ccc', fontSize: '14px', lineHeight: '1.6', marginBottom: '25px', maxWidth: '580px' }}>
+              {property.descripcion || 'Lote e inmueble estratégico en el corredor de alta plusvalía de Chancay y Huaral. Excelente proyección patrimonial y residencial.'}
+            </p>
+
+            <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', marginBottom: '20px' }}>
+              <a 
+                href={`https://wa.me/56982816844?text=${encodeURIComponent(whatsappMsg)}`}
+                target="_blank"
+                rel="noreferrer"
+                className="btn-pill" 
+                style={{ fontSize: '13px', background: '#25d366', color: '#fff', boxShadow: '0 4px 20px rgba(37, 211, 102, 0.35)' }}
+              >
+                💬 Consultar Disponibilidad
+              </a>
+              <a href="#contacto-ficha" className="btn-outline">
+                📅 Agendar Visita
+              </a>
+            </div>
+
+            <p style={{ fontSize: '12px', color: '#888' }}>
+              📍 Ubicación: Chancay - Huaral, Norte Chico, Lima, Perú
+            </p>
+          </div>
+
+          {/* GALERÍA DE FOTOS DENTRO DE HERO-VIDEO */}
+          <div>
+            <div className="hero-video" style={{ position: 'relative', width: '100%', aspectRatio: '16/9', minHeight: '320px', borderRadius: '24px', overflow: 'hidden', border: '4px solid var(--gold-dark, #957051)', boxShadow: '0 10px 30px rgba(0,0,0,0.8)' }}>
               <Image 
                 src={imagenesList[activeImgIdx]} 
-                alt={`${property.titulo} - Terreno en venta en Chancay Huaral - Vista ${activeImgIdx + 1}`} 
+                alt={`${property.titulo} - Vista ${activeImgIdx + 1}`} 
                 fill 
                 priority 
-                sizes="(max-width: 768px) 100vw, 65vw"
+                sizes="(max-width: 768px) 100vw, 50vw"
                 style={{ objectFit: 'cover' }} 
               />
               
               {/* Botón Pantalla Completa */}
               <button 
                 onClick={() => setLightboxOpen(true)}
-                style={{ position: 'absolute', top: '16px', right: '16px', background: 'rgba(0,0,0,0.7)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '8px 14px', borderRadius: '20px', fontSize: '12px', cursor: 'pointer', backdropFilter: 'blur(8px)', zIndex: 5, display: 'flex', alignItems: 'center', gap: '6px' }}
+                style={{ position: 'absolute', top: '16px', right: '16px', background: 'rgba(0,0,0,0.7)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '8px 14px', borderRadius: '20px', fontSize: '12px', cursor: 'pointer', backdropFilter: 'blur(8px)', zIndex: 5 }}
               >
-                🔍 Pantalla Completa HD
+                🔍 Pantalla Completa
               </button>
 
-              {/* Contadores e Indicadores */}
+              {/* Contador */}
               <div style={{ position: 'absolute', bottom: '16px', left: '16px', background: 'rgba(0,0,0,0.75)', color: '#fff', padding: '4px 12px', borderRadius: '12px', fontSize: '11px', fontWeight: 600, backdropFilter: 'blur(6px)' }}>
                 📷 {activeImgIdx + 1} / {imagenesList.length}
               </div>
@@ -253,65 +257,27 @@ export default function PropertyDetailView({ initialProperty }) {
                   <div 
                     key={idx} 
                     onClick={() => setActiveImgIdx(idx)}
-                    style={{ position: 'relative', width: '100px', height: '70px', borderRadius: '12px', overflow: 'hidden', border: idx === activeImgIdx ? '2px solid #cb9f74' : '2px solid transparent', opacity: idx === activeImgIdx ? 1 : 0.55, cursor: 'pointer', transition: 'all 0.2s ease', flexShrink: 0 }}
+                    style={{ position: 'relative', width: '90px', height: '60px', borderRadius: '12px', overflow: 'hidden', border: idx === activeImgIdx ? '2px solid #cb9f74' : '2px solid transparent', opacity: idx === activeImgIdx ? 1 : 0.55, cursor: 'pointer', transition: 'all 0.2s ease', flexShrink: 0 }}
                   >
-                    <Image src={img} alt={`${property.titulo} miniatura ${idx + 1}`} fill sizes="100px" style={{ objectFit: 'cover' }} />
+                    <Image src={img} alt={`${property.titulo} miniatura ${idx + 1}`} fill sizes="90px" style={{ objectFit: 'cover' }} />
                   </div>
                 ))}
               </div>
             )}
           </div>
 
-          {/* COLUMNA DERECHA: CAJA DE PRECIO Y ACCIONES */}
-          <div style={{ width: '100%' }}>
-            <div style={{ background: 'rgba(18, 18, 18, 0.85)', backdropFilter: 'blur(16px)', borderRadius: '24px', padding: '32px', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }}>
-              
-              <div style={{ fontSize: '11px', color: '#888', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '6px' }}>
-                Precio Promocional de Inversión
-              </div>
-              <div style={{ fontSize: 'clamp(36px, 3.5vw, 48px)', fontWeight: 900, background: 'linear-gradient(135deg, #fff, #cb9f74)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: '24px', lineHeight: '1' }}>
-                {precioFormat}
-              </div>
+        </div>
+      </header>
 
-              <div style={{ fontSize: '14px', color: '#ccc', lineHeight: '1.7', marginBottom: '30px' }}>
-                {property.descripcion || 'Inmueble residencial y de inversión ubicado estratégicamente en el corredor de alta plusvalía de Chancay y Huaral. Ideal para desarrollo familiar, casa de campo o reserva patrimonial.'}
-              </div>
-
-              {/* BOTONES DE ACCIÓN DE ALTA CONVERSIÓN */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '30px' }}>
-                <a 
-                  href={`https://wa.me/56982816844?text=${encodeURIComponent(whatsappMsg)}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="btn-pill" 
-                  style={{ width: '100%', textAlign: 'center', padding: '18px 24px', fontSize: '14px', background: '#25d366', color: '#fff', boxShadow: '0 4px 20px rgba(37, 211, 102, 0.35)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}
-                >
-                  💬 Consultar Disponibilidad por WhatsApp
-                </a>
-                <a 
-                  href="#contacto-ficha" 
-                  className="btn-outline" 
-                  style={{ textAlign: 'center', width: '100%', fontSize: '13px', padding: '16px 20px' }}
-                >
-                  📅 Agendar Recorrido Guiado
-                </a>
-              </div>
-
-              {/* TARJETA DE ASESOR PATRIMONIAL DEDICADO */}
-              <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <div style={{ position: 'relative', width: '54px', height: '54px', borderRadius: '50%', overflow: 'hidden', background: '#cb9f74', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>
-                  👨‍💼
-                </div>
-                <div>
-                  <div style={{ fontSize: '13px', fontWeight: 800, color: '#fff' }}>Asesor Inmobiliario Senior</div>
-                  <div style={{ fontSize: '11px', color: '#cb9f74' }}>Grupo Inmobiliario Norte Chico</div>
-                  <div style={{ fontSize: '11px', color: '#888', marginTop: '2px' }}>Atención inmediata en Huaral y Chancay</div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
+      <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px 5% 60px 5%', width: '100%', boxSizing: 'border-box' }}>
+        
+        {/* MIGA DE PAN (BREADCRUMB) */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#888', flexWrap: 'wrap', marginBottom: '40px' }}>
+          <Link href="/" style={{ color: '#aaa', textDecoration: 'none' }}>Inicio</Link>
+          <span>/</span>
+          <Link href="/#portafolio" style={{ color: '#aaa', textDecoration: 'none' }}>Colección Residencial</Link>
+          <span>/</span>
+          <span style={{ color: 'var(--gold-light, #cb9f74)', fontWeight: 600 }}>{property.titulo}</span>
         </div>
 
         {/* SECCIÓN 2: ESPECIFICACIONES TÉCNICAS Y GOOGLE MAPS INTERACTIVO */}
