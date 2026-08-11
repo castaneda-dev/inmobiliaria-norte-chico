@@ -206,19 +206,19 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
                 className="btn-pill w-full sm:w-auto text-center justify-center" 
                 style={{ fontSize: '12px', padding: '14px 24px', background: '#25d366', color: '#fff', boxShadow: '0 4px 20px rgba(37, 211, 102, 0.35)' }}
               >
-                💬 Consultar Disponibilidad
+                Consultar Disponibilidad
               </a>
               <a 
                 href="#contacto-ficha" 
                 className="btn-outline w-full sm:w-auto text-center justify-center"
                 style={{ fontSize: '12px', padding: '14px 24px' }}
               >
-                📅 Agendar Visita
+                Agendar Visita
               </a>
             </div>
 
             <p style={{ fontSize: '12px', color: '#aaa', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
-              📍 Ubicación: <span style={{ color: '#fff', fontWeight: 800 }}>{ubicacionFormateada}</span>
+              Ubicación: <span style={{ color: '#fff', fontWeight: 800 }}>{ubicacionFormateada}</span>
             </p>
           </div>
 
