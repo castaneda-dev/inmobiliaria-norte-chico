@@ -38,6 +38,8 @@ export default function AdminDashboardView() {
   const [pendingSessionToken, setPendingSessionToken] = useState(null);
   const [userIp, setUserIp] = useState('');
   const [ipConfigured, setIpConfigured] = useState(false);
+  const [qrCodeUrl, setQrCodeUrl] = useState('');
+  const [totpSecret, setTotpSecret] = useState('');
 
   // Supabase Data States
   const [properties, setProperties] = useState([]);
@@ -82,7 +84,7 @@ export default function AdminDashboardView() {
     };
   }, []);
 
-  // Fetch User Client IP Info on Mount
+  // Fetch User Client IP Info & Google Authenticator QR Code on Mount
   useEffect(() => {
     async function fetchIpInfo() {
       try {
@@ -90,8 +92,10 @@ export default function AdminDashboardView() {
         const data = await res.json();
         if (data.ip) setUserIp(data.ip);
         if (data.allowed_ips_configured !== undefined) setIpConfigured(data.allowed_ips_configured);
+        if (data.qr_code_url) setQrCodeUrl(data.qr_code_url);
+        if (data.totp_secret) setTotpSecret(data.totp_secret);
       } catch (e) {
-        console.error("Error fetching IP info:", e);
+        console.error("Error fetching IP & 2FA info:", e);
       }
     }
     fetchIpInfo();
@@ -404,21 +408,21 @@ export default function AdminDashboardView() {
               </button>
             </form>
           ) : (
-            /* STEP 2: Verificación de Código 2FA (Factor 3) */
+            /* STEP 2: Verificación de Código Google Authenticator (Factor 3) */
             <form onSubmit={handleVerify2FA} className="flex flex-col gap-4 text-left font-mono text-xs">
-              <div className="bg-terracota/10 border border-terracota/30 p-4 rounded-xl text-center mb-2">
-                <span className="text-xs text-terracota font-bold uppercase tracking-wider block mb-1">🔑 Verificación 2FA Requerida</span>
-                <span className="text-[11px] text-white/80">Ingresa tu PIN de Seguridad 2FA de 6 dígitos.</span>
+              <div className="bg-emerald-500/10 border border-emerald-500/30 p-4 rounded-xl text-center mb-2">
+                <span className="text-xs text-emerald-400 font-bold uppercase tracking-wider block mb-1">📱 Google Authenticator 2FA</span>
+                <span className="text-[11px] text-white/80">Ingresa el código dinámico de 6 dígitos que aparece en la app de tu celular.</span>
               </div>
 
               <div>
-                <label className="block text-terracota font-bold mb-1 uppercase tracking-wider text-center">Código 2FA / PIN de Seguridad</label>
+                <label className="block text-terracota font-bold mb-1 uppercase tracking-wider text-center">Código de 6 dígitos</label>
                 <input 
-                  type="password"
+                  type="text"
                   maxLength={6}
                   value={twoFactorCode}
                   onChange={(e) => setTwoFactorCode(e.target.value)}
-                  placeholder="••••••"
+                  placeholder="123456"
                   className="w-full bg-black/50 border border-terracota/50 rounded-xl px-4 py-4 text-white text-center font-mono text-xl tracking-[0.5em] focus:outline-none focus:border-terracota"
                   autoFocus
                   required
@@ -431,7 +435,7 @@ export default function AdminDashboardView() {
                 type="submit"
                 className="mt-2 bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-colors shadow-lg"
               >
-                Validar 2FA e Iniciar Sesión
+                Validar e Iniciar Sesión
               </button>
 
               <button 
@@ -791,31 +795,44 @@ export default function AdminDashboardView() {
                 </p>
               </div>
 
-              {/* Factor 3 Card */}
-              <div className="bg-asfalto/90 border border-arena/20 rounded-3xl p-6 shadow-2xl backdrop-blur-md">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-3 bg-emerald-500/20 border border-emerald-500/40 rounded-2xl text-emerald-400">
-                    <Lock size={24} />
+              {/* Factor 3 Card: Google Authenticator */}
+              <div className="bg-asfalto/90 border border-arena/20 rounded-3xl p-6 shadow-2xl backdrop-blur-md flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-3 bg-emerald-500/20 border border-emerald-500/40 rounded-2xl text-emerald-400">
+                      <Lock size={24} />
+                    </div>
+                    <div>
+                      <h4 className="font-sans font-bold text-lg text-white">Factor 3: Google Authenticator (TOTP)</h4>
+                      <span className="font-mono text-[10px] text-arena opacity-80 uppercase">Código Dinámico de 2 Pasos</span>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="font-sans font-bold text-lg text-white">Factor 3: Verificación 2FA</h4>
-                    <span className="font-mono text-[10px] text-arena opacity-80 uppercase">Autenticación de 2 Pasos (PIN de 6 dígitos)</span>
-                  </div>
-                </div>
 
-                <div className="bg-black/40 border border-arena/10 rounded-2xl p-4 font-mono text-xs space-y-3 mb-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-white/60">Estado de Verificación 2FA:</span>
-                    <span className="text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-500/30 px-3 py-1 rounded-full">🟢 Activo en Login</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-white/60">Método de Seguridad:</span>
-                    <span className="text-white font-bold">PIN Maestro de 6 dígitos</span>
+                  <div className="bg-black/40 border border-arena/10 rounded-2xl p-5 font-mono text-xs space-y-4 mb-4 text-center">
+                    <span className="text-white/80 font-bold block">Escanea este Código QR desde tu celular:</span>
+                    
+                    {qrCodeUrl ? (
+                      <div className="flex flex-col items-center justify-center gap-3">
+                        <div className="bg-white p-3 rounded-2xl shadow-xl border-4 border-terracota inline-block">
+                          <img src={qrCodeUrl} alt="Google Authenticator QR Code" className="w-48 h-48 object-contain" />
+                        </div>
+                        <span className="text-[11px] text-terracota font-bold">Inmobiliaria Norte Chico (CRM)</span>
+                      </div>
+                    ) : (
+                      <div className="py-8 text-white/50 animate-pulse">Generando Código QR...</div>
+                    )}
+
+                    <div className="bg-asfalto border border-arena/20 p-3 rounded-xl text-left">
+                      <span className="text-white/60 text-[10px] block mb-1">Clave Secreta Manual (si no puedes escanear):</span>
+                      <code className="text-emerald-400 font-mono font-bold text-sm tracking-wider select-all block text-center bg-black/60 py-1.5 rounded border border-emerald-500/30">
+                        {totpSecret || 'JBSWY3DPEHPK3PXP'}
+                      </code>
+                    </div>
                   </div>
                 </div>
 
                 <p className="font-mono text-xs text-white/70 leading-relaxed">
-                  El inicio de sesión exige verificar el PIN 2FA después de ingresar la contraseña. Puedes personalizar el PIN configurando la variable <code className="bg-black/60 text-terracota px-2 py-0.5 rounded border border-terracota/30">CRM_2FA_PIN</code>.
+                  Abre <strong>Google Authenticator</strong> o <strong>Authy</strong> en tu teléfono, escanea el QR superior y el código de 6 dígitos se generará automáticamente.
                 </p>
               </div>
             </div>
