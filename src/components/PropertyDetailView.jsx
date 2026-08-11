@@ -162,16 +162,16 @@ export default function PropertyDetailView({ initialProperty }) {
   return (
     <div style={{ backgroundColor: '#080808', color: '#fff', minHeight: '100vh', fontFamily: 'Montserrat, sans-serif', overflowX: 'hidden' }}>
       
-      {/* NAVEGACIÓN SUPERIOR CON SOPORTE RESPONSIVO */}
-      <nav className="hero-initial">
-        <div className="logo-container">
-          <span className="logo-main">NORTE CHICO</span>
-          <span className="logo-sub">GRUPO INMOBILIARIO</span>
-        </div>
-        <div className="nav-links">
-          <Link href="/#portafolio">Lotes Residenciales</Link>
-          <a href="#contacto-ficha" className="btn-pill" style={{ padding: '8px 20px', fontSize: '12px' }}>Agendar Visita</a>
-        </div>
+      {/* NAVEGACIÓN SUPERIOR: LOGO COMO BOTÓN DE RETORNO AL INICIO */}
+      <nav className="hero-initial" style={{ justifyContent: 'flex-start' }}>
+        <Link href="/" className="logo-container" style={{ textDecoration: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column' }}>
+          <span className="logo-main" style={{ color: '#fff', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            ← NORTE CHICO
+          </span>
+          <span className="logo-sub" style={{ color: 'var(--gold-light, #cb9f74)', fontSize: '10px', fontWeight: 700 }}>
+            GRUPO INMOBILIARIO • VOLVER AL INICIO
+          </span>
+        </Link>
       </nav>
 
       {/* HERO PRINCIPAL ADAPTADO A CELULAR Y WEB */}
