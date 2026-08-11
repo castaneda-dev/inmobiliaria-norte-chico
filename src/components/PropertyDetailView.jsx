@@ -392,7 +392,7 @@ export default function PropertyDetailView({ initialProperty }) {
         <section className="contact-module fade-module" id="contacto-ficha" style={{ marginTop: '40px' }}>
           <div className="form-container">
             <h2 style={{ fontSize: 'clamp(24px, 5vw, 40px)' }}>Solicitar Información de <span className="text-gradient">este Inmueble</span></h2>
-            <p style={{ fontSize: '14px' }}>Déjenos su contacto para enviarle más información de la propiedad y agendar un recorrido en {ubicacionFormateada}.</p>
+            <p style={{ fontSize: '14px' }}>Déjenos su contacto para enviarle más información de la propiedad y agendar un recorrido en {property.titulo}.</p>
             
             <form onSubmit={handleSubmit} className="form-grid">
               {/* CAMPO TRAP HONEYPOT ANTI-BOTS AUTOMATIZADOS */}
