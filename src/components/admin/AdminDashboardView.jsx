@@ -30,7 +30,14 @@ export default function AdminDashboardView() {
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [activeTab, setActiveTab] = useState('kpis'); // 'kpis' | 'propiedades' | 'clientes'
+  const [activeTab, setActiveTab] = useState('kpis'); // 'kpis' | 'propiedades' | 'clientes' | 'seguridad'
+
+  // 2FA Security States (Factor 3) & IP Info (Factor 1)
+  const [requires2FA, setRequires2FA] = useState(false);
+  const [twoFactorCode, setTwoFactorCode] = useState('');
+  const [pendingSessionToken, setPendingSessionToken] = useState(null);
+  const [userIp, setUserIp] = useState('');
+  const [ipConfigured, setIpConfigured] = useState(false);
 
   // Supabase Data States
   const [properties, setProperties] = useState([]);
@@ -75,7 +82,22 @@ export default function AdminDashboardView() {
     };
   }, []);
 
-  // Supabase Auth Login with Email & Password
+  // Fetch User Client IP Info on Mount
+  useEffect(() => {
+    async function fetchIpInfo() {
+      try {
+        const res = await fetch('/api/crm_verify_2fa');
+        const data = await res.json();
+        if (data.ip) setUserIp(data.ip);
+        if (data.allowed_ips_configured !== undefined) setIpConfigured(data.allowed_ips_configured);
+      } catch (e) {
+        console.error("Error fetching IP info:", e);
+      }
+    }
+    fetchIpInfo();
+  }, []);
+
+  // Supabase Auth Login with Email & Password -> Requires 2FA (Factor 3)
   const handleLogin = async (e) => {
     e.preventDefault();
     setAuthError('');
@@ -90,11 +112,36 @@ export default function AdminDashboardView() {
       }
 
       if (data?.session) {
-        setIsAuthenticated(true);
-        setSessionToken(data.session.access_token);
+        setPendingSessionToken(data.session.access_token);
+        setRequires2FA(true);
       }
     } catch (err) {
       setAuthError(err.message || 'Correo o contraseña incorrectos');
+    }
+  };
+
+  // Step 2: Verify 2FA OTP Code (Factor 3)
+  const handleVerify2FA = async (e) => {
+    e.preventDefault();
+    setAuthError('');
+    try {
+      const response = await fetch('/api/crm_verify_2fa', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: twoFactorCode })
+      });
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Código 2FA incorrecto');
+      }
+
+      // Verification Success -> Grant Access
+      setSessionToken(pendingSessionToken);
+      setIsAuthenticated(true);
+      setRequires2FA(false);
+    } catch (err) {
+      setAuthError(err.message || 'Error al verificar el código de seguridad');
     }
   };
 
@@ -298,7 +345,7 @@ export default function AdminDashboardView() {
     }
   };
 
-  // Login View
+  // Login View: Step 1 (Email & Password) or Step 2 (2FA OTP)
   if (!isAuthenticated) {
     return (
       <main 
@@ -313,49 +360,91 @@ export default function AdminDashboardView() {
           <h1 className="font-sans font-black text-2xl text-white mb-2">Panel Administrativo</h1>
           <p className="font-mono text-xs opacity-60 mb-8 text-arena">Inmobiliaria Norte Chico S.A.C.</p>
 
-          <form onSubmit={handleLogin} className="flex flex-col gap-4 text-left font-mono text-xs">
-            <div>
-              <label className="block text-terracota font-bold mb-1 uppercase tracking-wider">Correo Electrónico</label>
-              <input 
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@inmobiliarianortechico.pe"
-                className="w-full bg-black/40 border border-arena/20 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-terracota"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-terracota font-bold mb-1 uppercase tracking-wider">Contraseña</label>
-              <div className="relative">
+          {!requires2FA ? (
+            /* STEP 1: Email + Contraseña */
+            <form onSubmit={handleLogin} className="flex flex-col gap-4 text-left font-mono text-xs">
+              <div>
+                <label className="block text-terracota font-bold mb-1 uppercase tracking-wider">Correo Electrónico</label>
                 <input 
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••••••"
-                  className="w-full bg-black/40 border border-arena/20 rounded-xl pl-4 pr-12 py-3.5 text-white focus:outline-none focus:border-terracota"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="admin@inmobiliarianortechico.pe"
+                  className="w-full bg-black/40 border border-arena/20 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-terracota"
                   required
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-arena hover:text-terracota focus:outline-none opacity-60 hover:opacity-100 transition-opacity"
-                  title={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
               </div>
-            </div>
-            {authError && <div className="text-red-500 text-center font-mono text-xs mt-1">{authError}</div>}
-            <button 
-              type="submit"
-              className="mt-2 bg-terracota text-white py-4 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-[#a64b2b] transition-colors shadow-lg"
-            >
-              Iniciar Sesión
-            </button>
-          </form>
+              <div>
+                <label className="block text-terracota font-bold mb-1 uppercase tracking-wider">Contraseña</label>
+                <div className="relative">
+                  <input 
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••••••"
+                    className="w-full bg-black/40 border border-arena/20 rounded-xl pl-4 pr-12 py-3.5 text-white focus:outline-none focus:border-terracota"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-arena hover:text-terracota focus:outline-none opacity-60 hover:opacity-100 transition-opacity"
+                    title={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
+              {authError && <div className="text-red-400 text-center font-mono text-xs mt-1">{authError}</div>}
+              <button 
+                type="submit"
+                className="mt-2 bg-terracota text-white py-4 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-[#a64b2b] transition-colors shadow-lg"
+              >
+                Continuar a Verificación 2FA →
+              </button>
+            </form>
+          ) : (
+            /* STEP 2: Verificación de Código 2FA (Factor 3) */
+            <form onSubmit={handleVerify2FA} className="flex flex-col gap-4 text-left font-mono text-xs">
+              <div className="bg-terracota/10 border border-terracota/30 p-4 rounded-xl text-center mb-2">
+                <span className="text-xs text-terracota font-bold uppercase tracking-wider block mb-1">🔑 Verificación 2FA Requerida</span>
+                <span className="text-[11px] text-white/80">Ingresa tu PIN de Seguridad 2FA de 6 dígitos.</span>
+              </div>
 
-          <div className="mt-8 pt-6 border-t border-asfalto/10">
+              <div>
+                <label className="block text-terracota font-bold mb-1 uppercase tracking-wider text-center">Código 2FA / PIN de Seguridad</label>
+                <input 
+                  type="password"
+                  maxLength={6}
+                  value={twoFactorCode}
+                  onChange={(e) => setTwoFactorCode(e.target.value)}
+                  placeholder="••••••"
+                  className="w-full bg-black/50 border border-terracota/50 rounded-xl px-4 py-4 text-white text-center font-mono text-xl tracking-[0.5em] focus:outline-none focus:border-terracota"
+                  autoFocus
+                  required
+                />
+              </div>
+
+              {authError && <div className="text-red-400 text-center font-mono text-xs mt-1">{authError}</div>}
+
+              <button 
+                type="submit"
+                className="mt-2 bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-colors shadow-lg"
+              >
+                Validar 2FA e Iniciar Sesión
+              </button>
+
+              <button 
+                type="button" 
+                onClick={() => { setRequires2FA(false); setAuthError(''); }}
+                className="text-center opacity-60 hover:opacity-100 text-xs text-white mt-2 underline"
+              >
+                ← Volver al ingreso de contraseña
+              </button>
+            </form>
+          )}
+
+          <div className="mt-8 pt-6 border-t border-arena/10">
             <Link href="/" className="font-mono text-xs opacity-60 hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
               <ArrowLeft size={14} /> Volver a la Web Pública
             </Link>
@@ -417,6 +506,12 @@ export default function AdminDashboardView() {
               className={`px-6 py-3 rounded-full font-bold transition-all ${activeTab === 'clientes' ? 'bg-terracota text-white shadow-lg' : 'bg-asfalto text-white opacity-90 hover:opacity-100 hover:shadow-lg'}`}
             >
               Leads CRM ({clients.length})
+            </button>
+            <button 
+              onClick={() => setActiveTab('seguridad')} 
+              className={`px-6 py-3 rounded-full font-bold transition-all ${activeTab === 'seguridad' ? 'bg-terracota text-white shadow-lg' : 'bg-asfalto text-white opacity-90 hover:opacity-100 hover:shadow-lg'}`}
+            >
+              Seguridad CRM (IP / 2FA)
             </button>
           </div>
 
@@ -660,6 +755,72 @@ export default function AdminDashboardView() {
           </div>
         )}
 
+        {/* TAB 4: SEGURIDAD CRM (IP & 2FA) */}
+        {activeTab === 'seguridad' && (
+          <div className="space-y-8">
+            <h3 className="font-sans font-black text-2xl text-white">Configuración de Seguridad CRM</h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Factor 1 Card */}
+              <div className="bg-asfalto/90 border border-arena/20 rounded-3xl p-6 shadow-2xl backdrop-blur-md">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-3 bg-terracota/20 border border-terracota/40 rounded-2xl text-terracota">
+                    <ShieldCheck size={24} />
+                  </div>
+                  <div>
+                    <h4 className="font-sans font-bold text-lg text-white">Factor 1: Restricción por IP</h4>
+                    <span className="font-mono text-[10px] text-arena opacity-80 uppercase">Filtrado de Red Wi-Fi & Servidores</span>
+                  </div>
+                </div>
+
+                <div className="bg-black/40 border border-arena/10 rounded-2xl p-4 font-mono text-xs space-y-3 mb-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-white/60">Tu IP Pública Actual:</span>
+                    <span className="text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-500/30 px-3 py-1 rounded-full">{userIp || 'Detectando...'}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-white/60">Filtro de IP en Servidor:</span>
+                    <span className={`font-bold px-3 py-1 rounded-full ${ipConfigured ? 'text-emerald-400 bg-emerald-950/60 border border-emerald-500/30' : 'text-amber-400 bg-amber-950/60 border border-amber-500/30'}`}>
+                      {ipConfigured ? '🔒 Activo (Whitelist Activada)' : '⚠️ Permisivo (Falta variable CRM_ALLOWED_IPS)'}
+                    </span>
+                  </div>
+                </div>
+
+                <p className="font-mono text-xs text-white/70 leading-relaxed">
+                  Para restringir el acceso únicamente a la red Wi-Fi de tu oficina o servidor, agrega la variable <code className="bg-black/60 text-terracota px-2 py-0.5 rounded border border-terracota/30">CRM_ALLOWED_IPS</code> en Vercel con la IP mostrada arriba.
+                </p>
+              </div>
+
+              {/* Factor 3 Card */}
+              <div className="bg-asfalto/90 border border-arena/20 rounded-3xl p-6 shadow-2xl backdrop-blur-md">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-3 bg-emerald-500/20 border border-emerald-500/40 rounded-2xl text-emerald-400">
+                    <Lock size={24} />
+                  </div>
+                  <div>
+                    <h4 className="font-sans font-bold text-lg text-white">Factor 3: Verificación 2FA</h4>
+                    <span className="font-mono text-[10px] text-arena opacity-80 uppercase">Autenticación de 2 Pasos (PIN de 6 dígitos)</span>
+                  </div>
+                </div>
+
+                <div className="bg-black/40 border border-arena/10 rounded-2xl p-4 font-mono text-xs space-y-3 mb-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-white/60">Estado de Verificación 2FA:</span>
+                    <span className="text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-500/30 px-3 py-1 rounded-full">🟢 Activo en Login</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-white/60">Método de Seguridad:</span>
+                    <span className="text-white font-bold">PIN Maestro de 6 dígitos</span>
+                  </div>
+                </div>
+
+                <p className="font-mono text-xs text-white/70 leading-relaxed">
+                  El inicio de sesión exige verificar el PIN 2FA después de ingresar la contraseña. Puedes personalizar el PIN configurando la variable <code className="bg-black/60 text-terracota px-2 py-0.5 rounded border border-terracota/30">CRM_2FA_PIN</code>.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Property Create/Edit Modal */}
