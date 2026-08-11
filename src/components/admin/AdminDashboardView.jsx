@@ -368,21 +368,21 @@ export default function AdminDashboardView() {
   return (
     <main className="bg-arena text-asfalto min-h-screen">
       {/* Top Navbar */}
-      <header className="border-b border-asfalto/10 bg-white sticky top-0 z-40 px-8 py-4 flex flex-col md:flex-row justify-between items-center gap-4 shadow-sm">
+      <header className="border-b border-arena/10 bg-asfalto sticky top-0 z-40 px-8 py-4 flex flex-col md:flex-row justify-between items-center gap-4 shadow-2xl">
         <div className="flex items-center gap-4">
-          <Link href="/" className="font-sans font-black text-xl text-asfalto tracking-tight">
+          <Link href="/" className="font-sans font-black text-xl text-white tracking-tight">
             INMOBILIARIA NORTE CHICO
           </Link>
-          <span className="bg-terracota/10 border border-terracota/30 text-terracota px-3 py-1 rounded-full font-mono text-[10px] font-bold uppercase">
+          <span className="bg-terracota/20 border border-terracota/40 text-terracota px-3 py-1 rounded-full font-mono text-[10px] font-bold uppercase">
             Dashboard Admin
           </span>
         </div>
 
         <div className="flex items-center gap-6">
-          <button onClick={fetchData} className="font-mono text-xs opacity-70 hover:opacity-100 flex items-center gap-2 text-asfalto" title="Recargar Datos">
+          <button onClick={fetchData} className="font-mono text-xs opacity-70 hover:opacity-100 flex items-center gap-2 text-white" title="Recargar Datos">
             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} /> Actualizar
           </button>
-          <button onClick={handleLogout} className="bg-asfalto/5 hover:bg-red-50 text-asfalto hover:text-red-500 px-4 py-2 rounded-full font-mono text-xs flex items-center gap-2 transition-colors border border-asfalto/10">
+          <button onClick={handleLogout} className="bg-arena/10 hover:bg-red-500/20 text-white hover:text-red-400 px-4 py-2 rounded-full font-mono text-xs flex items-center gap-2 transition-colors border border-arena/20">
             <LogOut size={14} /> Salir
           </button>
         </div>
@@ -396,19 +396,19 @@ export default function AdminDashboardView() {
           <div className="flex gap-3 font-mono text-xs">
             <button 
               onClick={() => setActiveTab('kpis')} 
-              className={`px-6 py-3 rounded-full font-bold transition-all ${activeTab === 'kpis' ? 'bg-terracota text-white shadow-lg' : 'bg-white/60 text-asfalto/70 hover:bg-white'}`}
+              className={`px-6 py-3 rounded-full font-bold transition-all ${activeTab === 'kpis' ? 'bg-terracota text-white shadow-lg' : 'bg-asfalto text-white opacity-90 hover:opacity-100 hover:shadow-lg'}`}
             >
               Resumen KPIs
             </button>
             <button 
               onClick={() => setActiveTab('propiedades')} 
-              className={`px-6 py-3 rounded-full font-bold transition-all ${activeTab === 'propiedades' ? 'bg-terracota text-white shadow-lg' : 'bg-white/60 text-asfalto/70 hover:bg-white'}`}
+              className={`px-6 py-3 rounded-full font-bold transition-all ${activeTab === 'propiedades' ? 'bg-terracota text-white shadow-lg' : 'bg-asfalto text-white opacity-90 hover:opacity-100 hover:shadow-lg'}`}
             >
               Propiedades ({properties.length})
             </button>
             <button 
               onClick={() => setActiveTab('clientes')} 
-              className={`px-6 py-3 rounded-full font-bold transition-all ${activeTab === 'clientes' ? 'bg-terracota text-white shadow-lg' : 'bg-white/60 text-asfalto/70 hover:bg-white'}`}
+              className={`px-6 py-3 rounded-full font-bold transition-all ${activeTab === 'clientes' ? 'bg-terracota text-white shadow-lg' : 'bg-asfalto text-white opacity-90 hover:opacity-100 hover:shadow-lg'}`}
             >
               Leads CRM ({clients.length})
             </button>
