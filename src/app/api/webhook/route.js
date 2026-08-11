@@ -101,5 +101,5 @@ export async function POST(req) {
 }
 
 export async function GET() {
-  return NextResponse.json({ status: 'Webhook endpoint active and ready for HTTP POST' });
+  return NextResponse.json({ error: 'Not Found' }, { status: 404 });
 }

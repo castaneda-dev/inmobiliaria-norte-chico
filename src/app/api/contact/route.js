@@ -1,24 +1,41 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '../../../supabaseClient';
 
-// MAPA DE RATE LIMITING EN MEMORIA (VENTANA DESLIZANTE POR IP)
+// ESTRATEGIA MED-02: RATE LIMITING DISTRIBUIDO 100% GRATUITO VIA SUPABASE
+// Funciona en Vercel Serverless comprobando solicitudes en la BD sin costos adicionales
 const rateLimitMap = new Map();
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutos
-const MAX_REQUESTS_PER_WINDOW = 5; // Máximo 5 envíos por IP cada 10 min
+const MAX_REQUESTS_PER_WINDOW = 5; // Máximo 5 envíos por IP/cliente cada 10 min
 
-function isRateLimited(ip) {
+async function isRateLimitedDistributed(ip) {
   const now = Date.now();
+  
+  // 1. Verificación local en memoria para ráfagas inmediatas
   const userRecord = rateLimitMap.get(ip) || [];
-  
-  // Limpiar marcas de tiempo antiguas fuera de la ventana
-  const recentRequests = userRecord.filter(timestamp => now - timestamp < RATE_LIMIT_WINDOW_MS);
-  
-  if (recentRequests.length >= MAX_REQUESTS_PER_WINDOW) {
+  const recentLocalRequests = userRecord.filter(t => now - t < RATE_LIMIT_WINDOW_MS);
+  if (recentLocalRequests.length >= MAX_REQUESTS_PER_WINDOW) {
     return true;
   }
 
-  recentRequests.push(now);
-  rateLimitMap.set(ip, recentRequests);
+  // 2. Verificación distribuida en Supabase (funciona entre múltiples instancias serverless)
+  try {
+    const tenMinutesAgo = new Date(now - RATE_LIMIT_WINDOW_MS).toISOString();
+    const { count, error } = await supabase
+      .from('clientes')
+      .select('id', { count: 'exact', head: true })
+      .gte('created_at', tenMinutesAgo);
+
+    if (!error && typeof count === 'number' && count >= 15) {
+      // Protección global contra ráfagas de spam
+      return true;
+    }
+  } catch (err) {
+    console.error("Distributed Rate Limit Check error:", err);
+  }
+
+  // Registrar timestamp en memoria
+  recentLocalRequests.push(now);
+  rateLimitMap.set(ip, recentLocalRequests);
   return false;
 }
 
@@ -44,7 +61,7 @@ export async function POST(req) {
     const forwardHeader = req.headers.get('x-forwarded-for');
     const clientIp = forwardHeader ? forwardHeader.split(',')[0].trim() : '127.0.0.1';
 
-    if (isRateLimited(clientIp)) {
+    if (await isRateLimitedDistributed(clientIp)) {
       return NextResponse.json(
         { success: false, error: 'Demasiadas solicitudes. Por favor intente más tarde.' },
         { status: 429 }
