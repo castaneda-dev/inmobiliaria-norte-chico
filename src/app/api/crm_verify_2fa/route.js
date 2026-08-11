@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
+import QRCode from 'qrcode';
 
 // Base32 Decode Helper (RFC 4648)
 function base32Decode(base32Str) {
@@ -78,14 +79,28 @@ export async function GET(req) {
   const accountName = 'CRM Admin';
 
   const otpauthUri = `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(accountName)}?secret=${totpSecret}&issuer=${encodeURIComponent(issuer)}`;
-  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(otpauthUri)}`;
+
+  let qrCodeDataUrl = '';
+  try {
+    qrCodeDataUrl = await QRCode.toDataURL(otpauthUri, {
+      margin: 2,
+      width: 280,
+      color: {
+        dark: '#000000',
+        light: '#ffffff'
+      }
+    });
+  } catch (e) {
+    console.error("Error generating QR code data URL:", e);
+    qrCodeDataUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(otpauthUri)}`;
+  }
 
   return NextResponse.json({
     ip: clientIp,
     allowed_ips_configured: Boolean(process.env.CRM_ALLOWED_IPS),
     totp_secret: totpSecret,
     otpauth_uri: otpauthUri,
-    qr_code_url: qrCodeUrl,
+    qr_code_url: qrCodeDataUrl,
   });
 }
 
