@@ -40,6 +40,7 @@ export default function AdminDashboardView() {
   const [ipConfigured, setIpConfigured] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState('');
   const [totpSecret, setTotpSecret] = useState('');
+  const [showQrCode, setShowQrCode] = useState(false);
 
   // Supabase Data States
   const [properties, setProperties] = useState([]);
@@ -809,25 +810,48 @@ export default function AdminDashboardView() {
                   </div>
 
                   <div className="bg-black/40 border border-arena/10 rounded-2xl p-5 font-mono text-xs space-y-4 mb-4 text-center">
-                    <span className="text-white/80 font-bold block">Escanea este Código QR desde tu celular:</span>
-                    
-                    {qrCodeUrl ? (
-                      <div className="flex flex-col items-center justify-center gap-3">
-                        <div className="bg-white p-3 rounded-2xl shadow-xl border-4 border-terracota inline-block">
-                          <img src={qrCodeUrl} alt="Google Authenticator QR Code" className="w-48 h-48 object-contain" />
-                        </div>
-                        <span className="text-[11px] text-terracota font-bold">Inmobiliaria Norte Chico (CRM)</span>
+                    <div className="flex justify-between items-center bg-emerald-950/40 border border-emerald-500/30 p-3 rounded-xl">
+                      <span className="text-white/80">Estado de Vinculación:</span>
+                      <span className="text-emerald-400 font-bold">🟢 Celular Vinculado (2FA Activo)</span>
+                    </div>
+
+                    {!showQrCode ? (
+                      <div className="py-4">
+                        <button
+                          type="button"
+                          onClick={() => setShowQrCode(true)}
+                          className="bg-terracota/20 hover:bg-terracota border border-terracota text-white px-5 py-3 rounded-xl font-bold text-xs transition-colors flex items-center justify-center gap-2 mx-auto shadow-lg"
+                        >
+                          <Lock size={14} /> Mostrar Código QR / Clave Secreta
+                        </button>
+                        <span className="text-[10px] text-white/50 block mt-2">Usa este botón únicamente si necesitas vincular un teléfono nuevo.</span>
                       </div>
                     ) : (
-                      <div className="py-8 text-white/50 animate-pulse">Generando Código QR...</div>
-                    )}
+                      <div className="space-y-4 pt-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-white/80 font-bold">Escanea este Código QR desde tu celular:</span>
+                          <button type="button" onClick={() => setShowQrCode(false)} className="text-xs text-red-400 hover:underline">Ocultar QR ✕</button>
+                        </div>
+                        
+                        {qrCodeUrl ? (
+                          <div className="flex flex-col items-center justify-center gap-3">
+                            <div className="bg-white p-3 rounded-2xl shadow-xl border-4 border-terracota inline-block">
+                              <img src={qrCodeUrl} alt="Google Authenticator QR Code" className="w-48 h-48 object-contain" />
+                            </div>
+                            <span className="text-[11px] text-terracota font-bold">Inmobiliaria Norte Chico (CRM)</span>
+                          </div>
+                        ) : (
+                          <div className="py-8 text-white/50 animate-pulse">Generando Código QR...</div>
+                        )}
 
-                    <div className="bg-asfalto border border-arena/20 p-3 rounded-xl text-left">
-                      <span className="text-white/60 text-[10px] block mb-1">Clave Secreta Manual (si no puedes escanear):</span>
-                      <code className="text-emerald-400 font-mono font-bold text-sm tracking-wider select-all block text-center bg-black/60 py-1.5 rounded border border-emerald-500/30">
-                        {totpSecret || 'JBSWY3DPEHPK3PXP'}
-                      </code>
-                    </div>
+                        <div className="bg-asfalto border border-arena/20 p-3 rounded-xl text-left">
+                          <span className="text-white/60 text-[10px] block mb-1">Clave Secreta Manual (Privada):</span>
+                          <code className="text-emerald-400 font-mono font-bold text-sm tracking-wider select-all block text-center bg-black/60 py-1.5 rounded border border-emerald-500/30">
+                            {totpSecret || 'JBSWY3DPEHPK3PXP'}
+                          </code>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 

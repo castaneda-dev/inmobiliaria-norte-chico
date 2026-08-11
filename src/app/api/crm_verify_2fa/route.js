@@ -114,13 +114,13 @@ export async function POST(req) {
 
     const cleanCode = code.trim();
     const totpSecret = process.env.CRM_TOTP_SECRET || 'JBSWY3DPEHPK3PXP';
-    const masterPin = process.env.CRM_2FA_PIN || '192837';
+    const customMasterPin = process.env.CRM_2FA_PIN;
 
-    // 1. Validar contra Google Authenticator (TOTP)
+    // 1. Validar contra Google Authenticator (TOTP dinámico de tu celular)
     const isTotpValid = verifyTOTP(totpSecret, cleanCode);
 
-    // 2. Validar también contra Master PIN como respaldo
-    const isMasterPinValid = cleanCode === masterPin;
+    // 2. Validar contra PIN Maestro personalizado si está definido explícitamente en Vercel
+    const isMasterPinValid = Boolean(customMasterPin && cleanCode === customMasterPin.trim());
 
     if (isTotpValid || isMasterPinValid) {
       return NextResponse.json({ 
@@ -130,7 +130,7 @@ export async function POST(req) {
     } else {
       return NextResponse.json({ 
         success: false, 
-        error: 'Código de Google Authenticator incorrecto o expirado' 
+        error: 'Código de 6 dígitos inválido o expirado. Consulta tu app Google Authenticator.' 
       }, { status: 401 });
     }
   } catch (err) {
