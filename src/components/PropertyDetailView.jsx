@@ -239,12 +239,12 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
                 onClick={() => setLightboxOpen(true)}
                 style={{ position: 'absolute', top: '12px', right: '12px', background: 'rgba(0,0,0,0.75)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '6px 12px', borderRadius: '16px', fontSize: '11px', cursor: 'pointer', backdropFilter: 'blur(8px)', zIndex: 5 }}
               >
-                🔍 Pantalla Completa
+                Pantalla Completa
               </button>
 
               {/* Contador */}
               <div style={{ position: 'absolute', bottom: '12px', left: '12px', background: 'rgba(0,0,0,0.75)', color: '#fff', padding: '4px 10px', borderRadius: '10px', fontSize: '10px', fontWeight: 600, backdropFilter: 'blur(6px)' }}>
-                📷 {activeImgIdx + 1} / {imagenesList.length}
+                Foto {activeImgIdx + 1} / {imagenesList.length}
               </div>
 
               {/* Flechas del Carrusel */}
@@ -321,7 +321,7 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
               <div>
                 <h2 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: '#fff', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  🗺️ Google Maps | Eje Logístico
+                  Google Maps | Eje Logístico
                 </h2>
                 <p style={{ fontSize: '11px', color: '#cb9f74', margin: '2px 0 0 0', fontWeight: 700 }}>
                   Ubicación Estratégica: {ubicacionFormateada}
@@ -335,7 +335,7 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
                 rel="noreferrer"
                 style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', padding: '6px 12px', borderRadius: '10px', fontSize: '11px', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}
               >
-                📍 Google Maps App
+                Google Maps App
               </a>
             </div>
 
@@ -356,19 +356,19 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
             {/* MÉTRICAS DEL EJE LOGÍSTICO Y RUTAS RÁPIDAS */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '8px' }}>
               <div style={{ background: 'rgba(255,255,255,0.03)', padding: '10px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <div style={{ fontSize: '10px', color: '#888', fontWeight: 600 }}>⚓ Megapuerto</div>
+                <div style={{ fontSize: '10px', color: '#888', fontWeight: 600 }}>Megapuerto</div>
                 <div style={{ fontSize: '12px', fontWeight: 800, color: '#cb9f74', marginTop: '2px' }}>
                   {distMegapuerto.toFixed(1)} km (~{timeMegapuerto} m)
                 </div>
               </div>
               <div style={{ background: 'rgba(255,255,255,0.03)', padding: '10px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <div style={{ fontSize: '10px', color: '#888', fontWeight: 600 }}>🏙️ Plaza Chancay</div>
+                <div style={{ fontSize: '10px', color: '#888', fontWeight: 600 }}>Plaza Chancay</div>
                 <div style={{ fontSize: '12px', fontWeight: 800, color: '#fff', marginTop: '2px' }}>
                   {distPlazaChancay.toFixed(1)} km (~{timePlazaChancay} m)
                 </div>
               </div>
               <div style={{ background: 'rgba(255,255,255,0.03)', padding: '10px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <div style={{ fontSize: '10px', color: '#888', fontWeight: 600 }}>🏙️ Plaza Huaral</div>
+                <div style={{ fontSize: '10px', color: '#888', fontWeight: 600 }}>Plaza Huaral</div>
                 <div style={{ fontSize: '12px', fontWeight: 800, color: '#fff', marginTop: '2px' }}>
                   {distPlazaHuaral.toFixed(1)} km (~{timePlazaHuaral} m)
                 </div>
@@ -381,7 +381,7 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
               rel="noreferrer"
               style={{ textAlign: 'center', background: 'rgba(203, 159, 116, 0.15)', border: '1px solid #cb9f74', color: '#cb9f74', padding: '10px', borderRadius: '10px', fontSize: '11px', fontWeight: 800, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.5px' }}
             >
-              🚗 Ruta al Megapuerto en Maps
+              Ruta al Megapuerto en Maps
             </a>
 
           </div>
