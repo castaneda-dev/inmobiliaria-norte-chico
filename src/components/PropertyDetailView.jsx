@@ -503,16 +503,6 @@ export default function PropertyDetailView({ initialProperty }) {
         </div>
       )}
 
-      {/* BARRA FIXA BOTTOM PARA CELULARES */}
-      <a 
-        href={`https://wa.me/56982816844?text=${encodeURIComponent(whatsappMsg)}`}
-        target="_blank"
-        rel="noreferrer"
-        className="mobile-sticky-cta"
-      >
-        💬 Consultar por WhatsApp
-      </a>
-
       {/* BOTÓN WHATSAPP FLOTANTE */}
       <WhatsAppButton />
     </div>
