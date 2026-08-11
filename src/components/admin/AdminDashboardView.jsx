@@ -398,19 +398,19 @@ export default function AdminDashboardView() {
               onClick={() => setActiveTab('kpis')} 
               className={`px-6 py-3 rounded-full font-bold transition-all ${activeTab === 'kpis' ? 'bg-terracota text-white shadow-lg' : 'bg-white/60 text-asfalto/70 hover:bg-white'}`}
             >
-              📊 Resumen KPIs
+              Resumen KPIs
             </button>
             <button 
               onClick={() => setActiveTab('propiedades')} 
               className={`px-6 py-3 rounded-full font-bold transition-all ${activeTab === 'propiedades' ? 'bg-terracota text-white shadow-lg' : 'bg-white/60 text-asfalto/70 hover:bg-white'}`}
             >
-              🏠 Propiedades ({properties.length})
+              Propiedades ({properties.length})
             </button>
             <button 
               onClick={() => setActiveTab('clientes')} 
               className={`px-6 py-3 rounded-full font-bold transition-all ${activeTab === 'clientes' ? 'bg-terracota text-white shadow-lg' : 'bg-white/60 text-asfalto/70 hover:bg-white'}`}
             >
-              👥 Leads CRM ({clients.length})
+              Leads CRM ({clients.length})
             </button>
           </div>
 
@@ -503,11 +503,11 @@ export default function AdminDashboardView() {
               </button>
             </div>
 
-            <div className="bg-white border border-asfalto/10 rounded-[2rem] overflow-hidden shadow-sm">
+            <div className="bg-asfalto border border-arena/10 rounded-[2rem] overflow-hidden shadow-2xl">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="border-b border-asfalto/10 font-mono text-xs uppercase text-terracota bg-asfalto/5">
+                    <tr className="border-b border-arena/10 font-mono text-xs uppercase text-terracota bg-black/20">
                       <th className="p-4">Imagen</th>
                       <th className="p-4">Título</th>
                       <th className="p-4">Tipo</th>
@@ -517,21 +517,21 @@ export default function AdminDashboardView() {
                       <th className="p-4 text-right">Acciones</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-asfalto/10 font-mono text-xs">
+                  <tbody className="divide-y divide-arena/10 font-mono text-xs text-white">
                     {filteredProps.map(p => (
-                      <tr key={p.id} className="hover:bg-arena/50 transition-colors">
+                      <tr key={p.id} className="hover:bg-arena/5 transition-colors">
                         <td className="p-4">
-                          <img src={normalizeImageUrl(p.imagen_url || p.imagen) || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400'} alt="" className="w-12 h-12 rounded-xl object-cover" />
+                          <img src={normalizeImageUrl(p.imagen_url || p.imagen) || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400'} alt="" className="w-12 h-12 rounded-xl object-cover border border-arena/20" />
                         </td>
-                        <td className="p-4 font-sans font-bold text-asfalto text-sm">{p.titulo}</td>
-                        <td className="p-4 uppercase text-asfalto/70">{p.tipo_activo || 'Terreno'}</td>
+                        <td className="p-4 font-sans font-bold text-white text-sm">{p.titulo}</td>
+                        <td className="p-4 uppercase opacity-70">{p.tipo_activo || 'Terreno'}</td>
                         <td className="p-4 text-terracota font-bold">${parseFloat(p.precio || 0).toLocaleString()}</td>
-                        <td className="p-4 text-asfalto/70">{p.area_m2 || p.area || 'N/A'} m²</td>
+                        <td className="p-4 opacity-70">{p.area_m2 || p.area || 'N/A'} m²</td>
                         <td className="p-4">
                           <select 
                             value={p.estado || 'Disponible'}
                             onChange={(e) => handleUpdatePropStatus(p.id, e.target.value)}
-                            className="bg-white text-asfalto border border-asfalto/20 px-2 py-1 rounded text-xs focus:outline-none"
+                            className="bg-asfalto text-white border border-arena/20 px-2 py-1 rounded text-xs focus:outline-none"
                           >
                             <option value="Disponible">Disponible</option>
                             <option value="Reservado">Reservado</option>
@@ -558,14 +558,14 @@ export default function AdminDashboardView() {
                                 });
                                 setShowPropModal(true);
                               }}
-                              className="p-2 bg-asfalto/5 rounded-lg hover:bg-asfalto/10 text-asfalto transition-colors"
+                              className="p-2 bg-arena/10 rounded-lg hover:bg-arena/20 text-white transition-colors"
                               title="Editar"
                             >
                               <Edit3 size={14} />
                             </button>
                             <button 
                               onClick={() => handleDeleteProperty(p.id)}
-                              className="p-2 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition-colors"
+                              className="p-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors"
                               title="Eliminar"
                             >
                               <Trash2 size={14} />
@@ -576,7 +576,7 @@ export default function AdminDashboardView() {
                     ))}
                     {filteredProps.length === 0 && (
                       <tr>
-                        <td colSpan="7" className="p-8 text-center text-asfalto/50 font-sans">No se encontraron propiedades.</td>
+                        <td colSpan="7" className="p-8 text-center text-white/50 font-sans">No se encontraron propiedades.</td>
                       </tr>
                     )}
                   </tbody>
@@ -591,11 +591,11 @@ export default function AdminDashboardView() {
           <div className="space-y-6">
             <h3 className="font-sans font-black text-2xl text-asfalto">Leads y Prospectos (CRM)</h3>
 
-            <div className="bg-white border border-asfalto/10 rounded-[2rem] overflow-hidden shadow-sm">
+            <div className="bg-asfalto border border-arena/10 rounded-[2rem] overflow-hidden shadow-2xl">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="border-b border-asfalto/10 font-mono text-xs uppercase text-terracota bg-asfalto/5">
+                    <tr className="border-b border-arena/10 font-mono text-xs uppercase text-terracota bg-black/20">
                       <th className="p-4">Fecha / Nombre</th>
                       <th className="p-4">Contacto</th>
                       <th className="p-4">Notas / Interés</th>
@@ -604,24 +604,24 @@ export default function AdminDashboardView() {
                       <th className="p-4 text-right">Contactar</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-asfalto/10 font-mono text-xs">
+                  <tbody className="divide-y divide-arena/10 font-mono text-xs text-white">
                     {filteredClients.map(c => (
-                      <tr key={c.id} className="hover:bg-arena/50 transition-colors">
+                      <tr key={c.id} className="hover:bg-arena/5 transition-colors">
                         <td className="p-4">
-                          <div className="font-sans font-bold text-asfalto text-sm">{c.nombre || c.nombre_completo || 'Lead Anónimo'}</div>
-                          <div className="text-asfalto/60 text-[10px]">{c.created_at ? new Date(c.created_at).toLocaleDateString() : 'Reciente'}</div>
+                          <div className="font-sans font-bold text-white text-sm">{c.nombre || c.nombre_completo || 'Lead Anónimo'}</div>
+                          <div className="opacity-60 text-[10px]">{c.created_at ? new Date(c.created_at).toLocaleDateString() : 'Reciente'}</div>
                         </td>
                         <td className="p-4">
-                          <div className="text-asfalto font-bold">{c.telefono}</div>
-                          <div className="text-asfalto/70">{c.email}</div>
+                          <div className="text-white font-bold">{c.telefono}</div>
+                          <div className="opacity-70">{c.email}</div>
                         </td>
-                        <td className="p-4 max-w-xs truncate text-asfalto/80">{c.notas || c.tipo_interes || 'Sin notas'}</td>
-                        <td className="p-4 font-mono text-[10px] text-asfalto/60">{c.origen || 'Web'}</td>
+                        <td className="p-4 max-w-xs truncate opacity-80">{c.notas || c.tipo_interes || 'Sin notas'}</td>
+                        <td className="p-4 font-mono text-[10px] opacity-60">{c.origen || 'Web'}</td>
                         <td className="p-4">
                           <select 
                             value={c.estado || c.estado_lead || 'Nuevo'}
                             onChange={(e) => handleUpdateClientStatus(c.id, e.target.value)}
-                            className="bg-white text-asfalto border border-asfalto/20 px-2 py-1 rounded text-xs focus:outline-none"
+                            className="bg-asfalto text-white border border-arena/20 px-2 py-1 rounded text-xs focus:outline-none"
                           >
                             <option value="Nuevo">Nuevo</option>
                             <option value="Contactado">Contactado</option>
@@ -644,7 +644,7 @@ export default function AdminDashboardView() {
                     ))}
                     {filteredClients.length === 0 && (
                       <tr>
-                        <td colSpan="6" className="p-8 text-center text-asfalto/50 font-sans">No hay leads registrados.</td>
+                        <td colSpan="6" className="p-8 text-center text-white/50 font-sans">No hay leads registrados.</td>
                       </tr>
                     )}
                   </tbody>
