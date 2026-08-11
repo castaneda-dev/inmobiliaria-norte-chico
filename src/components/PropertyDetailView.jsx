@@ -395,6 +395,17 @@ export default function PropertyDetailView({ initialProperty }) {
             <p style={{ fontSize: '14px' }}>Déjenos sus datos para enviarle la ficha legal, planos y agendar un recorrido presencial en {property.titulo}.</p>
             
             <form onSubmit={handleSubmit} className="form-grid">
+              {/* CAMPO TRAP HONEYPOT ANTI-BOTS AUTOMATIZADOS */}
+              <input 
+                type="text" 
+                name="confirm_address" 
+                value={formData.confirm_address || ''} 
+                onChange={handleInputChange} 
+                style={{ display: 'none', opacity: 0, position: 'absolute', left: '-9999px' }} 
+                tabIndex={-1} 
+                autoComplete="off" 
+              />
+
               <input 
                 type="text" 
                 name="nombre"

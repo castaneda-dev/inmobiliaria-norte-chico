@@ -65,6 +65,17 @@ export default function ContactForm() {
 
         <div className="bg-asfalto rounded-xl p-8 md:p-12 border border-terracota/30 shadow-2xl relative">
           <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+            {/* CAMPO TRAP HONEYPOT ANTI-BOTS AUTOMATIZADOS */}
+            <input 
+              type="text" 
+              name="website" 
+              value={formData.website || ''} 
+              onChange={e => setFormData({...formData, website: e.target.value})} 
+              style={{ display: 'none', opacity: 0, position: 'absolute', left: '-9999px' }} 
+              tabIndex={-1} 
+              autoComplete="off" 
+            />
+
             <div>
               <label className="block font-mono text-xs uppercase tracking-widest mb-2 text-terracota font-bold">Nombre Completo</label>
               <input 
