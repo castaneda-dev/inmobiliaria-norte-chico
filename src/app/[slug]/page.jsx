@@ -4,18 +4,30 @@ import { supabase } from '../../supabaseClient';
 import PropertyDetailView from '../../components/PropertyDetailView';
 import { slugify, getPropertySlug } from '../../utils/slugify';
 
-const getPropertyBySlug = cache(async (slug) => {
+const getPropertyBySlug = cache(async (rawSlug) => {
   try {
-    // 1. Si el slug es numérico (ID de propiedad)
-    if (!isNaN(slug)) {
+    const slug = decodeURIComponent(rawSlug || '').trim();
+    if (!slug) return null;
+
+    // 1. Buscar por ID directo si es numérico (ej. /26)
+    if (!isNaN(slug) && Number(slug) > 0) {
       const { data } = await supabase.from('propiedades').select('*').eq('id', Number(slug)).single();
       if (data) return data;
     }
 
-    // 2. Buscar coincidencias por título slugificado
+    // 2. Traer todas las propiedades y buscar coincidencia por slug o título
     const { data: allProps } = await supabase.from('propiedades').select('*');
     if (allProps && allProps.length > 0) {
-      const match = allProps.find(p => getPropertySlug(p) === slug);
+      // Coincidencia exacta por slug generado
+      let match = allProps.find(p => getPropertySlug(p).toLowerCase() === slug.toLowerCase());
+      if (match) return match;
+
+      // Coincidencia por slug de título limpiado
+      match = allProps.find(p => slugify(p.titulo).toLowerCase() === slugify(slug).toLowerCase());
+      if (match) return match;
+
+      // Coincidencia por ID en string
+      match = allProps.find(p => String(p.id) === slug);
       if (match) return match;
     }
 

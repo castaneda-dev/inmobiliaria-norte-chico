@@ -161,46 +161,108 @@ export default function AdminDashboardView() {
     }
   };
 
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  const [customUrlInput, setCustomUrlInput] = useState('');
+
+  const getImagesList = (rawUrl) => {
+    if (!rawUrl) return [];
+    if (Array.isArray(rawUrl)) return rawUrl;
+    try {
+      if (typeof rawUrl === 'string' && rawUrl.trim().startsWith('[')) {
+        const parsed = JSON.parse(rawUrl);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (e) {}
+    return [rawUrl];
+  };
+
+  const handleMultiImageUpload = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
 
     const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
     const MAX_SIZE = 10 * 1024 * 1024; // 10MB
 
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      alert('Solo se permiten imágenes JPG, PNG y WebP.');
-      return;
-    }
-    if (file.size > MAX_SIZE) {
-      alert('La imagen no debe superar 10 MB.');
-      return;
-    }
+    const validFiles = files.filter(f => {
+      if (!ALLOWED_TYPES.includes(f.type)) {
+        alert(`El archivo ${f.name} no es un formato permitido (solo JPG, PNG o WebP).`);
+        return false;
+      }
+      if (f.size > MAX_SIZE) {
+        alert(`El archivo ${f.name} supera los 10 MB permitidos.`);
+        return false;
+      }
+      return true;
+    });
+
+    if (!validFiles.length) return;
 
     setUploadingImage(true);
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `${fileName}`;
+      const uploadedUrls = [];
+      for (const file of validFiles) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+        const filePath = `${fileName}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from('propiedades')
-        .upload(filePath, file);
+        const { error: uploadError } = await supabase.storage
+          .from('propiedades')
+          .upload(filePath, file);
 
-      if (uploadError) throw uploadError;
+        if (uploadError) {
+          console.error(`Error al subir ${file.name}:`, uploadError);
+          continue;
+        }
 
-      const { data } = supabase.storage
-        .from('propiedades')
-        .getPublicUrl(filePath);
+        const { data } = supabase.storage
+          .from('propiedades')
+          .getPublicUrl(filePath);
 
-      // Usar callback funcional para prevenir perdida de estado
-      setPropForm(prev => ({ ...prev, imagen_url: data.publicUrl }));
+        if (data?.publicUrl) {
+          uploadedUrls.push(data.publicUrl);
+        }
+      }
+
+      if (uploadedUrls.length > 0) {
+        setPropForm(prev => {
+          const currentList = getImagesList(prev.imagen_url);
+          const combined = [...currentList, ...uploadedUrls];
+          return {
+            ...prev,
+            imagen_url: JSON.stringify(combined)
+          };
+        });
+      }
     } catch (error) {
-      console.error("Internal error uploading image:", error);
-      alert(`Hubo un error al subir la imagen: ${error.message || 'Error desconocido'}. Intente nuevamente.`);
+      console.error("Internal error uploading multi images:", error);
+      alert(`Hubo un error al subir las imágenes: ${error.message || 'Error desconocido'}. Intente nuevamente.`);
     } finally {
       setUploadingImage(false);
     }
+  };
+
+  const handleAddImageUrl = (url) => {
+    const trimmed = url.trim();
+    if (!trimmed) return;
+    setPropForm(prev => {
+      const currentList = getImagesList(prev.imagen_url);
+      const combined = [...currentList, trimmed];
+      return {
+        ...prev,
+        imagen_url: JSON.stringify(combined)
+      };
+    });
+    setCustomUrlInput('');
+  };
+
+  const handleRemoveImage = (indexToRemove) => {
+    setPropForm(prev => {
+      const currentList = getImagesList(prev.imagen_url);
+      const updated = currentList.filter((_, idx) => idx !== indexToRemove);
+      return {
+        ...prev,
+        imagen_url: updated.length > 0 ? JSON.stringify(updated) : ''
+      };
+    });
   };
 
   const handleDeleteProperty = async (id) => {
@@ -690,34 +752,79 @@ export default function AdminDashboardView() {
               </div>
 
               <div>
-                <label className="block text-terracota font-bold mb-1">Imagen HD (Subir foto o pegar enlace)</label>
-                <div className="flex flex-col gap-2">
+                <label className="block text-terracota font-bold mb-1">
+                  Galería de Fotos HD (Sube hasta 10+ imágenes o pega enlaces)
+                </label>
+                
+                <div className="flex flex-col gap-3">
+                  {/* Selector para múltiples fotos */}
                   <div className="flex items-center gap-3">
                     <input 
                       type="file"
+                      multiple
                       accept="image/*"
-                      onChange={handleImageUpload}
+                      onChange={handleMultiImageUpload}
                       disabled={uploadingImage}
-                      className="w-full bg-asfalto/80 border border-arena/20 rounded-xl p-2 text-white focus:outline-none focus:border-terracota file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-terracota file:text-white hover:file:bg-[#a64b2b] transition-colors"
+                      className="w-full bg-asfalto/80 border border-arena/20 rounded-xl p-2 text-white focus:outline-none focus:border-terracota file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-terracota file:text-white hover:file:bg-[#a64b2b] transition-colors cursor-pointer"
                     />
-                    {uploadingImage && <span className="text-xs text-arena animate-pulse">Subiendo...</span>}
+                    {uploadingImage && <span className="text-xs text-arena animate-pulse shrink-0 font-bold">Subiendo fotos...</span>}
                   </div>
-                  <input 
-                    type="text"
-                    value={propForm.imagen_url}
-                    onChange={e => setPropForm(prev => ({ ...prev, imagen_url: e.target.value }))}
-                    placeholder="URL de la imagen (se genera automáticamente al subir)"
-                    className="w-full bg-asfalto/80 border border-arena/20 rounded-xl p-3 text-white focus:outline-none focus:border-terracota font-mono text-xs"
-                  />
+
+                  {/* Campo para pegar enlace de foto individual */}
+                  <div className="flex items-center gap-2">
+                    <input 
+                      type="text"
+                      value={customUrlInput}
+                      onChange={e => setCustomUrlInput(e.target.value)}
+                      placeholder="Pegar enlace de imagen (https://...)"
+                      className="w-full bg-asfalto/80 border border-arena/20 rounded-xl p-3 text-white focus:outline-none focus:border-terracota font-mono text-xs"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleAddImageUrl(customUrlInput)}
+                      className="px-4 py-3 bg-terracota/80 hover:bg-terracota text-white rounded-xl text-xs font-bold shrink-0 transition-colors"
+                    >
+                      + Agregar Enlace
+                    </button>
+                  </div>
                 </div>
-                {propForm.imagen_url && (
-                  <div className="mt-3 flex items-center gap-3">
-                    <div className="relative w-32 h-20 rounded-lg overflow-hidden border border-arena/20 bg-black/40">
-                      <img src={normalizeImageUrl(propForm.imagen_url)} alt="Preview" className="w-full h-full object-cover" />
+
+                {/* Vista Previa de la Galería de Fotos */}
+                {(() => {
+                  const currentList = getImagesList(propForm.imagen_url);
+                  if (!currentList.length) return null;
+                  return (
+                    <div className="mt-4">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-xs font-bold text-emerald-400">
+                          📷 {currentList.length} Foto{currentList.length > 1 ? 's' : ''} vinculada{currentList.length > 1 ? 's' : ''} al lote
+                        </span>
+                        <span className="text-[10px] text-arena/60">
+                          (La foto #1 es la portada principal)
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-h-60 overflow-y-auto p-2 bg-black/40 rounded-xl border border-arena/10">
+                        {currentList.map((imgUrl, idx) => (
+                          <div key={idx} className="relative group rounded-lg overflow-hidden border border-arena/20 bg-black/40 aspect-video">
+                            <img src={normalizeImageUrl(imgUrl)} alt={`Foto ${idx + 1}`} className="w-full h-full object-cover" />
+                            <span className="absolute top-1 left-1 bg-black/75 text-white px-2 py-0.5 rounded text-[9px] font-bold">
+                              {idx === 0 ? '⭐ Portada' : `#${idx + 1}`}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveImage(idx)}
+                              className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold transition-all shadow-md"
+                              title="Eliminar foto"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                    <span className="text-xs text-emerald-400 font-bold">✓ Imagen Vinculada</span>
-                  </div>
-                )}
+                  );
+                })()}
               </div>
 
               <div>
