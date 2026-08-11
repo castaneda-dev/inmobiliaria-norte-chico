@@ -3,7 +3,7 @@ import React from 'react';
 
 export default function WhatsAppButton({ propertyTitle, propertyId }) {
   const textMsg = propertyTitle 
-    ? `Hola Inmobiliaria Norte Chico, me interesa información y disponibilidad del proyecto ID-${propertyId || ''}: ${propertyTitle}.`
+    ? `Hola Inmobiliaria Norte Chico, me interesa información y disponibilidad de ${propertyTitle}.`
     : 'Hola, me interesa información sobre sus propiedades';
 
   return (
