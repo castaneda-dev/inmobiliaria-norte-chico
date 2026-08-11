@@ -430,48 +430,48 @@ export default function AdminDashboardView() {
         {activeTab === 'kpis' && (
           <div className="space-y-10">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <div className="bg-white border border-asfalto/10 rounded-3xl p-6 shadow-xl">
+              <div className="bg-asfalto border border-arena/10 rounded-3xl p-6 shadow-xl transition-transform hover:-translate-y-1 duration-300">
                 <div className="flex justify-between items-center mb-4">
-                  <span className="font-mono text-xs opacity-60 uppercase text-asfalto">Total Propiedades</span>
+                  <span className="font-mono text-xs opacity-70 uppercase text-arena">Total Propiedades</span>
                   <Building2 className="text-terracota" size={20} />
                 </div>
-                <div className="font-sans font-black text-4xl text-asfalto">{properties.length}</div>
-                <div className="font-mono text-[10px] text-emerald-600 mt-2">Disponibles en Catálogo</div>
+                <div className="font-sans font-black text-4xl text-white">{properties.length}</div>
+                <div className="font-mono text-[10px] text-emerald-400 mt-2">Disponibles en Catálogo</div>
               </div>
 
-              <div className="bg-white border border-asfalto/10 rounded-3xl p-6 shadow-xl">
+              <div className="bg-asfalto border border-arena/10 rounded-3xl p-6 shadow-xl transition-transform hover:-translate-y-1 duration-300">
                 <div className="flex justify-between items-center mb-4">
-                  <span className="font-mono text-xs opacity-60 uppercase text-asfalto">Leads Capturados</span>
+                  <span className="font-mono text-xs opacity-70 uppercase text-arena">Leads Capturados</span>
                   <Users className="text-terracota" size={20} />
                 </div>
-                <div className="font-sans font-black text-4xl text-asfalto">{clients.length}</div>
+                <div className="font-sans font-black text-4xl text-white">{clients.length}</div>
                 <div className="font-mono text-[10px] text-terracota mt-2">Clientes Registrados CRM</div>
               </div>
 
-              <div className="bg-white border border-asfalto/10 rounded-3xl p-6 shadow-xl">
+              <div className="bg-asfalto border border-arena/10 rounded-3xl p-6 shadow-xl transition-transform hover:-translate-y-1 duration-300">
                 <div className="flex justify-between items-center mb-4">
-                  <span className="font-mono text-xs opacity-60 uppercase text-asfalto">Tasa de Conversión</span>
-                  <TrendingUp className="text-emerald-500" size={20} />
+                  <span className="font-mono text-xs opacity-70 uppercase text-arena">Tasa de Conversión</span>
+                  <TrendingUp className="text-emerald-400" size={20} />
                 </div>
-                <div className="font-sans font-black text-4xl text-emerald-600">
+                <div className="font-sans font-black text-4xl text-emerald-400">
                   {clients.length > 0 ? ((clients.filter(c => c.estado === 'Ganado' || c.estado === 'Contactado').length / clients.length) * 100).toFixed(0) + '%' : '0%'}
                 </div>
-                <div className="font-mono text-[10px] text-asfalto opacity-60 mt-2">Interacciones Efectivas</div>
+                <div className="font-mono text-[10px] text-arena/60 mt-2">Interacciones Efectivas</div>
               </div>
 
-              <div className="bg-white border border-asfalto/10 rounded-3xl p-6 shadow-xl">
+              <div className="bg-asfalto border border-arena/10 rounded-3xl p-6 shadow-xl transition-transform hover:-translate-y-1 duration-300">
                 <div className="flex justify-between items-center mb-4">
-                  <span className="font-mono text-xs opacity-60 uppercase text-asfalto">Estatus Legal</span>
-                  <ShieldCheck className="text-emerald-500" size={20} />
+                  <span className="font-mono text-xs opacity-70 uppercase text-arena">Estatus Legal</span>
+                  <ShieldCheck className="text-emerald-400" size={20} />
                 </div>
-                <div className="font-sans font-black text-4xl text-asfalto">100%</div>
-                <div className="font-mono text-[10px] text-emerald-600 mt-2">Saneamiento en SUNARP</div>
+                <div className="font-sans font-black text-4xl text-white">100%</div>
+                <div className="font-mono text-[10px] text-emerald-400 mt-2">Saneamiento en SUNARP</div>
               </div>
             </div>
 
             {/* Quick Actions Panel */}
-            <div className="bg-white border border-asfalto/10 rounded-xl p-8 shadow-sm">
-              <h3 className="font-sans font-black text-xl text-asfalto mb-6">Acciones Rápidas del Administrador</h3>
+            <div className="bg-asfalto border border-arena/10 rounded-xl p-8 shadow-2xl">
+              <h3 className="font-sans font-black text-xl text-white mb-6">Acciones Rápidas del Administrador</h3>
               <div className="flex flex-wrap gap-4">
                 <button 
                   onClick={() => { setEditingProp(null); setPropForm({ titulo: '', precio: '', area_m2: '', tipo_activo: 'Terreno', zonificacion: 'Residencial', imagen_url: '', descripcion: '', estado: 'Disponible', ubicacion: '', latitud: '', longitud: '' }); setShowPropModal(true); }}
@@ -481,7 +481,7 @@ export default function AdminDashboardView() {
                 </button>
                 <button 
                   onClick={() => setActiveTab('clientes')}
-                  className="border border-asfalto/20 text-asfalto px-6 py-3.5 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-asfalto/5 transition-colors flex items-center gap-2"
+                  className="border border-arena/30 text-arena px-6 py-3.5 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-arena hover:text-asfalto transition-colors flex items-center gap-2"
                 >
                   <Users size={16} /> Ver Últimos Leads
                 </button>
