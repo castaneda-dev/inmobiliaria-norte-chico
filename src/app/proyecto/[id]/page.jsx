@@ -25,8 +25,8 @@ export async function generateMetadata({ params }) {
       }
     } catch (e) {}
 
-    const titleStr = `${property.titulo} en Chancay y Huaral | Inmobiliaria Norte Chico`;
-    const descStr = property.descripcion ? property.descripcion.slice(0, 160) : `Lote e inmueble en venta: ${property.titulo} en Chancay y Huaral. Inmobiliaria Norte Chico.`;
+    const titleStr = `${property.titulo} | Inmobiliaria Norte Chico`;
+    const descStr = property.descripcion ? property.descripcion.slice(0, 160) : `Lote e inmueble en venta: ${property.titulo} en ${property.ubicacion || 'Norte Chico'}. Inmobiliaria Norte Chico.`;
 
     return {
       title: titleStr,
@@ -52,7 +52,7 @@ export async function generateMetadata({ params }) {
 
   return {
     title: 'Proyecto | Inmobiliaria Norte Chico',
-    description: 'Especificaciones e información técnica del lote o vivienda en Chancay y Huaral.',
+    description: 'Especificaciones e información técnica del lote o vivienda.',
   };
 }
 
@@ -76,7 +76,7 @@ export default async function ProyectoPage({ params }) {
       '@context': 'https://schema.org',
       '@type': 'RealEstateListing',
       'name': initialProperty.titulo,
-      'description': initialProperty.descripcion || `Lote o inmueble en Chancay y Huaral: ${initialProperty.titulo}`,
+      'description': initialProperty.descripcion || `Lote o inmueble: ${initialProperty.titulo} en ${initialProperty.ubicacion || 'Norte Chico'}`,
       'url': `https://inmobiliarianortechico.pe/proyecto/${id}`,
       'image': mainImg,
       'datePosted': new Date().toISOString(),
@@ -89,7 +89,7 @@ export default async function ProyectoPage({ params }) {
       },
       'address': {
         '@type': 'PostalAddress',
-        'addressLocality': 'Chancay, Huaral',
+        'addressLocality': initialProperty.ubicacion || 'Norte Chico',
         'addressRegion': 'Lima',
         'addressCountry': 'PE',
       },

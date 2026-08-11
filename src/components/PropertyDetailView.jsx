@@ -179,9 +179,6 @@ export default function PropertyDetailView({ initialProperty }) {
               <span style={{ background: 'linear-gradient(135deg, #cb9f74, #e2b988)', color: '#000', padding: '4px 14px', borderRadius: '16px', fontSize: '11px', fontWeight: 800, textTransform: 'uppercase' }}>
                 {property.tipo_activo || 'Terreno'}
               </span>
-              <span style={{ background: 'rgba(16, 185, 129, 0.2)', border: '1px solid #10b981', color: '#10b981', padding: '4px 14px', borderRadius: '16px', fontSize: '11px', fontWeight: 800, backdropFilter: 'blur(4px)' }}>
-                ✓ Saneado 100% SUNARP
-              </span>
             </div>
 
             <h1 style={{ fontSize: 'clamp(24px, 5.5vw, 52px)', fontWeight: 900, lineHeight: '1.15', marginBottom: '12px' }}>
@@ -193,7 +190,7 @@ export default function PropertyDetailView({ initialProperty }) {
             </div>
 
             <p style={{ color: '#ccc', fontSize: '13px', lineHeight: '1.6', marginBottom: '20px', maxWidth: '580px' }}>
-              {property.descripcion || 'Lote e inmueble estratégico en el corredor de alta plusvalía de Chancay y Huaral. Excelente proyección patrimonial y residencial.'}
+              {property.descripcion || 'Lote e inmueble estratégico de alta plusvalía. Excelente proyección patrimonial y residencial.'}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 mb-4">
@@ -215,8 +212,8 @@ export default function PropertyDetailView({ initialProperty }) {
               </a>
             </div>
 
-            <p style={{ fontSize: '12px', color: '#888' }}>
-              📍 Ubicación: Chancay - Huaral, Norte Chico, Lima, Perú
+            <p style={{ fontSize: '12px', color: '#aaa', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+              📍 Ubicación: <span style={{ color: '#fff', fontWeight: 800 }}>{property.ubicacion || 'Norte Chico, Lima, Perú'}</span>
             </p>
           </div>
 
@@ -322,7 +319,7 @@ export default function PropertyDetailView({ initialProperty }) {
                   🗺️ Google Maps | Eje Logístico
                 </h2>
                 <p style={{ fontSize: '11px', color: '#cb9f74', margin: '2px 0 0 0', fontWeight: 700 }}>
-                  Ubicación Estratégica en Chancay - Huaral
+                  Ubicación Estratégica: {property.ubicacion || 'Norte Chico, Lima'}
                 </p>
               </div>
 
