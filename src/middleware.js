@@ -26,7 +26,7 @@ export function middleware(req) {
         <body style="background:#080808;color:#fff;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;">
           <div style="text-align:center;padding:40px;border:1px solid #cb9f74;border-radius:20px;background:#121212;max-width:450px;">
             <h1 style="color:#cb9f74;font-size:24px;margin-bottom:10px;">🔒 Acceso Restringido por IP</h1>
-            <p style="color:#aaa;font-size:14px;line-height:1.5;">Tu dirección IP (<strong>${rawIp || 'Desconocida'}</strong>) no está autorizada para acceder al CRM de Inmobiliaria Norte Chico.</p>
+            <p style="color:#aaa;font-size:14px;line-height:1.5;">Tu dirección de red no está autorizada para acceder al panel de administración.</p>
             <p style="color:#666;font-size:12px;margin-top:20px;">Contacta al administrador para habilitar esta red Wi-Fi/Dispositivo.</p>
           </div>
         </body>

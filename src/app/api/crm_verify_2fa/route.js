@@ -71,12 +71,21 @@ function verifyTOTP(secretBase32, inputCode) {
 }
 
 export async function GET(req) {
+  // Auth check: require active session cookie
+  const token = req.cookies.get('sb-access-token')?.value;
+  if (!token) {
+    return NextResponse.json({ error: 'No autorizado. Inicia sesión primero.' }, { status: 401 });
+  }
+
   const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 
                    req.headers.get('x-real-ip') || 
                    '127.0.0.1';
 
   // Secreto Base32 de la empresa o por defecto (16 caracteres base32)
-  const totpSecret = process.env.CRM_TOTP_SECRET || 'JBSWY3DPEHPK3PXP';
+  const totpSecret = process.env.CRM_TOTP_SECRET;
+  if (!totpSecret) {
+    return NextResponse.json({ error: 'CRM 2FA no configurado. Define CRM_TOTP_SECRET en las variables de entorno.' }, { status: 503 });
+  }
   const issuer = 'Inmobiliaria Norte Chico';
   const accountName = 'CRM Admin';
 
@@ -115,7 +124,10 @@ export async function POST(req) {
     }
 
     const cleanCode = code.trim();
-    const totpSecret = process.env.CRM_TOTP_SECRET || 'JBSWY3DPEHPK3PXP';
+    const totpSecret = process.env.CRM_TOTP_SECRET;
+    if (!totpSecret) {
+      return NextResponse.json({ success: false, error: 'Configuración 2FA no disponible' }, { status: 503 });
+    }
     const customMasterPin = process.env.CRM_2FA_PIN;
 
     // 1. Validar contra Google Authenticator (TOTP dinámico de tu celular)

@@ -4,7 +4,8 @@ export default function robots() {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/admin/', '/crm/', '/dashboard_admin/', '/api/'],
+        // Se bloquean las APIs pero sin revelar nombres de rutas admin específicas
+        disallow: ['/api/'],
       },
     ],
     sitemap: 'https://inmobiliarianortechico.pe/sitemap.xml',

@@ -3,10 +3,8 @@ import { supabase } from '../../../supabaseClient';
 
 export const dynamic = 'force-dynamic';
 
-const BOT_TOKEN_DEFAULT = '8270838507:AAEBNhdb3tldXmG5p4Kdn17TLQtA2-gqbSw';
-
 async function sendTelegramMessage(chatId, text, parseMode = 'Markdown') {
-  const botToken = process.env.TELEGRAM_BOT_TOKEN || BOT_TOKEN_DEFAULT;
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
   if (!botToken || !chatId) return;
 
   try {
@@ -26,16 +24,23 @@ async function sendTelegramMessage(chatId, text, parseMode = 'Markdown') {
 }
 
 export async function GET() {
-  const botToken = process.env.TELEGRAM_BOT_TOKEN || BOT_TOKEN_DEFAULT;
   return NextResponse.json({
     status: 'online',
-    bot_configured: Boolean(botToken),
-    message: 'Asistente Interno CRM en Telegram activo'
+    configured: Boolean(process.env.TELEGRAM_BOT_TOKEN)
   });
 }
 
 export async function POST(req) {
   try {
+    // Verificación de origen Telegram (HMAC secret_token)
+    const webhookSecret = process.env.TELEGRAM_WEBHOOK_SECRET;
+    if (webhookSecret) {
+      const headerToken = req.headers.get('x-telegram-bot-api-secret-token');
+      if (headerToken !== webhookSecret) {
+        return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 403 });
+      }
+    }
+
     const body = await req.json();
     
     if (!body || !body.message) {

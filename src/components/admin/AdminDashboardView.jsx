@@ -72,11 +72,13 @@ export default function AdminDashboardView() {
     checkSession();
 
     // Sincronizar sesión con cookies para el Middleware
+    // Nota: HttpOnly no es aplicable desde client-side JS. La cookie está protegida con
+    // SameSite=Strict (protección CSRF) y Secure (solo HTTPS).
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
-        document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=${session.expires_in}; secure; samesite=lax`;
+        document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=${session.expires_in}; secure; samesite=strict`;
       } else {
-        document.cookie = `sb-access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+        document.cookie = `sb-access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure; samesite=strict`;
       }
     });
 

@@ -10,7 +10,11 @@ export async function POST(req) {
     const signature = req.headers.get('x-hub-signature-256');
     const fbAppSecret = process.env.FACEBOOK_APP_SECRET;
 
-    if (fbAppSecret && signature) {
+    if (fbAppSecret) {
+      if (!signature) {
+        console.warn("⚠️ Meta Webhook: Missing HMAC Signature.");
+        return NextResponse.json({ success: false, error: 'Missing Signature' }, { status: 401 });
+      }
       const hmac = crypto.createHmac('sha256', fbAppSecret);
       const digest = `sha256=${hmac.update(rawBody).digest('hex')}`;
       
@@ -41,6 +45,17 @@ export async function POST(req) {
       origen = 'Facebook Lead Ads';
     }
 
+    function sanitizeWebhookInput(str, maxLength = 255) {
+      if (!str || typeof str !== 'string') return '';
+      return str.replace(/<[^>]*>?/gm, '').replace(/[\0\x08\x09\x1a\n\r"'\\%]/g, '').trim().slice(0, maxLength);
+    }
+
+    nombre = sanitizeWebhookInput(nombre);
+    telefono = sanitizeWebhookInput(telefono, 50);
+    email = sanitizeWebhookInput(email);
+    origen = sanitizeWebhookInput(origen);
+    notas = sanitizeWebhookInput(notas, 1000);
+
     // Insert into Supabase 'clientes' table
     const { data, error } = await supabase.from('clientes').insert([{
       nombre_completo: nombre,
@@ -53,7 +68,7 @@ export async function POST(req) {
 
     if (error) {
       console.error("Error inserting lead into Supabase:", error);
-      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+      return NextResponse.json({ success: false, error: 'Error interno al procesar el registro.' }, { status: 500 });
     }
 
     // Optional Telegram Notification API call
@@ -81,7 +96,7 @@ export async function POST(req) {
 
   } catch (err) {
     console.error("Webhook Handler Error:", err);
-    return NextResponse.json({ success: false, error: err.message }, { status: 400 });
+    return NextResponse.json({ success: false, error: 'Solicitud inválida o mal formada.' }, { status: 400 });
   }
 }
 
