@@ -22,6 +22,7 @@ async function sendTelegramMessage(chatId, text, parseMode = 'Markdown') {
 }
 
 export async function GET() {
+  // Verifica la configuración activa de variables de entorno en Vercel
   return NextResponse.json({
     status: 'online',
     bot_configured: Boolean(process.env.TELEGRAM_BOT_TOKEN),
