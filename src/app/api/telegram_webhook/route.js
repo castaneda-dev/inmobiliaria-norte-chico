@@ -3,8 +3,10 @@ import { supabase } from '../../../supabaseClient';
 
 export const dynamic = 'force-dynamic';
 
+const BOT_TOKEN_DEFAULT = '8270838507:AAEBNhdb3tldXmG5p4Kdn17TLQtA2-gqbSw';
+
 async function sendTelegramMessage(chatId, text, parseMode = 'Markdown') {
-  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  const botToken = process.env.TELEGRAM_BOT_TOKEN || BOT_TOKEN_DEFAULT;
   if (!botToken || !chatId) return;
 
   try {
@@ -24,10 +26,10 @@ async function sendTelegramMessage(chatId, text, parseMode = 'Markdown') {
 }
 
 export async function GET() {
-  // Verifica la configuración activa de variables de entorno en Vercel
+  const botToken = process.env.TELEGRAM_BOT_TOKEN || BOT_TOKEN_DEFAULT;
   return NextResponse.json({
     status: 'online',
-    bot_configured: Boolean(process.env.TELEGRAM_BOT_TOKEN),
+    bot_configured: Boolean(botToken),
     message: 'Asistente Interno CRM en Telegram activo'
   });
 }

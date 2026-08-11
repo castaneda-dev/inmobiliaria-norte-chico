@@ -95,8 +95,8 @@ export async function POST(req) {
     }
 
     // 6. NOTIFICACIÓN AUTOMÁTICA EN TIEMPO REAL A TELEGRAM
-    const botToken = process.env.TELEGRAM_BOT_TOKEN;
-    const chatId = process.env.TELEGRAM_CHAT_ID;
+    const botToken = process.env.TELEGRAM_BOT_TOKEN || '8270838507:AAEBNhdb3tldXmG5p4Kdn17TLQtA2-gqbSw';
+    const chatId = process.env.TELEGRAM_CHAT_ID || '8674291844';
 
     if (botToken && chatId) {
       try {
