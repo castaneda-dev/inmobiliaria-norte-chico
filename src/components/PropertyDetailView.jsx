@@ -22,8 +22,8 @@ function estimateDrivingTime(distanceKm) {
   return Math.max(2, timeMinutes);
 }
 
-export default function PropertyDetailView({ initialProperty }) {
-  const property = initialProperty;
+export default function PropertyDetailView({ property: propertyProp, initialProperty }) {
+  const property = propertyProp || initialProperty;
   
   // Memorizar la extracción de lista de imágenes para optimización de rendimiento
   const imagenesList = useMemo(() => {
