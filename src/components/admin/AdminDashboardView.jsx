@@ -301,14 +301,17 @@ export default function AdminDashboardView() {
   // Login View
   if (!isAuthenticated) {
     return (
-      <main className="bg-arena min-h-screen text-asfalto flex items-center justify-center px-4">
-        <div className="bg-white border border-terracota/30 rounded-xl p-10 max-w-md w-full shadow-2xl text-center">
+      <main 
+        className="min-h-screen text-white flex items-center justify-center px-4"
+        style={{ background: "linear-gradient(to bottom, rgba(8, 8, 8, 0.85), rgba(8, 8, 8, 0.95)), url('/PR_GLORIETA_DELUXE.webp') center/cover fixed" }}
+      >
+        <div className="bg-asfalto/90 backdrop-blur-md border border-arena/20 rounded-xl p-10 max-w-md w-full shadow-2xl text-center">
           <div className="w-16 h-16 bg-terracota/10 border border-terracota/30 rounded-full flex items-center justify-center mx-auto mb-6 text-terracota">
             <Lock size={32} />
           </div>
 
-          <h1 className="font-sans font-black text-2xl text-asfalto mb-2">Panel Administrativo</h1>
-          <p className="font-mono text-xs opacity-60 mb-8">Inmobiliaria Norte Chico S.A.C.</p>
+          <h1 className="font-sans font-black text-2xl text-white mb-2">Panel Administrativo</h1>
+          <p className="font-mono text-xs opacity-60 mb-8 text-arena">Inmobiliaria Norte Chico S.A.C.</p>
 
           <form onSubmit={handleLogin} className="flex flex-col gap-4 text-left font-mono text-xs">
             <div>
@@ -318,7 +321,7 @@ export default function AdminDashboardView() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@inmobiliarianortechico.pe"
-                className="w-full bg-arena/30 border border-asfalto/20 rounded-xl px-4 py-3.5 text-asfalto focus:outline-none focus:border-terracota"
+                className="w-full bg-black/40 border border-arena/20 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-terracota"
                 required
               />
             </div>
@@ -330,13 +333,13 @@ export default function AdminDashboardView() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  className="w-full bg-arena/30 border border-asfalto/20 rounded-xl pl-4 pr-12 py-3.5 text-asfalto focus:outline-none focus:border-terracota"
+                  className="w-full bg-black/40 border border-arena/20 rounded-xl pl-4 pr-12 py-3.5 text-white focus:outline-none focus:border-terracota"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-asfalto hover:text-terracota focus:outline-none opacity-60 hover:opacity-100 transition-opacity"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-arena hover:text-terracota focus:outline-none opacity-60 hover:opacity-100 transition-opacity"
                   title={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -366,7 +369,10 @@ export default function AdminDashboardView() {
   const filteredClients = clients.filter(c => c.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) || c.email?.toLowerCase().includes(searchTerm.toLowerCase()) || c.telefono?.includes(searchTerm));
 
   return (
-    <main className="bg-arena text-asfalto min-h-screen">
+    <main 
+      className="min-h-screen text-white"
+      style={{ background: "linear-gradient(to bottom, rgba(8, 8, 8, 0.88), rgba(8, 8, 8, 0.94)), url('/PR_GLORIETA_DELUXE.webp') center/cover fixed" }}
+    >
       {/* Top Navbar */}
       <header className="border-b border-arena/10 bg-asfalto sticky top-0 z-40 px-8 py-4 flex flex-col md:flex-row justify-between items-center gap-4 shadow-2xl">
         <div className="flex items-center gap-4">
@@ -415,13 +421,13 @@ export default function AdminDashboardView() {
           </div>
 
           <div className="w-full md:w-72 relative">
-            <Search size={16} className="absolute left-4 top-3.5 opacity-40 text-asfalto" />
+            <Search size={16} className="absolute left-4 top-3.5 opacity-60 text-white" />
             <input 
               type="text"
               placeholder="Buscar..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-white border border-asfalto/20 rounded-full pl-10 pr-4 py-2.5 text-xs text-asfalto placeholder:text-asfalto/40 focus:outline-none focus:border-terracota shadow-sm"
+              className="w-full bg-asfalto/80 border border-arena/20 rounded-full pl-10 pr-4 py-2.5 text-xs text-white placeholder:text-white/40 focus:outline-none focus:border-terracota shadow-sm"
             />
           </div>
         </div>
@@ -494,7 +500,7 @@ export default function AdminDashboardView() {
         {activeTab === 'propiedades' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h3 className="font-sans font-black text-2xl text-asfalto">Gestión de Propiedades</h3>
+              <h3 className="font-sans font-black text-2xl text-white">Gestión de Propiedades</h3>
               <button 
                 onClick={() => { setEditingProp(null); setPropForm({ titulo: '', precio: '', area_m2: '', tipo_activo: 'Terreno', zonificacion: 'Residencial', imagen_url: '', descripcion: '', estado: 'Disponible', ubicacion: '', latitud: '', longitud: '' }); setShowPropModal(true); }}
                 className="bg-terracota text-white px-6 py-3 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-[#a64b2b] transition-colors shadow-lg"
@@ -589,7 +595,7 @@ export default function AdminDashboardView() {
         {/* TAB 3: LEADS CRM (CLIENTES) */}
         {activeTab === 'clientes' && (
           <div className="space-y-6">
-            <h3 className="font-sans font-black text-2xl text-asfalto">Leads y Prospectos (CRM)</h3>
+            <h3 className="font-sans font-black text-2xl text-white">Leads y Prospectos (CRM)</h3>
 
             <div className="bg-asfalto border border-arena/10 rounded-[2rem] overflow-hidden shadow-2xl">
               <div className="overflow-x-auto">
