@@ -503,8 +503,8 @@ export default function PropertyDetailView({ initialProperty }) {
         </div>
       )}
 
-      {/* BOTÓN WHATSAPP FLOTANTE */}
-      <WhatsAppButton />
+      {/* BOTÓN WHATSAPP FLOTANTE IDÉNTICO AL DEL INICIO */}
+      <WhatsAppButton propertyTitle={property.titulo} propertyId={property.id} />
     </div>
   );
 }
