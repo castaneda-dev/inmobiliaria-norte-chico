@@ -1,46 +1,16 @@
 import { cache } from 'react';
 import { notFound } from 'next/navigation';
-import { supabase } from '../../supabaseClient';
 import PropertyDetailView from '../../components/PropertyDetailView';
-import { slugify, getPropertySlug } from '../../utils/slugify';
+import { getPropertySlug } from '../../utils/slugify';
+import { findProperty } from '../../utils/propertyResolver';
 
-const getPropertyBySlug = cache(async (rawSlug) => {
-  try {
-    const slug = decodeURIComponent(rawSlug || '').trim();
-    if (!slug) return null;
-
-    // 1. Buscar por ID directo si es numérico (ej. /26)
-    if (!isNaN(slug) && Number(slug) > 0) {
-      const { data } = await supabase.from('propiedades').select('*').eq('id', Number(slug)).single();
-      if (data) return data;
-    }
-
-    // 2. Traer todas las propiedades y buscar coincidencia por slug o título
-    const { data: allProps } = await supabase.from('propiedades').select('*');
-    if (allProps && allProps.length > 0) {
-      // Coincidencia exacta por slug generado
-      let match = allProps.find(p => getPropertySlug(p).toLowerCase() === slug.toLowerCase());
-      if (match) return match;
-
-      // Coincidencia por slug de título limpiado
-      match = allProps.find(p => slugify(p.titulo).toLowerCase() === slugify(slug).toLowerCase());
-      if (match) return match;
-
-      // Coincidencia por ID en string
-      match = allProps.find(p => String(p.id) === slug);
-      if (match) return match;
-    }
-
-    return null;
-  } catch (e) {
-    console.error("Error fetching property by slug:", e);
-    return null;
-  }
+const getPropertyCached = cache(async (slug) => {
+  return await findProperty(slug);
 });
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const property = await getPropertyBySlug(slug);
+  const property = await getPropertyCached(slug);
 
   if (property) {
     const propSlug = getPropertySlug(property);
@@ -85,7 +55,7 @@ export async function generateMetadata({ params }) {
 
 export default async function SlugPropertyPage({ params }) {
   const { slug } = await params;
-  const property = await getPropertyBySlug(slug);
+  const property = await getPropertyCached(slug);
 
   if (!property) {
     notFound();

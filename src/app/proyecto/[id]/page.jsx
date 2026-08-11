@@ -1,23 +1,19 @@
 import { cache } from 'react';
 import { notFound } from 'next/navigation';
-import { supabase } from '../../../supabaseClient';
 import PropertyDetailView from '../../../components/PropertyDetailView';
+import { getPropertySlug } from '../../../utils/slugify';
+import { findProperty } from '../../../utils/propertyResolver';
 
-const getProperty = cache(async (id) => {
-  try {
-    const { data } = await supabase.from('propiedades').select('*').eq('id', id).single();
-    return data;
-  } catch (e) {
-    console.error("Error fetching property by ID:", e);
-    return null;
-  }
+const getPropertyCached = cache(async (id) => {
+  return await findProperty(id);
 });
 
 export async function generateMetadata({ params }) {
   const { id } = await params;
-  const property = await getProperty(id);
+  const property = await getPropertyCached(id);
 
   if (property) {
+    const propSlug = getPropertySlug(property);
     let mainImg = property.imagen_url || property.imagen || 'https://inmobiliarianortechico.pe/PR_GLORIETA_DELUXE.webp';
     try {
       if (typeof mainImg === 'string' && mainImg.startsWith('[')) {
@@ -33,12 +29,12 @@ export async function generateMetadata({ params }) {
       title: titleStr,
       description: descStr,
       alternates: {
-        canonical: `https://inmobiliarianortechico.pe/proyecto/${id}`,
+        canonical: `https://inmobiliarianortechico.pe/${propSlug}`,
       },
       openGraph: {
         title: titleStr,
         description: descStr,
-        url: `https://inmobiliarianortechico.pe/proyecto/${id}`,
+        url: `https://inmobiliarianortechico.pe/${propSlug}`,
         siteName: 'Inmobiliaria Norte Chico',
         images: [{ url: mainImg, alt: property.titulo }],
       },
@@ -59,7 +55,7 @@ export async function generateMetadata({ params }) {
 
 export default async function ProyectoPage({ params }) {
   const { id } = await params;
-  const property = await getProperty(id);
+  const property = await getPropertyCached(id);
 
   if (!property) {
     notFound();
@@ -73,6 +69,7 @@ export default async function ProyectoPage({ params }) {
     }
   } catch (e) {}
 
+  const propSlug = getPropertySlug(property);
   const numericPrice = typeof property.precio === 'number' ? property.precio : parseFloat(String(property.precio).replace(/[^0-9.]/g, '')) || 0;
 
   const jsonLd = {
@@ -80,7 +77,7 @@ export default async function ProyectoPage({ params }) {
     '@type': 'RealEstateListing',
     'name': property.titulo,
     'description': property.descripcion || `Lote o inmueble: ${property.titulo} en ${property.ubicacion || 'Norte Chico'}`,
-    'url': `https://inmobiliarianortechico.pe/proyecto/${id}`,
+    'url': `https://inmobiliarianortechico.pe/${propSlug}`,
     'image': mainImg,
     'datePosted': new Date().toISOString(),
     'offers': {
