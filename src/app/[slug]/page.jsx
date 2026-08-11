@@ -1,3 +1,6 @@
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 import { cache } from 'react';
 import { notFound } from 'next/navigation';
 import PropertyDetailView from '../../components/PropertyDetailView';
