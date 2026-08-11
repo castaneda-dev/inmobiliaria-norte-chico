@@ -468,55 +468,55 @@ export default function AdminDashboardView() {
       style={{ background: "linear-gradient(to bottom, rgba(8, 8, 8, 0.88), rgba(8, 8, 8, 0.94)), url('/PR_GLORIETA_DELUXE.webp') center/cover fixed" }}
     >
       {/* Top Navbar */}
-      <header className="border-b border-arena/10 bg-asfalto sticky top-0 z-40 px-8 py-4 flex flex-col md:flex-row justify-between items-center gap-4 shadow-2xl">
-        <div className="flex items-center gap-4">
-          <Link href="/" className="font-sans font-black text-xl text-white tracking-tight">
-            INMOBILIARIA NORTE CHICO
+      <header className="border-b border-arena/10 bg-asfalto sticky top-0 z-40 px-4 sm:px-8 py-3.5 sm:py-4 flex flex-row justify-between items-center gap-2 shadow-2xl">
+        <div className="flex items-center gap-2 sm:gap-4">
+          <Link href="/" className="font-sans font-black text-base sm:text-xl text-white tracking-tight">
+            NORTE CHICO
           </Link>
-          <span className="bg-terracota/20 border border-terracota/40 text-terracota px-3 py-1 rounded-full font-mono text-[10px] font-bold uppercase">
-            Dashboard Admin
+          <span className="bg-terracota/20 border border-terracota/40 text-terracota px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full font-mono text-[9px] sm:text-[10px] font-bold uppercase shrink-0">
+            CRM
           </span>
         </div>
 
-        <div className="flex items-center gap-6">
-          <button onClick={fetchData} className="font-mono text-xs opacity-70 hover:opacity-100 flex items-center gap-2 text-white" title="Recargar Datos">
-            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} /> Actualizar
+        <div className="flex items-center gap-2 sm:gap-6">
+          <button onClick={fetchData} className="font-mono text-xs opacity-80 hover:opacity-100 flex items-center gap-1.5 text-white p-2 rounded-lg bg-arena/5" title="Recargar Datos">
+            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} /> <span className="hidden sm:inline">Actualizar</span>
           </button>
-          <button onClick={handleLogout} className="bg-arena/10 hover:bg-red-500/20 text-white hover:text-red-400 px-4 py-2 rounded-full font-mono text-xs flex items-center gap-2 transition-colors border border-arena/20">
-            <LogOut size={14} /> Salir
+          <button onClick={handleLogout} className="bg-arena/10 hover:bg-red-500/20 text-white hover:text-red-400 px-3 sm:px-4 py-2 rounded-full font-mono text-xs flex items-center gap-1.5 transition-colors border border-arena/20">
+            <LogOut size={14} /> <span className="hidden sm:inline">Salir</span>
           </button>
         </div>
       </header>
 
       {/* Main Admin Body */}
-      <div className="max-w-[90rem] mx-auto px-8 py-10">
+      <div className="max-w-[90rem] mx-auto px-4 sm:px-8 py-6 sm:py-10">
         
-        {/* Navigation Tabs */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-10 border-b border-asfalto/10 pb-6">
-          <div className="flex gap-3 font-mono text-xs">
+        {/* Navigation Tabs (Scrollable on Mobile) */}
+        <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 mb-6 sm:mb-10 border-b border-arena/10 pb-4 sm:pb-6">
+          <div className="flex gap-2 font-mono text-xs overflow-x-auto pb-2 scrollbar-none snap-x flex-nowrap -mx-4 px-4 sm:mx-0 sm:px-0">
             <button 
               onClick={() => setActiveTab('kpis')} 
-              className={`px-6 py-3 rounded-full font-bold transition-all ${activeTab === 'kpis' ? 'bg-terracota text-white shadow-lg' : 'bg-asfalto text-white opacity-90 hover:opacity-100 hover:shadow-lg'}`}
+              className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-full font-bold transition-all shrink-0 snap-start text-xs ${activeTab === 'kpis' ? 'bg-terracota text-white shadow-lg' : 'bg-asfalto text-white opacity-90 hover:opacity-100'}`}
             >
               Resumen KPIs
             </button>
             <button 
               onClick={() => setActiveTab('propiedades')} 
-              className={`px-6 py-3 rounded-full font-bold transition-all ${activeTab === 'propiedades' ? 'bg-terracota text-white shadow-lg' : 'bg-asfalto text-white opacity-90 hover:opacity-100 hover:shadow-lg'}`}
+              className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-full font-bold transition-all shrink-0 snap-start text-xs ${activeTab === 'propiedades' ? 'bg-terracota text-white shadow-lg' : 'bg-asfalto text-white opacity-90 hover:opacity-100'}`}
             >
               Propiedades ({properties.length})
             </button>
             <button 
               onClick={() => setActiveTab('clientes')} 
-              className={`px-6 py-3 rounded-full font-bold transition-all ${activeTab === 'clientes' ? 'bg-terracota text-white shadow-lg' : 'bg-asfalto text-white opacity-90 hover:opacity-100 hover:shadow-lg'}`}
+              className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-full font-bold transition-all shrink-0 snap-start text-xs ${activeTab === 'clientes' ? 'bg-terracota text-white shadow-lg' : 'bg-asfalto text-white opacity-90 hover:opacity-100'}`}
             >
               Leads CRM ({clients.length})
             </button>
             <button 
               onClick={() => setActiveTab('seguridad')} 
-              className={`px-6 py-3 rounded-full font-bold transition-all ${activeTab === 'seguridad' ? 'bg-terracota text-white shadow-lg' : 'bg-asfalto text-white opacity-90 hover:opacity-100 hover:shadow-lg'}`}
+              className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-full font-bold transition-all shrink-0 snap-start text-xs ${activeTab === 'seguridad' ? 'bg-terracota text-white shadow-lg' : 'bg-asfalto text-white opacity-90 hover:opacity-100'}`}
             >
-              Seguridad CRM (IP / 2FA)
+              Seguridad (IP / 2FA)
             </button>
           </div>
 
@@ -524,7 +524,7 @@ export default function AdminDashboardView() {
             <Search size={16} className="absolute left-4 top-3.5 opacity-60 text-white" />
             <input 
               type="text"
-              placeholder="Buscar..."
+              placeholder="Buscar por título o cliente..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full bg-asfalto/80 border border-arena/20 rounded-full pl-10 pr-4 py-2.5 text-xs text-white placeholder:text-white/40 focus:outline-none focus:border-terracota shadow-sm"

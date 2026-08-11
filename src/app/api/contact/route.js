@@ -94,6 +94,27 @@ export async function POST(req) {
       return NextResponse.json({ success: false, error: 'Error interno al procesar el registro.' }, { status: 500 });
     }
 
+    // 6. NOTIFICACIÓN AUTOMÁTICA EN TIEMPO REAL A TELEGRAM
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
+
+    if (botToken && chatId) {
+      try {
+        const alertMsg = `🚨 *NUEVO LEAD CAPTURADO EN LA WEB*\n\n👤 *Nombre:* ${cleanNombre}\n📞 *Teléfono:* ${fullPhone}\n📧 *Email:* ${cleanEmail || 'No proporcionado'}\n📝 *Consulta:* ${cleanMensaje || 'Sin mensaje'}\n🌐 *Origen:* Formulario Web Next.js`;
+        await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: alertMsg,
+            parse_mode: 'Markdown'
+          })
+        });
+      } catch (tErr) {
+        console.error("Telegram notification error:", tErr);
+      }
+    }
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("API /contact error:", error);
