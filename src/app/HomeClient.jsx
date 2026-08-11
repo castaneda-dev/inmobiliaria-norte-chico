@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { getPropertySlug } from '../utils/slugify';
 
 export default function HomeClient({ initialProperties }) {
   // Parse Supabase data to our UI format
@@ -305,7 +306,7 @@ export default function HomeClient({ initialProperties }) {
                                   </div>
                               </div>
                               <div style={{ padding: '0 20px 20px' }}>
-                                <Link href={`/proyecto/${prop.id}`} prefetch={true} className="btn-outline" style={{ display: 'block', textAlign: 'center', fontSize: '12px', padding: '8px' }} onClick={(e) => e.stopPropagation()}>
+                                <Link href={`/${getPropertySlug(prop)}`} prefetch={true} className="btn-outline" style={{ display: 'block', textAlign: 'center', fontSize: '12px', padding: '8px' }} onClick={(e) => e.stopPropagation()}>
                                   Ver Detalles Completos
                                 </Link>
                               </div>
@@ -439,7 +440,7 @@ export default function HomeClient({ initialProperties }) {
                         <a href={`https://wa.me/56982816844?text=Hola,%20me%20interesa%20el%20inmueble:%20${selectedProp.titulo}`} target="_blank" className="btn-pill" style={{ width: '100%', textAlign: 'center', background: '#25d366', color: '#fff', boxShadow: '0 4px 15px rgba(37, 211, 102, 0.4)' }} rel="noreferrer">
                           💬 CONSULTAR POR WHATSAPP
                         </a>
-                        <Link href={`/proyecto/${selectedProp.id}`} className="btn-outline" style={{ width: '100%', textAlign: 'center', padding: '14px 20px' }}>
+                        <Link href={`/${getPropertySlug(selectedProp)}`} className="btn-outline" style={{ width: '100%', textAlign: 'center', padding: '14px 20px' }}>
                           🔍 VER DETALLES DEL INMUEBLE
                         </Link>
                     </div>

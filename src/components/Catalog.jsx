@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../supabaseClient';
 import { MapPin, Maximize, ArrowRight } from 'lucide-react';
+import { getPropertySlug } from '../utils/slugify';
 
 export default function Catalog() {
   const [properties, setProperties] = useState([]);
@@ -94,9 +95,11 @@ export default function Catalog() {
 function PropertyCard({ property }) {
   const whatsappMsg = `Hola, me interesa asegurar capital en el proyecto ID-${property.id}: ${property.titulo}. Quisiera más información sobre la plusvalía.`;
 
+  const slug = getPropertySlug(property);
+
   return (
     <div className="group bg-white rounded-[2rem] overflow-hidden shadow-lg border border-asfalto/5 transition-transform duration-500 hover:-translate-y-2 flex flex-col">
-      <Link href={`/proyecto/${property.id}`} className="relative h-64 overflow-hidden block">
+      <Link href={`/${slug}`} className="relative h-64 overflow-hidden block">
         <img 
           src={property.imagenesList[0]} 
           alt={property.titulo} 
@@ -109,7 +112,7 @@ function PropertyCard({ property }) {
       
       <div className="p-8 flex flex-col flex-1">
         <div className="flex justify-between items-start mb-4">
-          <Link href={`/proyecto/${property.id}`} className="hover:text-terracota transition-colors">
+          <Link href={`/${slug}`} className="hover:text-terracota transition-colors">
             <h4 className="font-sans font-bold text-xl leading-tight line-clamp-2">{property.titulo}</h4>
           </Link>
           <span className="font-sans font-black text-xl text-terracota whitespace-nowrap ml-4">{property.precioFormat}</span>
@@ -130,7 +133,7 @@ function PropertyCard({ property }) {
 
         <div className="flex gap-3">
           <Link 
-            href={`/proyecto/${property.id}`}
+            href={`/${slug}`}
             className="flex-1 py-3.5 bg-asfalto text-arena rounded font-bold text-xs uppercase tracking-widest hover:bg-terracota transition-colors flex justify-center items-center gap-2"
           >
             Ver Ficha 1:1 <ArrowRight size={14} />

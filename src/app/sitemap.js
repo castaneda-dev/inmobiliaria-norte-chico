@@ -1,4 +1,5 @@
 import { supabase } from '../supabaseClient';
+import { getPropertySlug } from '../utils/slugify';
 
 export default async function sitemap() {
   const baseUrl = 'https://inmobiliarianortechico.pe';
@@ -7,11 +8,11 @@ export default async function sitemap() {
   try {
     const { data: properties } = await supabase
       .from('propiedades')
-      .select('id');
+      .select('id, titulo');
     
     if (properties && properties.length > 0) {
       propertyRoutes = properties.map((prop) => ({
-        url: `${baseUrl}/proyecto/${prop.id}`,
+        url: `${baseUrl}/${getPropertySlug(prop)}`,
         lastModified: new Date(),
         changeFrequency: 'weekly',
         priority: 0.8,
