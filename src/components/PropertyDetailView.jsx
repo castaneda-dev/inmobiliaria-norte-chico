@@ -154,6 +154,11 @@ export default function PropertyDetailView({ initialProperty }) {
   const precioFormat = typeof property.precio === 'number' ? '$' + parseFloat(property.precio).toLocaleString() : (property.precio || '$0');
   const whatsappMsg = `Hola Inmobiliaria Norte Chico, me interesa información y disponibilidad del proyecto ID-${property.id}: ${property.titulo}.`;
 
+  const rawUbicacion = (property.ubicacion || 'Chancay').trim();
+  const ubicacionFormateada = (rawUbicacion.toLowerCase().includes('perú') || rawUbicacion.toLowerCase().includes('peru'))
+    ? rawUbicacion
+    : `${rawUbicacion}, Perú`;
+
   return (
     <div style={{ backgroundColor: '#080808', color: '#fff', minHeight: '100vh', fontFamily: 'Montserrat, sans-serif', overflowX: 'hidden' }}>
       
@@ -213,7 +218,7 @@ export default function PropertyDetailView({ initialProperty }) {
             </div>
 
             <p style={{ fontSize: '12px', color: '#aaa', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
-              📍 Ubicación: <span style={{ color: '#fff', fontWeight: 800 }}>{property.ubicacion || 'Norte Chico, Lima, Perú'}</span>
+              📍 Ubicación: <span style={{ color: '#fff', fontWeight: 800 }}>{ubicacionFormateada}</span>
             </p>
           </div>
 
@@ -319,7 +324,7 @@ export default function PropertyDetailView({ initialProperty }) {
                   🗺️ Google Maps | Eje Logístico
                 </h2>
                 <p style={{ fontSize: '11px', color: '#cb9f74', margin: '2px 0 0 0', fontWeight: 700 }}>
-                  Ubicación Estratégica: {property.ubicacion || 'Norte Chico, Lima'}
+                  Ubicación Estratégica: {ubicacionFormateada}
                 </p>
               </div>
 
