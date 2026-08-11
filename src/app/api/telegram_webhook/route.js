@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '../../../supabaseClient';
 
+export const dynamic = 'force-dynamic';
+
 async function sendTelegramMessage(chatId, text, parseMode = 'Markdown') {
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
   if (!botToken || !chatId) return;

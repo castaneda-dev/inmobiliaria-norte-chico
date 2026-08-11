@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import QRCode from 'qrcode';
 
+export const dynamic = 'force-dynamic';
+
 // Base32 Decode Helper (RFC 4648)
 function base32Decode(base32Str) {
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
