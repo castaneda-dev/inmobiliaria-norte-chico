@@ -129,10 +129,6 @@ export default function RootLayout({ children }) {
   return (
     <html lang="es">
       <head>
-        {/* Preconnect a origenes criticos para reducir latencia de ruta critica */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://jlgnqiedkagkcqoakmom.supabase.co" />
         {/* Precarga de imagenes LCP criticas */}
         <link rel="preload" as="image" href="/PR_GLORIETA_DELUXE.webp" fetchPriority="high" />
         <link rel="preload" as="image" href="/PR_PLAZA_CHANCAY_desktop.webp" fetchPriority="high" />
