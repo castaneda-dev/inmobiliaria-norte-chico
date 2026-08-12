@@ -130,6 +130,7 @@ export default function RootLayout({ children }) {
     <html lang="es">
       <head>
         <link rel="preload" as="image" href="/PR_GLORIETA_DELUXE.webp" fetchPriority="high" />
+        <link rel="preload" as="image" href="/PR_PLAZA_CHANCAY_desktop.webp" fetchPriority="high" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
