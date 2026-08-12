@@ -91,6 +91,7 @@ export default function ContactForm() {
                 <label className="block font-mono text-xs uppercase tracking-widest mb-2 text-terracota font-bold">Teléfono (WhatsApp)</label>
                 <div className="flex items-center gap-2">
                   <select 
+                    aria-label="Código de país"
                     value={formData.prefijo} 
                     onChange={e => setFormData({...formData, prefijo: e.target.value})}
                     className="bg-asfalto/80 text-white border border-arena/20 rounded-xl px-3 py-3.5 text-xs font-mono focus:outline-none focus:border-terracota cursor-pointer shrink-0"

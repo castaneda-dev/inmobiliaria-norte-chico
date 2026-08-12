@@ -2,7 +2,6 @@ import path from 'path';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  outputFileTracingRoot: process.cwd(),
   async redirects() {
     return [
       {
@@ -39,10 +38,11 @@ const nextConfig = {
           { key: 'X-XSS-Protection', value: '1; mode=block' },
           { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(self), payment=(), usb=(), interest-cohort=()' },
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin-allow-popups' },
           {
             key: 'Content-Security-Policy',
-            // Se eliminó unsafe-eval (innecesario). Se mantiene unsafe-inline por Google Maps, Facebook Pixel y Microsoft Clarity
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.clarity.ms https://connect.facebook.net https://maps.googleapis.com https://*.google.com https://*.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://images.unsplash.com https://jlgnqiedkagkcqoakmom.supabase.co https://maps.googleapis.com https://maps.gstatic.com https://*.google.com; connect-src 'self' https://jlgnqiedkagkcqoakmom.supabase.co https://www.clarity.ms https://api.telegram.org https://maps.googleapis.com https://connect.facebook.net; frame-src 'self' https://www.google.com https://maps.google.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
+            // CSP estricto autorizando dominios necesarios de Clarity, Maps y Facebook Pixel
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.clarity.ms https://*.clarity.ms https://scripts.clarity.ms https://connect.facebook.net https://maps.googleapis.com https://*.google.com https://*.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://images.unsplash.com https://jlgnqiedkagkcqoakmom.supabase.co https://maps.googleapis.com https://maps.gstatic.com https://*.google.com https://c.clarity.ms https://*.clarity.ms; connect-src 'self' https://jlgnqiedkagkcqoakmom.supabase.co https://www.clarity.ms https://c.clarity.ms https://*.clarity.ms https://c.bing.com https://api.telegram.org https://maps.googleapis.com https://connect.facebook.net; frame-src 'self' https://www.google.com https://maps.google.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
           }
         ],
       },

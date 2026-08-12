@@ -376,6 +376,7 @@ export default function HomeClient({ initialProperties }) {
                       </div>
                       <select 
                           name="interes"
+                          aria-label="Tipo de inmueble o consulta"
                           value={formData.interes}
                           onChange={handleInputChange}
                           required
