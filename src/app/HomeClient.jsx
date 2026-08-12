@@ -218,7 +218,17 @@ export default function HomeClient({ initialProperties }) {
 
       {/* HERO */}
       <header className="hero hero-initial">
-          <div className="hero-grid">
+          <Image 
+              src="/PR_GLORIETA_DELUXE.webp" 
+              alt="Inmobiliaria Norte Chico - Terrenos y Lotes en Chancay y Huaral" 
+              priority
+              fetchPriority="high"
+              fill
+              sizes="100vw"
+              style={{ objectFit: 'cover', objectPosition: 'center', zIndex: 0 }}
+          />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(8,8,8,1) 0%, rgba(8,8,8,0.6) 50%, rgba(8,8,8,0.8) 100%)', zIndex: 1 }} />
+          <div className="hero-grid" style={{ zIndex: 2, position: 'relative' }}>
               <div className="hero-text">
                   <h1>Inmobiliaria Norte Chico<br/><span style={{ fontSize: '0.8em', fontWeight: 600, display: 'block', marginTop: '10px' }}>Lotes e Inmuebles en Chancay y Huaral</span></h1>
                   <span className="sub-heading text-gradient">Terrenos de Alta Plusvalía y Proyectos Residenciales</span>

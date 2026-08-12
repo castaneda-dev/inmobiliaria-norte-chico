@@ -1,6 +1,21 @@
 import './globals.css';
 import '../../public/assets/css/index.min.css';
 import Script from 'next/script';
+import { Montserrat, Space_Mono } from 'next/font/google';
+
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  weight: ['300', '400', '600', '700', '900'],
+  variable: '--font-body',
+  display: 'swap',
+});
+
+const spaceMono = Space_Mono({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  variable: '--font-mono',
+  display: 'swap',
+});
 
 export const metadata = {
   metadataBase: new URL('https://inmobiliarianortechico.pe'),
@@ -115,15 +130,12 @@ export default function RootLayout({ children }) {
     <html lang="es">
       <head>
         <link rel="preload" as="image" href="/PR_GLORIETA_DELUXE.webp" fetchPriority="high" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="bg-arena text-asfalto antialiased overflow-x-hidden selection:bg-terracota selection:text-arena">
+      <body className={`${montserrat.className} ${spaceMono.variable} bg-arena text-asfalto antialiased overflow-x-hidden selection:bg-terracota selection:text-arena`}>
         <div className="noise-overlay"></div>
         {children}
 
