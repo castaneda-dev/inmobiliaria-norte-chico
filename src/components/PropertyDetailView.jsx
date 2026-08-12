@@ -190,7 +190,7 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
           <div style={{
             position: 'absolute',
             inset: 0,
-            background: 'linear-gradient(to bottom, rgba(8,8,8,0.94) 0%, rgba(8,8,8,0.82) 50%, rgba(8,8,8,0.94) 100%)',
+            background: 'linear-gradient(to top, rgba(8,8,8,1) 0%, rgba(8,8,8,0.6) 50%, rgba(8,8,8,0.8) 100%)',
           }} />
         </div>
         <div className="hero-grid" style={{ gap: '30px', position: 'relative', zIndex: 1 }}>
