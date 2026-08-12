@@ -276,35 +276,8 @@ export default function HomeClient({ initialProperties }) {
       {/* PUNTO DE REFERENCIA PRINCIPAL (MAIN) */}
       <main>
           {/* COLECCIÓN */}
-          <section
-            className="featured-section fade-module"
-            id="portafolio"
-            style={{ position: 'relative', overflow: 'hidden' }}
-          >
-            {/* Fondo Glorieta Deluxe — cargado con next/image para optimización automática */}
-            <div style={{
-              position: 'absolute',
-              inset: 0,
-              zIndex: 0,
-              pointerEvents: 'none',
-            }}>
-              <Image
-                src="/PR_GLORIETA_DELUXE.webp"
-                alt=""
-                fill
-                aria-hidden="true"
-                loading="lazy"
-                sizes="100vw"
-                style={{ objectFit: 'cover', objectPosition: 'center' }}
-              />
-              {/* Overlay oscuro para mantener legibilidad del texto */}
-              <div style={{
-                position: 'absolute',
-                inset: 0,
-                background: 'linear-gradient(to bottom, rgba(8,8,8,0.82) 0%, rgba(8,8,8,0.72) 50%, rgba(8,8,8,0.88) 100%)',
-              }} />
-            </div>
-            <div className="featured-container" style={{ position: 'relative', zIndex: 1 }}>
+          <section className="featured-section fade-module" id="portafolio">
+            <div className="featured-container">
               <h2 className="section-title">Nuestra <span className="text-gradient">Colección Residencial</span></h2>
               <div className="filter-controls">
                   <button className={`btn-outline ${filtro === 'todos' ? 'btn-active' : ''}`} onClick={() => setFiltro('todos')}>
