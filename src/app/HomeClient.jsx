@@ -156,8 +156,8 @@ export default function HomeClient({ initialProperties }) {
   // Carousel Hero state
   const [heroIdx, setHeroIdx] = useState(0);
   const heroImgs = [
-    'PR_PLAZA_HUARAL_desktop.webp',
     'PR_PLAZA_CHANCAY_desktop.webp',
+    'PR_PLAZA_HUARAL_desktop.webp',
     'PR_ECOTRULY_PARK_desktop.webp',
     'PR_CHANCAY_desktop.webp'
   ];
@@ -250,9 +250,9 @@ export default function HomeClient({ initialProperties }) {
                                   src={'/' + img} 
                                   alt="Inmobiliaria Norte Chico Terrenos en Chancay y Huaral" 
                                   fill 
-                                  priority={i < 2} 
-                                  loading={i < 2 ? "eager" : "lazy"}
-                                  fetchPriority={i < 2 ? "high" : "low"}
+                                  priority={i === 0} 
+                                  loading={i === 0 ? "eager" : "lazy"}
+                                  fetchPriority={i === 0 ? "high" : "low"}
                                   sizes="(max-width: 768px) 100vw, 50vw" 
                                   style={{ objectFit: 'cover' }} 
                                   className="carousel-img" 
