@@ -344,6 +344,7 @@ export default function HomeClient({ initialProperties }) {
                       <div className="phone-input-group">
                           <select 
                               name="paisCode"
+                              aria-label="Código de país"
                               value={formData.paisCode}
                               onChange={handleInputChange}
                               required

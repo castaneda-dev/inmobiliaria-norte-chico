@@ -114,6 +114,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="es">
       <head>
+        <link rel="preload" as="image" href="/PR_GLORIETA_DELUXE.webp" fetchPriority="high" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
@@ -127,7 +128,7 @@ export default function RootLayout({ children }) {
         {children}
 
         {/* Microsoft Clarity */}
-        <Script id="clarity-script" strategy="afterInteractive">
+        <Script id="clarity-script" strategy="lazyOnload">
           {`
             (function(c,l,a,r,i,t,y){
                 c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -138,7 +139,7 @@ export default function RootLayout({ children }) {
         </Script>
 
         {/* Lazy Meta Pixel */}
-        <Script id="meta-pixel-lazy" strategy="afterInteractive">
+        <Script id="meta-pixel-lazy" strategy="lazyOnload">
           {`
             (function() {
                 let pixelLoaded = false;
@@ -161,7 +162,7 @@ export default function RootLayout({ children }) {
                 ['touchstart', 'scroll', 'mousemove', 'click'].forEach(function(evt) {
                     window.addEventListener(evt, initMetaPixel, { passive: true, once: true });
                 });
-                setTimeout(initMetaPixel, 3000);
+                setTimeout(initMetaPixel, 5000);
             })();
           `}
         </Script>
