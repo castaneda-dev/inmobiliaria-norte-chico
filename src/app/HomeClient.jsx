@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getPropertySlug } from '../utils/slugify';
@@ -52,6 +52,20 @@ export default function HomeClient({ initialProperties }) {
   const [filtro, setFiltro] = useState('todos');
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedProp, setSelectedProp] = useState(null);
+  const cssLoadedRef = useRef(false);
+
+  // Cargar index.min.css de forma NO bloqueante (después de la primera pintura)
+  useEffect(() => {
+    if (cssLoadedRef.current) return;
+    cssLoadedRef.current = true;
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = '/assets/css/index.min.css';
+    link.media = 'print';
+    link.onload = () => { link.media = 'all'; };
+    document.head.appendChild(link);
+  }, []);
+
   const [modalCurrentImgIdx, setModalCurrentImgIdx] = useState(0);
 
   // Form states for Lead submission
