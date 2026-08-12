@@ -76,6 +76,17 @@ const nextConfig = {
       },
     ],
   },
+  webpack: (config, { isServer, webpack }) => {
+    if (!isServer) {
+      config.plugins.push(
+        new webpack.NormalModuleReplacementPlugin(
+          /next[\\/]dist[\\/](client[\\/]polyfills|build[\\/]polyfills)/,
+          path.resolve('./src/utils/emptyPolyfill.js')
+        )
+      );
+    }
+    return config;
+  },
 };
 
 export default nextConfig;
