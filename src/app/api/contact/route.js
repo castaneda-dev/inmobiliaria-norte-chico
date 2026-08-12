@@ -58,8 +58,11 @@ function isValidEmail(email) {
 export async function POST(req) {
   try {
     // 1. OBTENER IP Y VERIFICAR RATE LIMITING ANTI-SPAM / ATAQUE MASIVO
-    const forwardHeader = req.headers.get('x-forwarded-for');
-    const clientIp = forwardHeader ? forwardHeader.split(',')[0].trim() : '127.0.0.1';
+    // Mitigación Anti IP-Spoofing: priorizar cabeceras de infraestructura (Vercel) sobre x-forwarded-for
+    const clientIp = req.headers.get('x-vercel-forwarded-for')?.split(',')[0]?.trim() || 
+                     req.headers.get('x-real-ip') || 
+                     req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 
+                     '127.0.0.1';
 
     if (await isRateLimitedDistributed(clientIp)) {
       return NextResponse.json(

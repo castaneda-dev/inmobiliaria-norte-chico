@@ -12,9 +12,12 @@ export function middleware(req) {
   // Factor 1: Filtrado de IP (si está configurada la variable CRM_ALLOWED_IPS)
   const allowedIpsEnv = process.env.CRM_ALLOWED_IPS;
   if (isCrmRoute && allowedIpsEnv) {
-    const rawIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 
+    // Mitigación Anti IP-Spoofing: Priorizamos req.ip (nativo Next.js Edge) y cabeceras de hosting (Vercel)
+    const rawIp = req.ip || 
+                  req.headers.get('x-vercel-forwarded-for')?.split(',')[0]?.trim() || 
                   req.headers.get('x-real-ip') || 
-                  req.ip || '';
+                  req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 
+                  '';
     const allowedIps = allowedIpsEnv.split(',').map(ip => ip.trim()).filter(Boolean);
     const isLocalhost = rawIp === '127.0.0.1' || rawIp === '::1' || rawIp === '::ffff:127.0.0.1';
 
