@@ -175,8 +175,25 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
       </nav>
 
       {/* HERO PRINCIPAL ADAPTADO A CELULAR Y WEB */}
-      <header className="hero hero-initial" style={{ minHeight: 'auto', padding: '130px 5% 40px' }}>
-        <div className="hero-grid" style={{ gap: '30px' }}>
+      <header className="hero hero-initial" style={{ minHeight: 'auto', padding: '130px 5% 40px', position: 'relative', overflow: 'hidden' }}>
+        {/* Fondo Glorieta Deluxe decorativo para el inicio de la pagina */}
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
+          <Image
+            src="/PR_GLORIETA_DELUXE.webp"
+            alt=""
+            fill
+            aria-hidden="true"
+            priority
+            sizes="100vw"
+            style={{ objectFit: 'cover', objectPosition: 'center 30%' }}
+          />
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(to bottom, rgba(8,8,8,0.94) 0%, rgba(8,8,8,0.82) 50%, rgba(8,8,8,0.94) 100%)',
+          }} />
+        </div>
+        <div className="hero-grid" style={{ gap: '30px', position: 'relative', zIndex: 1 }}>
           
           {/* INFORMACIÓN PRINCIPAL DEL INMUEBLE */}
           <div className="hero-text" style={{ textAlign: 'left' }}>
@@ -387,31 +404,9 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
           </div>
 
         </div>
-
         {/* SECCIÓN 3: FORMULARIO DE CAPTACIÓN CENTRALIZADO */}
-        <section
-          className="contact-module fade-module"
-          id="contacto-ficha"
-          style={{ marginTop: '40px', position: 'relative', overflow: 'hidden' }}
-        >
-          {/* Fondo Glorieta Deluxe — imagen decorativa con overlay */}
-          <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
-            <Image
-              src="/PR_GLORIETA_DELUXE.webp"
-              alt=""
-              fill
-              aria-hidden="true"
-              loading="lazy"
-              sizes="100vw"
-              style={{ objectFit: 'cover', objectPosition: 'center 30%' }}
-            />
-            <div style={{
-              position: 'absolute',
-              inset: 0,
-              background: 'linear-gradient(to bottom, rgba(18,18,18,0.90) 0%, rgba(18,18,18,0.80) 50%, rgba(18,18,18,0.92) 100%)',
-            }} />
-          </div>
-          <div className="form-container" style={{ position: 'relative', zIndex: 1 }}>
+        <section className="contact-module fade-module" id="contacto-ficha" style={{ marginTop: '40px' }}>
+          <div className="form-container">
             <h2 style={{ fontSize: 'clamp(24px, 5vw, 40px)' }}>Solicitar Información de <span className="text-gradient">este Inmueble</span></h2>
             <p style={{ fontSize: '14px' }}>Déjenos su contacto para enviarle más información de la propiedad y agendar un recorrido en {property.titulo}.</p>
             
