@@ -246,7 +246,17 @@ export default function HomeClient({ initialProperties }) {
                   <div className="carousel-track" style={{ transform: `translateX(-${heroIdx * 100}%)`, display: 'flex', transition: 'transform 0.5s ease' }}>
                       {heroImgs.map((img, i) => (
                           <div key={i} style={{ minWidth: '100%', height: '100%', position: 'relative' }}>
-                              <Image src={'/' + img} alt="Hero" fill priority={i === 0} sizes="100vw" style={{ objectFit: 'cover' }} className="carousel-img" />
+                              <Image 
+                                  src={'/' + img} 
+                                  alt="Inmobiliaria Norte Chico Terrenos en Chancay y Huaral" 
+                                  fill 
+                                  priority={i === 0} 
+                                  loading={i === 0 ? "eager" : "lazy"}
+                                  fetchPriority={i === 0 ? "high" : "low"}
+                                  sizes="(max-width: 768px) 100vw, 50vw" 
+                                  style={{ objectFit: 'cover' }} 
+                                  className="carousel-img" 
+                              />
                           </div>
                       ))}
                   </div>

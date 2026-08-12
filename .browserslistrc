@@ -1,0 +1,6 @@
+chrome >= 90
+edge >= 90
+firefox >= 88
+safari >= 15
+not ie 11
+not dead
