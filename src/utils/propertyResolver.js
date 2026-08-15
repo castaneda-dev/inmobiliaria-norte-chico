@@ -1,4 +1,4 @@
-import { supabase } from '../supabaseClient';
+import { createClient } from './supabase/server';
 import { slugify, getPropertySlug } from './slugify';
 
 export async function findProperty(identifier) {

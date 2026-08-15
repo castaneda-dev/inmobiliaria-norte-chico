@@ -1,8 +1,10 @@
 import crypto from 'crypto';
 import { NextResponse } from 'next/server';
-import { supabase } from '../../../supabaseClient';
+import { createClient } from '../../../utils/supabase/server';
+import { z } from 'zod';
 
 export async function POST(req) {
+  const supabase = createClient();
   try {
     const rawBody = await req.text();
     
@@ -45,26 +47,32 @@ export async function POST(req) {
       origen = 'Facebook Lead Ads';
     }
 
-    function sanitizeWebhookInput(str, maxLength = 255) {
-      if (!str || typeof str !== 'string') return '';
-      return str.replace(/<[^>]*>?/gm, '').replace(/[\0\x08\x09\x1a\n\r"'\\%]/g, '').trim().slice(0, maxLength);
+    // Zod Schema para sanitizar y tipar la inserción
+    const leadSchema = z.object({
+      nombre_completo: z.string().min(2, "Nombre muy corto").max(255).transform(s => s.replace(/<[^>]*>?/gm, '').trim()),
+      telefono: z.string().max(50).transform(s => s.replace(/[^0-9+]/g, '').trim()),
+      email: z.string().email("Email inválido").or(z.literal('')).transform(s => s.trim().toLowerCase()),
+      origen: z.string().max(255).transform(s => s.replace(/<[^>]*>?/gm, '').trim()),
+      tipo_interes: z.string().max(1000).transform(s => s.replace(/<[^>]*>?/gm, '').trim()),
+      estado_lead: z.string().default('Nuevo')
+    });
+
+    let validatedData;
+    try {
+      validatedData = leadSchema.parse({
+        nombre_completo: nombre,
+        telefono: telefono,
+        email: email,
+        origen: origen,
+        tipo_interes: notas
+      });
+    } catch (zodError) {
+      console.warn("⚠️ Meta Webhook: Datos no superaron esquema Zod", zodError.errors);
+      return NextResponse.json({ success: false, error: 'Estructura de datos inválida', details: zodError.errors }, { status: 400 });
     }
 
-    nombre = sanitizeWebhookInput(nombre);
-    telefono = sanitizeWebhookInput(telefono, 50);
-    email = sanitizeWebhookInput(email);
-    origen = sanitizeWebhookInput(origen);
-    notas = sanitizeWebhookInput(notas, 1000);
-
     // Insert into Supabase 'clientes' table
-    const { data, error } = await supabase.from('clientes').insert([{
-      nombre_completo: nombre,
-      telefono: telefono,
-      email: email,
-      origen: origen,
-      tipo_interes: notas,
-      estado_lead: 'Nuevo'
-    }]).select();
+    const { data, error } = await supabase.from('clientes').insert([validatedData]).select();
 
     if (error) {
       console.error("Error inserting lead into Supabase:", error);

@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 import HomeClient from '../HomeClient';
-import { supabase } from '../../supabaseClient';
+import { createClient } from '../../utils/supabase/server';
 
 export const metadata = {
   title: 'Inmobiliaria en Huaral | Terrenos, Lotes y Casas',
@@ -18,6 +18,7 @@ export const metadata = {
 };
 
 export default async function HuaralLandingPage() {
+  const supabase = createClient();
   const { data: properties, error } = await supabase
     .from('propiedades')
     .select('*')

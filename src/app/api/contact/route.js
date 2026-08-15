@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '../../../supabaseClient';
+import { createClient } from '../../../utils/supabase/server';
 
 // ESTRATEGIA MED-02: RATE LIMITING DISTRIBUIDO 100% GRATUITO VIA SUPABASE
 // Funciona en Vercel Serverless comprobando solicitudes en la BD sin costos adicionales
@@ -8,6 +8,7 @@ const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutos
 const MAX_REQUESTS_PER_WINDOW = 5; // Máximo 5 envíos por IP/cliente cada 10 min
 
 async function isRateLimitedDistributed(ip) {
+  const supabase = createClient();
   const now = Date.now();
   
   // 1. Verificación local en memoria para ráfagas inmediatas
@@ -56,6 +57,7 @@ function isValidEmail(email) {
 }
 
 export async function POST(req) {
+  const supabase = createClient();
   try {
     // 1. OBTENER IP Y VERIFICAR RATE LIMITING ANTI-SPAM / ATAQUE MASIVO
     // Mitigación Anti IP-Spoofing: priorizar cabeceras de infraestructura (Vercel) sobre x-forwarded-for

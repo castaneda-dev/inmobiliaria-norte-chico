@@ -1,7 +1,8 @@
-import { supabase } from '../supabaseClient';
+import { createClient } from '../utils/supabase/server';
 import { getPropertySlug } from '../utils/slugify';
 
 export default async function sitemap() {
+  const supabase = createClient();
   const baseUrl = 'https://inmobiliarianortechico.pe';
 
   let propertyRoutes = [];

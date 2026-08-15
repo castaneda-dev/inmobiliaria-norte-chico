@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from 'react';
-import { supabase } from '../supabaseClient';
+import { createClient } from '../utils/supabase/client';
+const supabase = createClient();
 import { ShieldCheck, CalendarCheck, TrendingUp } from 'lucide-react';
 
 export default function ContactForm() {

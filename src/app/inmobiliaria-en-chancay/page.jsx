@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 import HomeClient from '../HomeClient';
-import { supabase } from '../../supabaseClient';
+import { createClient } from '../../utils/supabase/server';
 
 export const metadata = {
   title: 'Inmobiliaria en Chancay | Terrenos y Lotes Cerca al Megapuerto',
@@ -18,6 +18,7 @@ export const metadata = {
 };
 
 export default async function ChancayLandingPage() {
+  const supabase = createClient();
   // Filtramos las propiedades que contengan Chancay en algún campo relevante
   const { data: properties, error } = await supabase
     .from('propiedades')

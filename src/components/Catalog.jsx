@@ -1,7 +1,8 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { supabase } from '../supabaseClient';
+import { createClient } from '../utils/supabase/client';
+const supabase = createClient();
 import { MapPin, Maximize, ArrowRight } from 'lucide-react';
 import { getPropertySlug } from '../utils/slugify';
 

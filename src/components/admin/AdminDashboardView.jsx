@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { supabase } from '../../supabaseClient';
+import { createClient } from '../../utils/supabase/client';
+const supabase = createClient();
 import { savePropertyAction, deletePropertyAction } from '../../app/actions/adminActions';
 import { 
   Building2, Users, TrendingUp, ShieldCheck, Plus, Trash2, Edit3, 
@@ -201,7 +202,7 @@ export default function AdminDashboardView() {
         longitud: propForm.longitud ? parseFloat(propForm.longitud) : null
       };
 
-      const result = await savePropertyAction(sessionToken, payload, !!editingProp, editingProp?.id);
+      const result = await savePropertyAction(payload, !!editingProp, editingProp?.id);
       
       if (!result.success) throw new Error(result.error);
 
