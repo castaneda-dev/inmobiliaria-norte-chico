@@ -82,6 +82,9 @@ const jsonLd = {
   'image': 'https://inmobiliarianortechico.pe/PR_GLORIETA_DELUXE.webp',
   '@id': 'https://inmobiliarianortechico.pe',
   'url': 'https://inmobiliarianortechico.pe',
+  'sameAs': [
+    'https://inmobiliarianortechico.pe'
+  ],
   'telephone': '+56982816844',
   'priceRange': '$$',
   'address': {

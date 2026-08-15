@@ -48,9 +48,9 @@ El proyecto está diseñado bajo una **arquitectura modular Next.js 14 (App Rout
 
 El acceso al CRM está blindado por tres niveles de autenticación independientes:
 
-1. **Factor 1 (Filtrado por IP Whitelist):** Evaluado en [src/middleware.js](file:///c:/Users/Usuario/OneDrive/Escritorio/PRODUCCION%20WEB%20INMOBILIARIA/src/middleware.js) mediante la variable `CRM_ALLOWED_IPS`.
+1. **Factor 1 (Filtrado por IP Whitelist Segura):** Evaluado en `src/middleware.js` mediante la variable `CRM_ALLOWED_IPS`. La validación prioriza cabeceras nativas inmutables del proveedor de infraestructura (`req.ip`, `x-vercel-forwarded-for`) para prevenir vulnerabilidades de **IP Spoofing** por parte de atacantes que intenten alterar `x-forwarded-for`.
 2. **Factor 2 (Autenticación Supabase Auth):** Verificación de credenciales de usuario (email y contraseña).
-3. **Factor 3 (Google Authenticator TOTP RFC 6238):** Verificación de código dinámico de 6 dígitos procesado en el servidor vía [src/app/api/crm_verify_2fa/route.js](file:///c:/Users/Usuario/OneDrive/Escritorio/PRODUCCION%20WEB%20INMOBILIARIA/src/app/api/crm_verify_2fa/route.js). El secreto se gestiona mediante `CRM_TOTP_SECRET`.
+3. **Factor 3 (Google Authenticator TOTP RFC 6238):** Verificación de código dinámico de 6 dígitos procesado en el servidor vía `src/app/api/crm_verify_2fa/route.js`. El secreto se gestiona mediante `CRM_TOTP_SECRET`.
 
 ---
 
@@ -66,7 +66,7 @@ El acceso al CRM está blindado por tres niveles de autenticación independiente
 
 ### 4.2. Notificaciones en Tiempo Real (`/api/contact`)
 - **Ubicación**: [src/app/api/contact/route.js](file:///c:/Users/Usuario/OneDrive/Escritorio/PRODUCCION%20WEB%20INMOBILIARIA/src/app/api/contact/route.js)
-- **Estrategia Rate Limiting (MED-02):** Implementación distribuida 100% gratuita evaluando timestamps en Supabase (`gte.created_at`) combinada con ventana deslizante local.
+- **Estrategia Rate Limiting Anti-Spoofing (MED-02):** Implementación distribuida 100% gratuita evaluando timestamps en Supabase (`gte.created_at`) combinada con ventana deslizante local. Protegida contra evasión y ataques masivos mediante validación estricta de la dirección IP (`x-vercel-forwarded-for`).
 - **Honeypot Anti-Bot:** Campos invisibles `website` y `confirm_address` para atrapar robots de spam.
 - **Alerta instantánea:** Emite un reporte con los datos del lead al chat personal del administrador (`TELEGRAM_CHAT_ID`).
 
@@ -81,9 +81,10 @@ El acceso al CRM está blindado por tres niveles de autenticación independiente
 
 ## 6. Hardening de Ciberseguridad, CSP & Políticas RLS
 
-- **Content-Security-Policy (CSP):** Configurado en [next.config.mjs](file:///c:/Users/Usuario/OneDrive/Escritorio/PRODUCCION%20WEB%20INMOBILIARIA/next.config.mjs) eliminando la directiva `unsafe-eval`.
-- **Headers Anti-Caché:** `Cache-Control: no-store, no-cache` aplicados estrictamente a las APIs y al panel CRM.
+- **Content-Security-Policy (CSP):** Configurado en `next.config.mjs` eliminando la directiva `unsafe-eval`.
+- **Headers Anti-Caché:** `Cache-Control: no-store, no-cache` aplicados estrictamente a las APIs y al panel CRM para prevenir fugas de memoria.
 - **Sanitización Rigurosa:** Filtrado de caracteres de control e inyecciones mediante `sanitizeInput()`.
+- **Políticas RLS en Supabase (Prevención de Data Scraping):** Las tablas críticas (`clientes` y `propiedades`) operan bajo Row Level Security (RLS) estricto. La llave anónima pública permite escritura de leads (solo `INSERT`), pero bloquea rotundamente la extracción o alteración de registros (`SELECT`, `UPDATE`, `DELETE`) para visitantes no autenticados.
 
 ---
 

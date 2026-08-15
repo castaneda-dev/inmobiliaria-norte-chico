@@ -23,6 +23,8 @@
 3. **Manejo de Errores Seguro:** No exponer detalles de errores internos de la BD en las respuestas HTTP.
 4. **Sanitización de Entradas:** Filtrar todo input del usuario contra XSS/inyecciones.
 5. **Verificación de Seguridad:** Ejecutar `npm run build` antes de realizar commits.
+6. **Prevención de IP Spoofing:** Priorizar siempre cabeceras seguras de infraestructura (`req.ip`, `x-vercel-forwarded-for`) en la extracción de IPs, desestimando la cabecera `x-forwarded-for` inyectada por clientes.
+7. **Protección de Privacidad (RLS):** Garantizar políticas estrictas de Row Level Security en Supabase (ej. limitar el rol `anon` solo a `INSERT`) para impedir la lectura masiva de datos (Data Scraping).
 
 ---
 

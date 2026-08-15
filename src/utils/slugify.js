@@ -14,5 +14,9 @@ export function slugify(text) {
 export function getPropertySlug(property) {
   if (!property) return '';
   const cleanTitle = slugify(property.titulo);
-  return cleanTitle || `propiedad-${property.id}`;
+  const tipo = slugify(property.tipo_activo || 'inmueble');
+  const ubicacion = slugify(property.ubicacion || property.zonificacion || '');
+  
+  let parts = [tipo, ubicacion, cleanTitle, property.id].filter(Boolean);
+  return parts.join('-').replace(/--+/g, '-').replace(/^-|-$/g, '');
 }

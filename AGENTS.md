@@ -55,5 +55,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 ## 🔒 3. Directivas de Seguridad Cero-Fugas (Security Guidelines)
 
 - **Sanitización de Inputs:** Todas las entradas públicas en APIs (`/api/contact`, `/api/webhook`) deben ser filtradas contra XSS e inyecciones mediante `sanitizeInput()`.
+- **Prevención de IP Spoofing:** Las políticas de Rate Limiting y listas blancas de Middleware deben extraer la IP usando exclusivamente cabeceras seguras inyectadas por el proveedor (`req.ip` o `x-vercel-forwarded-for`), invalidando `x-forwarded-for` modificado por clientes.
+- **Políticas de Privacidad de Datos (RLS):** Toda tabla en Supabase que reciba datos de clientes o leads debe tener Row Level Security habilitado. El rol `anon` está estrictamente limitado a sentencias `INSERT` para evitar fuga de información por Data Scraping.
 - **Manejo de Errores Protegido:** Jamás responder al cliente con `error.message` crudo de la base de datos. Usar siempre mensajes genéricos en producción.
 - **Content-Security-Policy (CSP):** `next.config.mjs` aplica CSP estricto sin `unsafe-eval`, con `frame-ancestors 'none'` y cabeceras anti-caché en rutas admin/API.

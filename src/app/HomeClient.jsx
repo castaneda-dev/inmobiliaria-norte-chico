@@ -5,7 +5,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getPropertySlug } from '../utils/slugify';
 
-export default function HomeClient({ initialProperties }) {
+export default function HomeClient({ 
+  initialProperties,
+  heroTitle = "Inmobiliaria Norte Chico",
+  heroSubtitle = "Venta de Lotes y Terrenos en Chancay y Huaral",
+  heroLocation = "Chancay y Huaral"
+}) {
   // Parse Supabase data to our UI format
   const [coleccion, setColeccion] = useState(() => {
     const formatted = (initialProperties || []).map(p => {
@@ -232,7 +237,7 @@ export default function HomeClient({ initialProperties }) {
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(8,8,8,1) 0%, rgba(8,8,8,0.6) 50%, rgba(8,8,8,0.8) 100%)', zIndex: 1 }} />
           <div className="hero-grid" style={{ zIndex: 2, position: 'relative' }}>
               <div className="hero-text">
-                  <h1>Inmobiliaria Norte Chico<br/><span style={{ fontSize: '0.8em', fontWeight: 600, display: 'block', marginTop: '10px' }}>Lotes e Inmuebles en Chancay y Huaral</span></h1>
+                  <h1>{heroTitle}<br/><span style={{ fontSize: '0.8em', fontWeight: 600, display: 'block', marginTop: '10px' }}>{heroSubtitle}</span></h1>
                   <span className="sub-heading text-gradient">Terrenos de Alta Plusvalía y Proyectos Residenciales</span>
                   <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', justifyContent: 'left' }}>
                       <a href="#contacto" className="btn-pill" style={{ fontSize: '13px' }}>Contactar a un asesor</a>
@@ -278,7 +283,7 @@ export default function HomeClient({ initialProperties }) {
           {/* COLECCIÓN */}
           <section className="featured-section fade-module" id="portafolio">
             <div className="featured-container">
-              <h2 className="section-title">Nuestra <span className="text-gradient">Colección Residencial</span></h2>
+              <h2 className="section-title">Propiedades y Terrenos en <span className="text-gradient">{heroLocation}</span></h2>
               <div className="filter-controls">
                   <button className={`btn-outline ${filtro === 'todos' ? 'btn-active' : ''}`} onClick={() => setFiltro('todos')}>
                       Todos <span className="filter-count">{total}</span>
@@ -342,8 +347,8 @@ export default function HomeClient({ initialProperties }) {
           {/* CONTACTO / CRM */}
           <section className="contact-module fade-module" id="contacto">
               <div className="form-container">
-                  <h2>Construye el futuro de <span className="text-gradient">tu Familia</span></h2>
-                  <p>Déjenos sus datos para organizar un recorrido por nuestros lotes en Huaral y Chancay.</p>
+                  <h2>Invierte seguro en el <span className="text-gradient">Norte Chico</span></h2>
+                  <p>Déjenos sus datos para organizar un recorrido por nuestros lotes en {heroLocation}.</p>
                   
                   <form onSubmit={handleFormSubmit} className="form-grid">
                       <input 

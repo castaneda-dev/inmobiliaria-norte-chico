@@ -29,6 +29,8 @@
    - **Depuración de Obfuscated JS:** Eliminación total de scripts `.obf.js` antiguos (`api.obf.js`, `index-app.obf.js`, `supabase_config.obf.js`). Toda la lógica ahora es 100% nativa en React/Next.js.
    - **Remoción de Credenciales Hardcodeadas:** Eliminación de accesos de prueba inseguros en el panel de administración (`AdminDashboardView.jsx`). Autenticación estricta vía Supabase Auth.
    - **Middleware Protector Server-Side (`src/middleware.js`):** Bloqueo a nivel de servidor de las rutas `/admin` y `/dashboard_admin` para usuarios sin sesión activa.
+   - **Prevención de IP Spoofing (Nuevo):** Actualización del Middleware y API de contacto para priorizar cabeceras de infraestructura inmutables (`req.ip`, `x-vercel-forwarded-for`), asegurando la integridad del Rate Limiting y las listas blancas.
+   - **Protección de Datos RLS (Nuevo):** Implementación de políticas de seguridad a nivel de fila (Row Level Security) en Supabase para bloquear la extracción masiva de datos y el acceso no autorizado de lectura desde la API pública.
    - **Server Actions Seguros (`src/app/actions/adminActions.js`):** Mutaciones (creación/edición/eliminación) ejecutadas exclusivamente en el servidor con validación de tokens.
 3. **Rendimiento y Optimización de Experiencia Visual:**
    - **ISR Bajo Demanda:** Eliminación del parpadeo de revalidación constante (`revalidate = 60`). La página principal es 100% estática y se revalida al instante (`revalidatePath('/')`) al modificar propiedades.
@@ -60,7 +62,7 @@
 - **Riesgos Identificados:** Evitar publicar en producción sin verificar previamente en el ambiente de pruebas.
 
 ### 🔬 ROL 2: Ingeniería de Producto & Arquitectura
-- **Estado:** Arquitectura híbrida en Next.js completada. Código limpio de dependencias legadas u ofuscadas. Middleware, Server Actions e ISR bajo demanda operativos.
+- **Estado:** Arquitectura híbrida en Next.js completada. Código limpio de dependencias legadas u ofuscadas. Middleware mitigado contra IP Spoofing, base de datos blindada con RLS, Server Actions e ISR bajo demanda operativos.
 
 ### 📢 ROL 3: Marketing & Contenidos
 - **Enfoque:** Posicionamiento de "Norte Chico Properties" como la opción de inversión residencial más segura en el hub logístico de Chancay.
@@ -79,4 +81,4 @@
 
 ---
 
-*Última actualización: 10 de Agosto de 2026 - Registrado en el sistema de memoria compartida.*
+*Última actualización: 11 de Agosto de 2026 - Registrado en el sistema de memoria compartida.*

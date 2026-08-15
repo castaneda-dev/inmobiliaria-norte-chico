@@ -8,7 +8,7 @@ export default async function sitemap() {
   try {
     const { data: properties } = await supabase
       .from('propiedades')
-      .select('id, titulo');
+      .select('id, titulo, tipo_activo, ubicacion, zonificacion');
     
     if (properties && properties.length > 0) {
       propertyRoutes = properties.map((prop) => ({
@@ -28,6 +28,18 @@ export default async function sitemap() {
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 1.0,
+    },
+    {
+      url: `${baseUrl}/inmobiliaria-en-chancay`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/inmobiliaria-en-huaral`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
     },
     ...propertyRoutes,
   ];
