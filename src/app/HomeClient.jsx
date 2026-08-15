@@ -257,9 +257,9 @@ export default function HomeClient({
                                   src={'/' + img} 
                                   alt="Inmobiliaria Norte Chico Terrenos en Chancay y Huaral" 
                                   fill 
-                                  priority={i === 0} 
-                                  loading={i === 0 ? "eager" : "lazy"}
-                                  fetchPriority={i === 0 ? "high" : "low"}
+                                  priority={i <= 1} 
+                                  loading={i <= 1 ? "eager" : "lazy"}
+                                  fetchPriority={i <= 1 ? "high" : "auto"}
                                   sizes="(max-width: 768px) 100vw, 50vw" 
                                   style={{ objectFit: 'cover' }} 
                                   className="carousel-img" 
