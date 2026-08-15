@@ -30,10 +30,9 @@ El proyecto está diseñado bajo una **arquitectura modular Next.js 14 (App Rout
 
 ## 2. Mapa de Módulos del Sistema y Rutas de Next.js 14
 
-### 2.1. Módulo Core / Conexión a Base de Datos
-- **Responsabilidad**: Inicialización centralizada de servicios base (Supabase) con validación estricta de variables de entorno.
-- **Ubicación**: [src/supabaseClient.js](file:///c:/Users/Usuario/OneDrive/Escritorio/PRODUCCION%20WEB%20INMOBILIARIA/src/supabaseClient.js)
-
+### 2.1. Módulo Core / Arquitectura Supabase SSR
+- **Responsabilidad**: Inicialización de clientes Supabase diferenciando estrictamente el contexto del servidor y el cliente para evitar Cross-Request State Pollution, y uso de Zod para validación estricta de variables y esquemas.
+- **Ubicación**: [src/utils/supabase/server.js](file:///c:/Users/Usuario/OneDrive/Escritorio/PRODUCCION%20WEB%20INMOBILIARIA/src/utils/supabase/server.js) (Server Components/Actions/API) y [src/utils/supabase/client.js](file:///c:/Users/Usuario/OneDrive/Escritorio/PRODUCCION%20WEB%20INMOBILIARIA/src/utils/supabase/client.js) (Client Components).
 ### 2.2. Módulo Landing Page Pública & Catálogo Híbrido
 - **Responsabilidad**: Presentación de catálogo de terrenos en Chancay y Huaral, resolución dinámica de URLs amigables (`/[slug]`), precarga ISR y formularios de captación de leads.
 - **Ubicación**: [src/app/page.jsx](file:///c:/Users/Usuario/OneDrive/Escritorio/PRODUCCION%20WEB%20INMOBILIARIA/src/app/page.jsx), [src/app/[slug]/page.jsx](file:///c:/Users/Usuario/OneDrive/Escritorio/PRODUCCION%20WEB%20INMOBILIARIA/src/app/[slug]/page.jsx)
@@ -83,7 +82,8 @@ El acceso al CRM está blindado por tres niveles de autenticación independiente
 
 - **Content-Security-Policy (CSP):** Configurado en `next.config.mjs` eliminando la directiva `unsafe-eval`.
 - **Headers Anti-Caché:** `Cache-Control: no-store, no-cache` aplicados estrictamente a las APIs y al panel CRM para prevenir fugas de memoria.
-- **Sanitización Rigurosa:** Filtrado de caracteres de control e inyecciones mediante `sanitizeInput()`.
+- **Validación Estricta de Esquemas (Zod):** Todas las entradas en el Backend (Server Actions y Webhooks) son validadas, tipadas y sanitizadas utilizando la librería Zod. Esto previene ataques de Mass Assignment, inyección SQL y garantiza la integridad de los datos antes de guardarse en Supabase.
+- **Autenticación por Cookies (SSR):** Las peticiones autenticadas hacia Server Actions no envían tokens JWT por argumentos. Extraen la sesión de manera nativa e indetectable usando `cookies().get('sb-access-token')`.
 - **Políticas RLS en Supabase (Prevención de Data Scraping):** Las tablas críticas (`clientes` y `propiedades`) operan bajo Row Level Security (RLS) estricto. La llave anónima pública permite escritura de leads (solo `INSERT`), pero bloquea rotundamente la extracción o alteración de registros (`SELECT`, `UPDATE`, `DELETE`) para visitantes no autenticados.
 
 ---

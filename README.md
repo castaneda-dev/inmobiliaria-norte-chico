@@ -5,8 +5,8 @@ Plataforma inmobiliaria integral para la gestión de lotes residenciales, depart
 ## 🚀 Arquitectura
 - **Landing Page Pública**: `/` (`src/app/page.jsx`)
 - **Dashboard de Control CRM**: `/crm` o `/admin` (`src/app/crm/page.jsx`)
-- **Base de Datos & Autenticación**: Supabase Cloud PostgreSQL
-- **Webhook de Leads (Serverless)**: `api/webhook.js` — Recibe leads automáticamente de Facebook Lead Ads, TikTok Ads y formularios externos
+- **Base de Datos & Autenticación**: Supabase Cloud PostgreSQL (Arquitectura SSR)
+- **Webhook de Leads (Serverless)**: `api/webhook.js` — Recibe leads de Meta y TikTok con validación estricta usando Zod.
 - **Despliegue Continuo**: Vercel con Dominio `inmobiliarianortechico.pe`
 
 ## 🔑 Variables de Entorno (Vercel)
@@ -15,8 +15,8 @@ Las siguientes variables deben estar configuradas en **Vercel > Settings > Envir
 
 | Variable | Descripción |
 | :--- | :--- |
-| `SUPABASE_URL` | URL de tu proyecto Supabase |
-| `SUPABASE_ANON_KEY` | Clave anónima (pública) de Supabase |
+| `NEXT_PUBLIC_SUPABASE_URL` | URL de tu proyecto Supabase |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clave anónima (pública) de Supabase |
 | `TELEGRAM_BOT_TOKEN` | Token del bot de Telegram (obtenido vía @BotFather) |
 | `TELEGRAM_CHAT_ID` | ID numérico del chat de Telegram donde se reciben alertas |
 

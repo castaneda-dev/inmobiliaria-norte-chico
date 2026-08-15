@@ -31,7 +31,9 @@
    - **Middleware Protector Server-Side (`src/middleware.js`):** Bloqueo a nivel de servidor de las rutas `/admin` y `/dashboard_admin` para usuarios sin sesión activa.
    - **Prevención de IP Spoofing (Nuevo):** Actualización del Middleware y API de contacto para priorizar cabeceras de infraestructura inmutables (`req.ip`, `x-vercel-forwarded-for`), asegurando la integridad del Rate Limiting y las listas blancas.
    - **Protección de Datos RLS (Nuevo):** Implementación de políticas de seguridad a nivel de fila (Row Level Security) en Supabase para bloquear la extracción masiva de datos y el acceso no autorizado de lectura desde la API pública.
-   - **Server Actions Seguros (`src/app/actions/adminActions.js`):** Mutaciones (creación/edición/eliminación) ejecutadas exclusivamente en el servidor con validación de tokens.
+   - **Arquitectura Supabase SSR (Nuevo):** Eliminación del cliente singleton obsoleto (`supabaseClient.js`) para migrar hacia `@supabase/ssr`, separando limpiamente el contexto del servidor y el cliente.
+   - **Autenticación Segura (Server-Side Cookies):** Las Server Actions ya no exponen tokens JWT como argumentos. Utilizan `cookies().get('sb-access-token')` de forma invisible.
+   - **Validación Estricta Zod (Nuevo):** Todos los inputs al backend (Server Actions de administración y Webhooks) son validadados estructuralmente mediante esquemas `zod` para prevenir inyecciones y Mass Assignment.
 3. **Rendimiento y Optimización de Experiencia Visual:**
    - **ISR Bajo Demanda:** Eliminación del parpadeo de revalidación constante (`revalidate = 60`). La página principal es 100% estática y se revalida al instante (`revalidatePath('/')`) al modificar propiedades.
    - **Optimizador de Imágenes Next.js (`<Image>`):** Migración de elementos visuales al componente nativo de Next.js con configuración remota autorizada en `next.config.mjs`.
