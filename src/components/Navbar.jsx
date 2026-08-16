@@ -91,7 +91,7 @@ export default function Navbar({ onFilterSelect }) {
             </a>
           </div>
 
-          {/* Botón Hamburguesa Móvil */}
+          {/* Botón Hamburguesa Móvil (Alineación Geométrica Perfecta) */}
           <button 
             type="button"
             className={`mobile-menu-toggle ${mobileMenuOpen ? 'is-active' : ''}`}
@@ -99,9 +99,20 @@ export default function Navbar({ onFilterSelect }) {
             aria-label={mobileMenuOpen ? "Cerrar menú de navegación" : "Abrir menú de navegación"}
             aria-expanded={mobileMenuOpen}
           >
-            <span className="hamburger-box">
-              <span className="hamburger-inner"></span>
-            </span>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              {mobileMenuOpen ? (
+                <>
+                  <line x1="18" y1="6" x2="6" y2="18" stroke="var(--gold-light, #cb9f74)" />
+                  <line x1="6" y1="6" x2="18" y2="18" stroke="var(--gold-light, #cb9f74)" />
+                </>
+              ) : (
+                <>
+                  <line x1="3.5" y1="6" x2="20.5" y2="6" stroke="#ffffff" />
+                  <line x1="3.5" y1="12" x2="20.5" y2="12" stroke="#ffffff" />
+                  <line x1="3.5" y1="18" x2="20.5" y2="18" stroke="#ffffff" />
+                </>
+              )}
+            </svg>
           </button>
         </div>
       </nav>
