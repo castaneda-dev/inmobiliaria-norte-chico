@@ -398,20 +398,17 @@
         }
 
         .property-price {
-            font-size: 24px;
-            font-weight: 300;
-            font-family: var(--font-display), serif;
+            font-size: 26px;
+            font-weight: 900;
             color: var(--gold-light);
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
 
         .property-title {
             font-size: 18px;
-            font-weight: 400;
-            font-family: var(--font-display), serif;
-            margin-bottom: 16px;
-            line-height: 1.35;
-            color: #fff;
+            font-weight: 700;
+            margin-bottom: 15px;
+            line-height: 1.3;
         }
 
         .property-specs {

@@ -214,7 +214,7 @@ export default function HomeClient({
       {/* NAVEGACIÓN */}
       <nav className="hero-initial" style={{ position: 'fixed', top: 0, left: 0, right: 0, background: 'rgba(8, 8, 8, 0.65)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(203, 159, 116, 0.08)', padding: '16px 5%', zIndex: 1000 }}>
           <div className="logo-container">
-              <span className="logo-main" style={{ letterSpacing: '4px', fontWeight: 300, fontSize: '18px' }}>NORTE CHICO</span>
+              <span className="logo-main" style={{ letterSpacing: '4px', fontWeight: 900, fontSize: '18px' }}>NORTE CHICO</span>
               <span className="logo-sub" style={{ color: '#cb9f74', letterSpacing: '3px', fontSize: '9px', fontWeight: 600 }}>GRUPO INMOBILIARIO</span>
           </div>
           <div className="nav-links">
@@ -241,7 +241,7 @@ export default function HomeClient({
                   <div style={{ display: 'flex', gap: '20px', alignItems: 'stretch', marginBottom: '24px' }}>
                       <div style={{ width: '3px', background: 'var(--gold-gradient)', borderRadius: '2px' }} />
                       <div>
-                          <h1 style={{ fontSize: 'clamp(36px, 4.8vw, 58px)', fontWeight: 300, lineHeight: 1.15, margin: 0, color: '#fff', fontFamily: 'var(--font-display), serif' }}>
+                          <h1 style={{ fontSize: 'clamp(36px, 4.8vw, 58px)', fontWeight: 900, lineHeight: 1.15, margin: 0, color: '#fff', fontFamily: 'var(--font-display), serif' }}>
                               {heroTitle}
                               <span style={{ fontSize: '0.45em', fontWeight: 600, display: 'block', marginTop: '12px', color: '#cb9f74', letterSpacing: '2px', textTransform: 'uppercase', fontFamily: 'var(--font-body), sans-serif' }}>
                                   {heroSubtitle}
@@ -295,7 +295,7 @@ export default function HomeClient({
       <main>
           {/* SECCIÓN DE LOGROS / ESTADÍSTICAS */}
           <section style={{ padding: '60px 5% 40px', background: '#080808', position: 'relative', zIndex: 10 }}>
-              <div style={{ maxWidth: '1300px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '30px', borderTop: '1px solid rgba(203, 159, 116, 0.15)', borderBottom: '1px solid rgba(203, 159, 116, 0.15)', padding: '40px 0' }}>
+              <div style={{ maxWidth: '1300px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '30px', borderTop: '1px solid rgba(203, 159, 116, 0.15)', borderBottom: '1px solid rgba(203, 159, 116, 0.15)', padding: '40px 0' }}>
                   <div style={{ textAlign: 'center' }}>
                       <div style={{ fontSize: '36px', fontFamily: 'var(--font-display), serif', fontWeight: 300, color: '#cb9f74', marginBottom: '8px' }}>100%</div>
                       <div style={{ fontSize: '11px', letterSpacing: '2px', textTransform: 'uppercase', color: '#aaa', fontWeight: 600 }}>Saneamiento Legal</div>
@@ -305,16 +305,6 @@ export default function HomeClient({
                       <div style={{ fontSize: '36px', fontFamily: 'var(--font-display), serif', fontWeight: 300, color: '#cb9f74', marginBottom: '8px' }}>Chancay y Huaral</div>
                       <div style={{ fontSize: '11px', letterSpacing: '2px', textTransform: 'uppercase', color: '#aaa', fontWeight: 600 }}>Ubicaciones Estratégicas</div>
                       <div style={{ fontSize: '11px', color: '#666', marginTop: '4px' }}>Zona de Alta Plusvalía</div>
-                  </div>
-                  <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '36px', fontFamily: 'var(--font-display), serif', fontWeight: 300, color: '#cb9f74', marginBottom: '8px' }}>Sin Intereses</div>
-                      <div style={{ fontSize: '11px', letterSpacing: '2px', textTransform: 'uppercase', color: '#aaa', fontWeight: 600 }}>Financiamiento Directo</div>
-                      <div style={{ fontSize: '11px', color: '#666', marginTop: '4px' }}>Cuotas a tu Medida</div>
-                  </div>
-                  <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '36px', fontFamily: 'var(--font-display), serif', fontWeight: 300, color: '#cb9f74', marginBottom: '8px' }}>+500</div>
-                      <div style={{ fontSize: '11px', letterSpacing: '2px', textTransform: 'uppercase', color: '#aaa', fontWeight: 600 }}>Clientes Satisfechos</div>
-                      <div style={{ fontSize: '11px', color: '#666', marginTop: '4px' }}>Garantía y Confianza</div>
                   </div>
               </div>
           </section>
