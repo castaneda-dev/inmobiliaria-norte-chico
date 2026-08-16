@@ -4,7 +4,6 @@ import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Navbar from './Navbar';
-import MobileBottomBar from './MobileBottomBar';
 import dynamic from 'next/dynamic';
 
 const WhatsAppButton = dynamic(() => import('./WhatsAppButton'), { 
@@ -579,13 +578,6 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
           </div>
         </div>
       )}
-
-      {/* BARRA FIJA DE CONVERSIÓN INFERIOR MÓVIL CONTEXTUAL */}
-      <MobileBottomBar 
-        propertyTitle={property.titulo} 
-        propertyPrice={precioFormat} 
-        formTargetId="#contacto-ficha" 
-      />
 
       {/* NOTIFICACIONES TOAST */}
       {toastMessage && (

@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Navbar from '../../components/Navbar';
-import MobileBottomBar from '../../components/MobileBottomBar';
 import dynamic from 'next/dynamic';
 
 const WhatsAppButton = dynamic(() => import('../../components/WhatsAppButton'), { 
@@ -435,9 +434,6 @@ export default function BlogClient({ articles, faqItems }) {
         </div>
         <p style={{ fontSize: '12px', color: '#a3a3a3' }}>2026 © Inmobiliaria Norte Chico. Todos los derechos reservados.</p>
       </footer>
-
-      {/* BARRA FIJA DE CONVERSIÓN INFERIOR MÓVIL */}
-      <MobileBottomBar formTargetId="#faqs-seccion" />
 
       {/* BOTÓN WHATSAPP FLOTANTE */}
       <WhatsAppButton />

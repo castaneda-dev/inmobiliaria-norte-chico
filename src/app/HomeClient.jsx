@@ -6,7 +6,6 @@ import Image from 'next/image';
 import { ShieldCheck, TrendingUp, MapPin } from 'lucide-react';
 import { getPropertySlug } from '../utils/slugify';
 import Navbar from '../components/Navbar';
-import MobileBottomBar from '../components/MobileBottomBar';
 import dynamic from 'next/dynamic';
 
 const WhatsAppButton = dynamic(() => import('../components/WhatsAppButton'), { 
@@ -536,9 +535,6 @@ export default function HomeClient({
 
       {/* WHATSAPP FLOATING BUTTON WITH CONVERSATIONAL TOOLTIP */}
       <WhatsAppButton />
-
-      {/* BARRA FIJA DE CONVERSIÓN INFERIOR MÓVIL */}
-      <MobileBottomBar formTargetId="#contacto" />
 
       {/* Toast Notification */}
       {toast && (
