@@ -37,9 +37,13 @@ El proyecto está diseñado bajo una **arquitectura modular Next.js 14 (App Rout
 - **Responsabilidad**: Presentación de catálogo de terrenos en Chancay y Huaral, resolución dinámica de URLs amigables (`/[slug]`), precarga ISR y formularios de captación de leads.
 - **Ubicación**: [src/app/page.jsx](file:///c:/Users/Usuario/OneDrive/Escritorio/PRODUCCION%20WEB%20INMOBILIARIA/src/app/page.jsx), [src/app/[slug]/page.jsx](file:///c:/Users/Usuario/OneDrive/Escritorio/PRODUCCION%20WEB%20INMOBILIARIA/src/app/[slug]/page.jsx)
 
-### 2.3. Módulo Dashboard CRM de Administración
-- **Responsabilidad**: Gestión privada de inventarios, prospectos, métricas y configuración de seguridad con tema Bento Box y visualización optimizada para dispositivos móviles.
-- **Ubicación**: [src/components/admin/AdminDashboardView.jsx](file:///c:/Users/Usuario/OneDrive/Escritorio/PRODUCCION%20WEB%20INMOBILIARIA/src/components/admin/AdminDashboardView.jsx), [src/app/crm/page.jsx](file:///c:/Users/Usuario/OneDrive/Escritorio/PRODUCCION%20WEB%20INMOBILIARIA/src/app/crm/page.jsx)
+### 2.3. Módulo Blog Editorial & Centro de Conocimiento
+- **Responsabilidad**: Publicación dinámica de análisis de mercado, plusvalía del Megapuerto de Chancay, guías legales de SUNARP y resolución de Preguntas Frecuentes con estética editorial de alta gama. Soporta lector modal interactivo, conclusiones clave y datos estructurados Schema.org (`Blog`, `BlogPosting`, `FAQPage`, `BreadcrumbList`).
+- **Ubicación**: [src/app/blog/page.jsx](file:///c:/Users/Usuario/OneDrive/Escritorio/PRODUCCION%20WEB%20INMOBILIARIA/src/app/blog/page.jsx), [src/app/blog/BlogClient.jsx](file:///c:/Users/Usuario/OneDrive/Escritorio/PRODUCCION%20WEB%20INMOBILIARIA/src/app/blog/BlogClient.jsx), [src/app/preguntas-frecuentes/page.jsx](file:///c:/Users/Usuario/OneDrive/Escritorio/PRODUCCION%20WEB%20INMOBILIARIA/src/app/preguntas-frecuentes/page.jsx)
+
+### 2.4. Módulo Dashboard CRM de Administración
+- **Responsabilidad**: Gestión privada de inventarios de propiedades, leads/prospectos, métricas en tiempo real, gestión completa de Artículos de Blog (crear, modificar, publicar/borrador, eliminar) y configuración de seguridad con tema Bento Box.
+- **Ubicación**: [src/components/admin/AdminDashboardView.jsx](file:///c:/Users/Usuario/OneDrive/Escritorio/PRODUCCION%20WEB%20INMOBILIARIA/src/components/admin/AdminDashboardView.jsx), [src/app/crm/page.jsx](file:///c:/Users/Usuario/OneDrive/Escritorio/PRODUCCION%20WEB%20INMOBILIARIA/src/app/crm/page.jsx), [src/app/actions/adminActions.js](file:///c:/Users/Usuario/OneDrive/Escritorio/PRODUCCION%20WEB%20INMOBILIARIA/src/app/actions/adminActions.js)
 
 ---
 
@@ -47,7 +51,7 @@ El proyecto está diseñado bajo una **arquitectura modular Next.js 14 (App Rout
 
 El acceso al CRM está blindado por tres niveles de autenticación independientes:
 
-1. **Factor 1 (Filtrado por IP Whitelist Segura):** Evaluado en `src/middleware.js` mediante la variable `CRM_ALLOWED_IPS`. La validación prioriza cabeceras nativas inmutables del proveedor de infraestructura (`req.ip`, `x-vercel-forwarded-for`) para prevenir vulnerabilidades de **IP Spoofing** por parte de atacantes que intenten alterar `x-forwarded-for`.
+1. **Factor 1 (Filtrado por IP Whitelist Segura):** Evaluado en `src/middleware.js` mediante la variable `CRM_ALLOWED_IPS` (configurada para la red Wi-Fi autorizada `181.43.209.183`). La validación prioriza cabeceras nativas inmutables del proveedor de infraestructura (`req.ip`, `x-vercel-forwarded-for`) para prevenir vulnerabilidades de **IP Spoofing** por parte de atacantes que intenten alterar `x-forwarded-for`.
 2. **Factor 2 (Autenticación Supabase Auth):** Verificación de credenciales de usuario (email y contraseña).
 3. **Factor 3 (Google Authenticator TOTP RFC 6238):** Verificación de código dinámico de 6 dígitos procesado en el servidor vía `src/app/api/crm_verify_2fa/route.js`. El secreto se gestiona mediante `CRM_TOTP_SECRET`.
 
@@ -73,8 +77,9 @@ El acceso al CRM está blindado por tres niveles de autenticación independiente
 
 ## 5. Estrategias de Rendimiento, ISR & Optimización Visual
 
-- **ISR Bajo Demanda:** Revalidación instantánea del catálogo mediante `revalidatePath('/')` al realizar mutaciones desde `src/app/actions/adminActions.js`.
-- **Optimización WebP HD:** Reducción de imágenes a formato WebP optimizado manteniendo calidad retina de alta resolución para los terrenos de Glorieta Deluxe.
+- **ISR Bajo Demanda:** Revalidación instantánea del catálogo, blog y sitemap (`/`, `/blog`, `/preguntas-frecuentes`, `/sitemap.xml`) mediante `revalidatePath` al realizar mutaciones desde `src/app/actions/adminActions.js`.
+- **Optimización WebP HD & CSS Minificado:** Reducción de imágenes a formato WebP manteniendo calidad retina de alta resolución para los terrenos de Glorieta Deluxe, y minificación automática de estilos por el compilador SWC de Next.js.
+- **Lazy Loading de Componentes Flotantes:** Carga diferida (`next/dynamic` con `ssr: false`) para componentes no críticos como botones de WhatsApp para desahogar el hilo principal y maximizar puntuaciones Lighthouse.
 
 ---
 
@@ -82,12 +87,13 @@ El acceso al CRM está blindado por tres niveles de autenticación independiente
 
 - **Content-Security-Policy (CSP):** Configurado en `next.config.mjs` eliminando la directiva `unsafe-eval`.
 - **Headers Anti-Caché:** `Cache-Control: no-store, no-cache` aplicados estrictamente a las APIs y al panel CRM para prevenir fugas de memoria.
-- **Validación Estricta de Esquemas (Zod):** Todas las entradas en el Backend (Server Actions y Webhooks) son validadas, tipadas y sanitizadas utilizando la librería Zod. Esto previene ataques de Mass Assignment, inyección SQL y garantiza la integridad de los datos antes de guardarse en Supabase.
-- **Autenticación por Cookies (SSR):** Las peticiones autenticadas hacia Server Actions no envían tokens JWT por argumentos. Extraen la sesión de manera nativa e indetectable usando `cookies().get('sb-access-token')`.
-- **Políticas RLS en Supabase (Prevención de Data Scraping):** Las tablas críticas (`clientes` y `propiedades`) operan bajo Row Level Security (RLS) estricto. La llave anónima pública permite escritura de leads (solo `INSERT`), pero bloquea rotundamente la extracción o alteración de registros (`SELECT`, `UPDATE`, `DELETE`) para visitantes no autenticados.
+- **Validación Estricta de Esquemas (Zod):** Todas las entradas en el Backend (Server Actions y Webhooks) son validadas, tipadas y sanitizadas utilizando la librería Zod (`propertySchema`, `articleSchema`). Esto previene ataques de Mass Assignment, inyección SQL y garantiza la integridad de los datos antes de guardarse en Supabase.
+- **Mecanismo Dual de Sincronización:** Autenticación por cookies y paso explícito de tokens de sesión con fallback seguro al cliente autenticado para evitar bloqueos por políticas de cookies locales.
+- **Políticas RLS en Supabase (Prevención de Data Scraping):** Las tablas críticas (`clientes`, `propiedades`, `articulos`) operan bajo Row Level Security (RLS) estricto. La llave anónima pública permite lectura de propiedades disponibles y artículos publicados, pero bloquea rotundamente la extracción o alteración no autorizada de registros.
 
 ---
 
 ## 7. Kit de Roles & Guía de Mantenimiento
 
-Para detalles sobre los roles de la empresa y la memoria estratégica del proyecto, consultar [AGENTS.md](file:///c:/Users/Usuario/OneDrive/Escritorio/PRODUCCION%20WEB%20INMOBILIARIA/AGENTS.md) y [CLAUDE.md](file:///c:/Users/Usuario/OneDrive/Escritorio/PRODUCCION%20WEB%20INMOBILIARIA/CLAUDE.md).
+Para detalles sobre los roles de la empresa y la memoria estratégica del proyecto, consultar [AGENTS.md](file:///c:/Users/Usuario/OneDrive/Escritorio/PRODUCCION%20WEB%20INMOBILIARIA/AGENTS.md).
+

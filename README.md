@@ -4,12 +4,15 @@ Plataforma inmobiliaria integral para la gestión de lotes residenciales, depart
 
 ## 🚀 Arquitectura
 - **Landing Page Pública**: `/` (`src/app/page.jsx`)
-- **Dashboard de Control CRM**: `/crm` o `/admin` (`src/app/crm/page.jsx`)
-- **Base de Datos & Autenticación**: Supabase Cloud PostgreSQL (Arquitectura SSR)
-- **Webhook de Leads (Serverless)**: `api/webhook.js` — Recibe leads de Meta y TikTok con validación estricta usando Zod.
+- **Blog Inmobiliario & Noticias**: `/blog` (`src/app/blog/page.jsx`)
+- **Preguntas Frecuentes**: `/preguntas-frecuentes` (`src/app/preguntas-frecuentes/page.jsx`)
+- **Dashboard de Control CRM**: `/crm` o `/admin` (`src/app/crm/page.jsx` / `AdminDashboardView.jsx`)
+- **Base de Datos & Autenticación**: Supabase Cloud PostgreSQL (Tablas: `propiedades`, `clientes`, `articulos` con RLS estricto)
+- **Seguridad 3FA**: Whitelist IP (`CRM_ALLOWED_IPS`), Supabase Auth y Google Authenticator TOTP (`CRM_TOTP_SECRET`)
+- **Asistente Telegram Serverless**: `src/app/api/telegram_webhook/route.js` (@InmoPeru_bot)
 - **Despliegue Continuo**: Vercel con Dominio `inmobiliarianortechico.pe`
 
-## 🔑 Variables de Entorno (Vercel)
+## 🔑 Variables de Entorno (Vercel & `.env.local`)
 
 Las siguientes variables deben estar configuradas en **Vercel > Settings > Environment Variables**:
 
@@ -19,6 +22,9 @@ Las siguientes variables deben estar configuradas en **Vercel > Settings > Envir
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clave anónima (pública) de Supabase |
 | `TELEGRAM_BOT_TOKEN` | Token del bot de Telegram (obtenido vía @BotFather) |
 | `TELEGRAM_CHAT_ID` | ID numérico del chat de Telegram donde se reciben alertas |
+| `TELEGRAM_WEBHOOK_SECRET` | Token secreto para autenticar el webhook de Telegram |
+| `CRM_TOTP_SECRET` | Clave secreta RFC 6238 para Google Authenticator 2FA |
+| `CRM_ALLOWED_IPS` | Lista blanca de IPs autorizadas para acceder al CRM (ej. Wi-Fi Casa/Oficina) |
 
 ---
 

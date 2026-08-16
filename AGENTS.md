@@ -40,15 +40,15 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   - Webhook seguro de Telegram (`x-telegram-bot-api-secret-token`).
 
 ### 📢 Rol 3: Marketing & Contenidos
-- **Función:** Posicionamiento SEO de "Norte Chico Properties", integración de Meta CAPI / Pixel y analítica en tiempo real.
-- **Memoria Activa:** Medición de conversiones de leads de terrenos en Chancay y Huaral.
+- **Función:** Posicionamiento SEO de "Norte Chico Properties", redacción y publicación de artículos de alta autoridad sobre el Megapuerto de Chancay y Huaral, integración de Meta CAPI / Pixel y analítica en tiempo real.
+- **Memoria Activa:** Gestión del Blog y FAQs (`/blog`, `/preguntas-frecuentes`) directamente desde el CRM, enriquecido con datos estructurados Schema.org (`Blog`, `BlogPosting`, `FAQPage`, `BreadcrumbList`).
 
 ### 🎯 Rol 4: Ventas & Conversión
 - **Función:** Gestión del embudo comercial, integración con WhatsApp y atención inmediata de prospectos.
 - **Memoria Activa:** El bot de Telegram (`@InmoPeru_bot`) funciona como asistente interno para consultar `/kpis`, `/leads` (con botón 1-clic a WhatsApp) y `/propiedades`.
 
 ### ⚙️ Rol 7: Operaciones & Saneamiento Legal
-- **Función:** Validación del inventario en SUNARP antes de marcar propiedades como `Disponible` en la base de datos.
+- **Función:** Validación del inventario en SUNARP antes de marcar propiedades como `Disponible` en la base de datos y autoría de guías legales sobre partidas registrales y CRI en el blog.
 
 ---
 
