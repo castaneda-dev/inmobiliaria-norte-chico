@@ -445,10 +445,9 @@
         }
 
         .form-container h2 {
-            font-size: clamp(32px, 5vw, 46px);
-            font-weight: 300;
-            font-family: var(--font-display), serif;
-            margin-bottom: 16px;
+            font-size: clamp(32px, 5vw, 48px);
+            font-weight: 900;
+            margin-bottom: 15px;
         }
 
         .form-container p {
