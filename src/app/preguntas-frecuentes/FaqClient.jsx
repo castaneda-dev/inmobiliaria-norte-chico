@@ -33,22 +33,9 @@ export default function FaqClient({ faqItems }) {
       <Navbar />
 
       {/* HEADER HERO */}
-      <header style={{ position: 'relative', paddingTop: '130px', paddingBottom: '40px', paddingLeft: '5%', paddingRight: '5%', textAlign: 'center', background: 'radial-gradient(ellipse at top, rgba(203, 159, 116, 0.12) 0%, rgba(8, 8, 8, 0) 70%)' }}>
+      <header style={{ position: 'relative', paddingTop: '100px', paddingBottom: '30px', paddingLeft: '5%', paddingRight: '5%', textAlign: 'center', background: 'radial-gradient(ellipse at top, rgba(203, 159, 116, 0.12) 0%, rgba(8, 8, 8, 0) 70%)' }}>
         
-        {/* MIGA DE PAN SEMÁNTICA */}
-        <nav aria-label="Breadcrumb" style={{ maxWidth: '900px', margin: '0 auto 20px', textAlign: 'left' }}>
-          <ol style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: '#888', listStyle: 'none', padding: 0, margin: 0 }}>
-            <li>
-              <Link href="/" style={{ color: '#aaa', textDecoration: 'none' }}>Inicio</Link>
-            </li>
-            <li aria-hidden="true">/</li>
-            <li>
-              <span style={{ color: 'var(--gold-light, #cb9f74)', fontWeight: 600 }} aria-current="page">Preguntas Frecuentes</span>
-            </li>
-          </ol>
-        </nav>
-
-        <h1 style={{ fontSize: 'clamp(30px, 5vw, 48px)', fontWeight: 900, lineHeight: 1.15, marginBottom: '15px' }}>
+        <h1 style={{ fontSize: 'clamp(26px, 4.5vw, 42px)', fontWeight: 900, lineHeight: 1.15, marginBottom: '12px' }}>
           Preguntas <span className="text-gradient">Frecuentes</span>
         </h1>
         <p style={{ color: '#aaa', fontSize: '15px', maxWidth: '650px', margin: '0 auto 25px', lineHeight: 1.6 }}>

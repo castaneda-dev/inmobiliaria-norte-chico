@@ -61,19 +61,6 @@ export default function BlogClient({ articles, faqItems }) {
         
         <div style={{ position: 'relative', zIndex: 2, maxWidth: '1140px', width: '100%', margin: '0 auto', textAlign: 'center', padding: '0 5%' }}>
           
-          {/* MIGA DE PAN */}
-          <nav aria-label="Breadcrumb" style={{ display: 'inline-block', marginBottom: '12px' }}>
-            <ol style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: '#888', listStyle: 'none', padding: 0, margin: 0 }}>
-              <li>
-                <Link href="/" style={{ color: '#aaa', textDecoration: 'none' }}>Inicio</Link>
-              </li>
-              <li aria-hidden="true">/</li>
-              <li>
-                <span style={{ color: 'var(--gold-light, #cb9f74)', fontWeight: 600 }} aria-current="page">Blog & Preguntas Frecuentes</span>
-              </li>
-            </ol>
-          </nav>
-
           <h1 style={{ fontSize: 'clamp(26px, 4.5vw, 42px)', fontWeight: 900, lineHeight: 1.2, marginBottom: '10px', letterSpacing: '-0.5px' }}>
             Blog & <span className="text-gradient">Preguntas Frecuentes</span>
           </h1>
