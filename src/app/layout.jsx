@@ -87,9 +87,11 @@ const jsonLd = {
   ],
   'telephone': '+56982816844',
   'priceRange': '$$',
+  'currenciesAccepted': 'USD, PEN',
+  'paymentAccepted': 'Cash, Bank Transfer',
   'address': {
     '@type': 'PostalAddress',
-    'addressLocality': 'Huaral y Chancay',
+    'addressLocality': 'Chancay y Huaral',
     'addressRegion': 'Lima',
     'addressCountry': 'PE',
   },
@@ -112,6 +114,32 @@ const jsonLd = {
       'name': 'Norte Chico',
     },
   ],
+  'hasOfferCatalog': {
+    '@type': 'OfferCatalog',
+    'name': 'Catálogo de Inmuebles y Terrenos',
+    'itemListElement': [
+      {
+        '@type': 'OfferCatalog',
+        'name': 'Terrenos Residenciales e Inversión',
+        'itemListElement': [
+          {
+            '@type': 'Offer',
+            'itemOffered': {
+              '@type': 'Service',
+              'name': 'Venta de Lotes y Terrenos en Chancay y Huaral',
+            },
+          },
+        ],
+      },
+    ],
+  },
+  'contactPoint': {
+    '@type': 'ContactPoint',
+    'telephone': '+56982816844',
+    'contactType': 'customer service',
+    'areaServed': 'PE',
+    'availableLanguage': ['Spanish', 'English'],
+  },
   'openingHoursSpecification': {
     '@type': 'OpeningHoursSpecification',
     'dayOfWeek': [
@@ -124,7 +152,7 @@ const jsonLd = {
       'Sunday',
     ],
     'opens': '09:00',
-    'closes': '18:00',
+    'closes': '19:00',
   },
 };
 

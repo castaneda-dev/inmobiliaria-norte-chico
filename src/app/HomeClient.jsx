@@ -424,7 +424,14 @@ export default function HomeClient({
                           className="btn-pill form-full" 
                           style={{ marginTop: '10px' }}
                       >
-                          {formStatus === 'submitting' ? 'ENVIANDO...' : 'CONTACTAR CON UN ASESOR'}
+                          {formStatus === 'submitting' ? (
+                            <>
+                              <span className="btn-spinner" aria-hidden="true"></span>
+                              <span>ENVIANDO INFORMACIÓN...</span>
+                            </>
+                          ) : (
+                            'CONTACTAR CON UN ASESOR'
+                          )}
                       </button>
                   </form>
               </div>

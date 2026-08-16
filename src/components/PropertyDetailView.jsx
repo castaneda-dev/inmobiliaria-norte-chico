@@ -481,7 +481,14 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
                 className="btn-pill form-full" 
                 style={{ marginTop: '10px', fontSize: '13px', padding: '16px 20px' }}
               >
-                {formStatus === 'loading' ? 'ENVIANDO SOLICITUD...' : 'SOLICITAR FICHA LEGAL Y DISPONIBILIDAD'}
+                {formStatus === 'loading' ? (
+                  <>
+                    <span className="btn-spinner" aria-hidden="true"></span>
+                    <span>ENVIANDO SOLICITUD...</span>
+                  </>
+                ) : (
+                  'SOLICITAR FICHA LEGAL Y DISPONIBILIDAD'
+                )}
               </button>
             </form>
           </div>
