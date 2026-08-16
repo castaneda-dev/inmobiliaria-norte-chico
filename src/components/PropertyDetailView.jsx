@@ -91,9 +91,14 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     if (name === 'celular') {
-      const numbersOnly = value.replace(/[^0-9]/g, '');
-      if (numbersOnly.length > 9) return;
-      setFormData(prev => ({ ...prev, celular: numbersOnly }));
+      const numbersOnly = value.replace(/[^0-9]/g, '').slice(0, 9);
+      let formatted = numbersOnly;
+      if (numbersOnly.length > 6) {
+        formatted = `${numbersOnly.slice(0, 3)} ${numbersOnly.slice(3, 6)} ${numbersOnly.slice(6)}`;
+      } else if (numbersOnly.length > 3) {
+        formatted = `${numbersOnly.slice(0, 3)} ${numbersOnly.slice(3)}`;
+      }
+      setFormData(prev => ({ ...prev, celular: formatted }));
       return;
     }
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -103,7 +108,8 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
     e.preventDefault();
     if (formStatus === 'loading') return;
 
-    if (formData.celular.length !== 9) {
+    const rawCelular = (formData.celular || '').replace(/\s/g, '');
+    if (rawCelular.length !== 9) {
       showToast('El teléfono celular debe contener 9 dígitos exactos.', 'error');
       return;
     }
@@ -113,7 +119,7 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
       const payload = {
         nombre: formData.nombre.trim().replace(/<[^>]*>?/gm, ''),
         email: formData.email.trim().replace(/<[^>]*>?/gm, ''),
-        telefono: `${formData.paisCode}${formData.celular}`,
+        telefono: `${formData.paisCode}${rawCelular}`,
         origen: `Web Ficha Proyecto ID-${property?.id || 'General'}`,
         notas: `Interés en: ${property?.titulo || 'Propiedad'} - ${formData.mensaje ? `Mensaje: ${formData.mensaje.replace(/<[^>]*>?/gm, '')}` : 'Consulta de disponibilidad'}`
       };
