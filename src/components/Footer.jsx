@@ -8,7 +8,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-sm font-mono opacity-70 gap-4">
         <div>
           <div className="font-sans font-black text-lg text-white mb-1">INMOBILIARIA NORTE CHICO</div>
-          <p className="text-xs opacity-60">2026 © Inmobiliaria Norte Chico S.A.C. Todos los derechos reservados.</p>
+          <p className="text-xs opacity-60">2026 © Inmobiliaria Norte Chico. Todos los derechos reservados.</p>
         </div>
         <div>
           <Link href="/crm" className="text-xs text-terracota hover:underline flex items-center gap-1 font-mono">

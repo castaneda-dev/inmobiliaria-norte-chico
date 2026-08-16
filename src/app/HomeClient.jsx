@@ -467,7 +467,7 @@ export default function HomeClient({
               Inmobiliaria en Huaral
             </Link>
           </div>
-          <p style={{ fontSize: '12px', color: '#a3a3a3' }}>2026 © Inmobiliaria Norte Chico S.A.C. Todos los derechos reservados.</p>
+          <p style={{ fontSize: '12px', color: '#a3a3a3' }}>2026 © Inmobiliaria Norte Chico. Todos los derechos reservados.</p>
       </footer>
 
       {/* WHATSAPP FLOATING BUTTON WITH CONVERSATIONAL TOOLTIP */}

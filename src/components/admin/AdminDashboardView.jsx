@@ -588,7 +588,7 @@ export default function AdminDashboardView() {
           </div>
 
           <h1 className="font-sans font-black text-2xl text-white mb-2">Panel Administrativo</h1>
-          <p className="font-mono text-xs opacity-60 mb-8 text-arena">Inmobiliaria Norte Chico S.A.C.</p>
+          <p className="font-mono text-xs opacity-60 mb-8 text-arena">Inmobiliaria Norte Chico</p>
 
           {!requires2FA ? (
             /* STEP 1: Email + Contraseña */

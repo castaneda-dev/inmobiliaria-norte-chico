@@ -476,7 +476,7 @@ export default function BlogClient({ articles, faqItems }) {
             <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px' }}>
               <div>
                 <div style={{ fontWeight: 800, color: '#fff', fontSize: '13px' }}>Redactado por: {activeArticle.author}</div>
-                <div style={{ color: '#777', fontSize: '11px' }}>{activeArticle.authorRole} • Inmobiliaria Norte Chico S.A.C.</div>
+                <div style={{ color: '#777', fontSize: '11px' }}>{activeArticle.authorRole} • Inmobiliaria Norte Chico</div>
               </div>
               <a 
                 href={`https://wa.me/56982816844?text=Hola,%20leí%20el%20artículo:%20"${encodeURIComponent(activeArticle.title)}"%20y%20deseo%20más%20información`}
@@ -510,7 +510,7 @@ export default function BlogClient({ articles, faqItems }) {
             Inmobiliaria en Huaral
           </Link>
         </div>
-        <p style={{ fontSize: '12px', color: '#a3a3a3' }}>2026 © Inmobiliaria Norte Chico S.A.C. Todos los derechos reservados.</p>
+        <p style={{ fontSize: '12px', color: '#a3a3a3' }}>2026 © Inmobiliaria Norte Chico. Todos los derechos reservados.</p>
       </footer>
 
       {/* BOTÓN WHATSAPP FLOTANTE */}
