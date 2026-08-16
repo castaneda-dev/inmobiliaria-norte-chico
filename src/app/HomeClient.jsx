@@ -4,7 +4,12 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getPropertySlug } from '../utils/slugify';
-import WhatsAppButton from '../components/WhatsAppButton';
+import dynamic from 'next/dynamic';
+
+const WhatsAppButton = dynamic(() => import('../components/WhatsAppButton'), { 
+  ssr: false,
+  loading: () => null
+});
 
 export default function HomeClient({ 
   initialProperties,
@@ -61,6 +66,8 @@ export default function HomeClient({
 
 
   const [modalCurrentImgIdx, setModalCurrentImgIdx] = useState(0);
+
+
 
   // Form states for Lead submission
   const [formData, setFormData] = useState({
@@ -227,6 +234,8 @@ export default function HomeClient({
           <div className="nav-links">
               <a href="#portafolio" onClick={(e) => filtrarYNavegar(e, 'vivienda')}>Casas</a>
               <a href="#portafolio" onClick={(e) => filtrarYNavegar(e, 'terreno')}>Lotes Residenciales</a>
+              <Link href="/blog">Blog & Guías</Link>
+              <Link href="/preguntas-frecuentes">Preguntas Frecuentes</Link>
               <a href="#contacto" className="btn-pill" style={{ padding: '8px 20px', fontSize: '11px', boxShadow: 'none' }}>Agendar Visita</a>
           </div>
       </nav>
@@ -245,15 +254,16 @@ export default function HomeClient({
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(8,8,8,1) 0%, rgba(8,8,8,0.5) 60%, rgba(8,8,8,0.7) 100%)', zIndex: 1 }} />
           <div className="hero-grid" style={{ zIndex: 2, position: 'relative', maxWidth: '1300px', width: '100%' }}>
               <div className="hero-text">
-                  <h1>
+                  <h1 className="sr-only">Venta de Terrenos y Lotes de Inversión cerca al Megapuerto de Chancay y Huaral</h1>
+                  <h2 style={{ fontSize: 'var(--fs-4xl)', lineHeight: '1.1', fontWeight: '900', letterSpacing: '-1px', marginBottom: '15px' }}>
                     {heroTitle}
                     {heroSubtitle && (
                       <>
                         <br/>
-                        <span style={{ fontSize: '0.8em', fontWeight: 600, display: 'block', marginTop: '10px' }}>{heroSubtitle}</span>
+                        <span style={{ fontSize: '0.6em', fontWeight: 600, display: 'block', marginTop: '10px' }}>{heroSubtitle}</span>
                       </>
                     )}
-                  </h1>
+                  </h2>
                   <span className="sub-heading text-gradient">Terrenos de Alta Plusvalía y Proyectos Residenciales</span>
                   <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', justifyContent: 'left' }}>
                       <a href="#contacto" className="btn-pill" style={{ fontSize: '13px' }}>Contactar a un asesor</a>
@@ -328,7 +338,7 @@ export default function HomeClient({
                                   {prop.imagenes && prop.imagenes.length > 1 && (
                                       <div className="tag-photos">📷 {prop.imagenes.length} Fotos</div>
                                   )}
-                                  <Image src={prop.imagen} alt={prop.titulo} fill sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: 'cover' }} className="property-img-next" />
+                                  <Image src={prop.imagen} alt={`Venta de ${prop.categoria} en Chancay/Huaral - ${prop.titulo}`} fill sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: 'cover' }} className="property-img-next" />
                               </div>
                               <div className="property-info">
                                   <div className="property-price">{prop.precio}</div>
@@ -360,6 +370,8 @@ export default function HomeClient({
               </div>
             </div>
           </section>
+
+
 
           {/* CONTACTO / CRM */}
           <section className="contact-module fade-module" id="contacto">
@@ -441,6 +453,20 @@ export default function HomeClient({
       {/* FOOTER */}
       <footer className="fade-module" style={{ background: 'var(--bg-black)', padding: '40px 5% 40px', textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
           <div className="logo-main" style={{ fontSize: '16px', marginBottom: '10px' }}>INMOBILIARIA NORTE CHICO | CHANCAY Y HUARAL</div>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', margin: '15px 0', fontSize: '12px', flexWrap: 'wrap' }}>
+            <Link href="/blog" style={{ color: 'var(--gold-light, #cb9f74)', textDecoration: 'none', fontWeight: 600 }}>
+              Blog & Guías de Inversión
+            </Link>
+            <Link href="/preguntas-frecuentes" style={{ color: '#ccc', textDecoration: 'none', fontWeight: 600 }}>
+              Preguntas Frecuentes (FAQ)
+            </Link>
+            <Link href="/inmobiliaria-en-chancay" style={{ color: '#aaa', textDecoration: 'none' }}>
+              Inmobiliaria en Chancay
+            </Link>
+            <Link href="/inmobiliaria-en-huaral" style={{ color: '#aaa', textDecoration: 'none' }}>
+              Inmobiliaria en Huaral
+            </Link>
+          </div>
           <p style={{ fontSize: '12px', color: '#a3a3a3' }}>2026 © Inmobiliaria Norte Chico S.A.C. Todos los derechos reservados.</p>
       </footer>
 

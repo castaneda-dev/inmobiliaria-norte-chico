@@ -4,11 +4,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { createClient } from '../../utils/supabase/client';
 const supabase = createClient();
-import { savePropertyAction, deletePropertyAction } from '../../app/actions/adminActions';
+import { savePropertyAction, deletePropertyAction, saveArticleAction, deleteArticleAction } from '../../app/actions/adminActions';
 import { 
   Building2, Users, TrendingUp, ShieldCheck, Plus, Trash2, Edit3, 
   Search, LogOut, Lock, ArrowLeft, RefreshCw, CheckCircle, MessageSquare, PhoneCall,
-  Eye, EyeOff
+  Eye, EyeOff, BookOpen, Star, Sparkles, ExternalLink
 } from 'lucide-react';
 
 const normalizeImageUrl = (url) => {
@@ -31,7 +31,7 @@ export default function AdminDashboardView() {
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [activeTab, setActiveTab] = useState('kpis'); // 'kpis' | 'propiedades' | 'clientes' | 'seguridad'
+  const [activeTab, setActiveTab] = useState('kpis'); // 'kpis' | 'propiedades' | 'clientes' | 'articulos' | 'seguridad'
 
   // 2FA Security States (Factor 3) & IP Info (Factor 1)
   const [requires2FA, setRequires2FA] = useState(false);
@@ -46,6 +46,7 @@ export default function AdminDashboardView() {
   // Supabase Data States
   const [properties, setProperties] = useState([]);
   const [clients, setClients] = useState([]);
+  const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -55,6 +56,24 @@ export default function AdminDashboardView() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [propForm, setPropForm] = useState({
     titulo: '', precio: '', area_m2: '', tipo_activo: 'Terreno', zonificacion: 'Residencial', imagen_url: '', descripcion: '', estado: 'Disponible', ubicacion: '', latitud: '', longitud: ''
+  });
+
+  // Blog & Articles Form States
+  const [showArticleModal, setShowArticleModal] = useState(false);
+  const [editingArticle, setEditingArticle] = useState(null);
+  const [articleForm, setArticleForm] = useState({
+    titulo: '',
+    categoria: 'Estrategia & Plusvalía',
+    resumen: '',
+    contenido_texto: '',
+    puntos_clave_texto: '',
+    autor: 'Dirección Estratégica Norte Chico',
+    autor_rol: 'Comité de Inversiones',
+    imagen_url: '/PR_CHANCAY_desktop.webp',
+    tiempo_lectura: '4 min de lectura',
+    destacado: false,
+    publicado: true,
+    badge_color: '#cb9f74'
   });
 
   // Check active Supabase Auth session on mount
@@ -164,13 +183,15 @@ export default function AdminDashboardView() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [propRes, clientRes] = await Promise.all([
+      const [propRes, clientRes, artRes] = await Promise.all([
         supabase.from('propiedades').select('*').order('id', { ascending: false }),
-        supabase.from('clientes').select('*').order('id', { ascending: false })
+        supabase.from('clientes').select('*').order('id', { ascending: false }),
+        supabase.from('articulos').select('*').order('id', { ascending: false })
       ]);
 
       if (propRes.data) setProperties(propRes.data);
       if (clientRes.data) setClients(clientRes.data);
+      if (artRes.data) setArticles(artRes.data);
     } catch (err) {
       console.error("Error loading dashboard data:", err);
     } finally {
@@ -342,14 +363,215 @@ export default function AdminDashboardView() {
     }
   };
 
-  // CRM Operation: Update Client Status
-  const handleUpdateClientStatus = async (id, status) => {
+  // Blog & Articles CRUD Operations
+  const handleOpenNewArticle = () => {
+    setEditingArticle(null);
+    setArticleForm({
+      titulo: '',
+      categoria: 'Estrategia & Plusvalía',
+      resumen: '',
+      contenido_texto: '',
+      puntos_clave_texto: '',
+      autor: 'Dirección Estratégica Norte Chico',
+      autor_rol: 'Comité de Inversiones',
+      imagen_url: '/PR_CHANCAY_desktop.webp',
+      tiempo_lectura: '4 min de lectura',
+      destacado: false,
+      publicado: true,
+      badge_color: '#cb9f74'
+    });
+    setShowArticleModal(true);
+  };
+
+  const handleEditArticle = (art) => {
+    setEditingArticle(art);
+    
+    let contentStr = '';
+    if (Array.isArray(art.contenido)) {
+      contentStr = art.contenido.map(c => `### ${c.subtitle || ''}\n${c.text || ''}`).join('\n\n');
+    } else if (typeof art.contenido === 'string') {
+      try {
+        const parsed = JSON.parse(art.contenido);
+        if (Array.isArray(parsed)) {
+          contentStr = parsed.map(c => `### ${c.subtitle || ''}\n${c.text || ''}`).join('\n\n');
+        } else {
+          contentStr = art.contenido;
+        }
+      } catch (e) {
+        contentStr = art.contenido;
+      }
+    }
+
+    let pointsStr = '';
+    if (Array.isArray(art.puntos_clave)) {
+      pointsStr = art.puntos_clave.join('\n');
+    } else if (typeof art.puntos_clave === 'string') {
+      try {
+        const parsed = JSON.parse(art.puntos_clave);
+        if (Array.isArray(parsed)) {
+          pointsStr = parsed.join('\n');
+        } else {
+          pointsStr = art.puntos_clave;
+        }
+      } catch (e) {
+        pointsStr = art.puntos_clave;
+      }
+    }
+
+    setArticleForm({
+      titulo: art.titulo || '',
+      categoria: art.categoria || 'Estrategia & Plusvalía',
+      resumen: art.resumen || '',
+      contenido_texto: contentStr,
+      puntos_clave_texto: pointsStr,
+      autor: art.autor || 'Equipo Norte Chico',
+      autor_rol: art.autor_rol || 'Comité Editorial',
+      imagen_url: art.imagen_url || '/PR_CHANCAY_desktop.webp',
+      tiempo_lectura: art.tiempo_lectura || '4 min de lectura',
+      destacado: !!art.destacado,
+      publicado: art.publicado !== false,
+      badge_color: art.badge_color || '#cb9f74'
+    });
+    setShowArticleModal(true);
+  };
+
+  const handleSaveArticle = async (e) => {
+    e.preventDefault();
     try {
-      const { error } = await supabase.from('clientes').update({ estado_lead: status }).eq('id', id);
-      if (error) throw error;
-      fetchData();
+      const sections = [];
+      const rawText = articleForm.contenido_texto.trim();
+      if (rawText) {
+        const blocks = rawText.split(/(?=###\s+)/g);
+        for (const block of blocks) {
+          const match = block.match(/###\s+(.+?)(?:\n|\r\n)([\s\S]*)/);
+          if (match) {
+            sections.push({
+              subtitle: match[1].trim(),
+              text: match[2].trim()
+            });
+          } else {
+            sections.push({
+              subtitle: 'Detalle',
+              text: block.trim()
+            });
+          }
+        }
+      }
+
+      const points = (articleForm.puntos_clave_texto || '')
+        .split('\n')
+        .map(p => p.trim().replace(/^[-*•]\s*/, ''))
+        .filter(Boolean);
+
+      const payload = {
+        titulo: articleForm.titulo,
+        categoria: articleForm.categoria,
+        resumen: articleForm.resumen,
+        contenido: sections.length ? sections : [{ subtitle: 'Información', text: articleForm.resumen }],
+        puntos_clave: points.length ? points : ['Información oficial de Inmobiliaria Norte Chico'],
+        autor: articleForm.autor,
+        autor_rol: articleForm.autor_rol,
+        imagen_url: articleForm.imagen_url || '/PR_CHANCAY_desktop.webp',
+        tiempo_lectura: articleForm.tiempo_lectura,
+        destacado: articleForm.destacado,
+        publicado: articleForm.publicado,
+        badge_color: articleForm.badge_color
+      };
+
+      // Intento 1: Server Action con token de sesión
+      let success = false;
+      try {
+        const result = await saveArticleAction(payload, !!editingArticle, editingArticle?.id, sessionToken);
+        if (result.success) {
+          success = true;
+        } else {
+          console.warn("Server action aviso:", result.error);
+        }
+      } catch (saErr) {
+        console.warn("Server action error:", saErr);
+      }
+
+      // Intento 2 (Fallback): Guardar directamente con el cliente autenticado de Supabase
+      if (!success) {
+        if (editingArticle?.id) {
+          const { error: dbErr } = await supabase.from('articulos').update({
+            ...payload,
+            updated_at: new Date().toISOString()
+          }).eq('id', editingArticle.id);
+          if (dbErr) throw dbErr;
+        } else {
+          const { error: dbErr } = await supabase.from('articulos').insert([{
+            ...payload,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }]);
+          if (dbErr) throw dbErr;
+        }
+      }
+
+      setShowArticleModal(false);
+      setEditingArticle(null);
+      await fetchData();
+      alert(editingArticle ? "¡Artículo actualizado con éxito!" : "¡Artículo publicado con éxito en el blog!");
     } catch (err) {
-      console.error(err);
+      console.error("Error saving article:", err);
+      alert("Hubo un error al guardar el artículo: " + (err.message || err));
+    }
+  };
+
+  const handleDeleteArticle = async (id) => {
+    if (!confirm("¿Seguro de eliminar este artículo del blog? Esta acción no se puede deshacer.")) return;
+    try {
+      let success = false;
+      try {
+        const result = await deleteArticleAction(id, sessionToken);
+        if (result.success) success = true;
+      } catch (e) {}
+
+      if (!success) {
+        const { error } = await supabase.from('articulos').delete().eq('id', id);
+        if (error) throw error;
+      }
+
+      await fetchData();
+    } catch (err) {
+      console.error("Error deleting article:", err);
+      alert("Hubo un error al eliminar el artículo: " + (err.message || err));
+    }
+  };
+
+  const handleTogglePublishArticle = async (art) => {
+    try {
+      const updated = {
+        titulo: art.titulo,
+        categoria: art.categoria,
+        resumen: art.resumen,
+        contenido: art.contenido,
+        puntos_clave: art.puntos_clave,
+        autor: art.autor,
+        autor_rol: art.autor_rol,
+        imagen_url: art.imagen_url,
+        tiempo_lectura: art.tiempo_lectura,
+        destacado: art.destacado,
+        publicado: !art.publicado,
+        badge_color: art.badge_color
+      };
+
+      let success = false;
+      try {
+        const result = await saveArticleAction(updated, true, art.id, sessionToken);
+        if (result.success) success = true;
+      } catch (e) {}
+
+      if (!success) {
+        const { error } = await supabase.from('articulos').update({ publicado: !art.publicado }).eq('id', art.id);
+        if (error) throw error;
+      }
+
+      await fetchData();
+    } catch (err) {
+      console.error("Error toggling publish:", err);
+      alert("Error al cambiar estado: " + (err.message || err));
     }
   };
 
@@ -514,6 +736,12 @@ export default function AdminDashboardView() {
               className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-full font-bold transition-all shrink-0 snap-start text-xs ${activeTab === 'clientes' ? 'bg-terracota text-white shadow-lg' : 'bg-asfalto text-white opacity-90 hover:opacity-100'}`}
             >
               Leads CRM ({clients.length})
+            </button>
+            <button 
+              onClick={() => setActiveTab('articulos')} 
+              className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-full font-bold transition-all shrink-0 snap-start text-xs ${activeTab === 'articulos' ? 'bg-terracota text-white shadow-lg' : 'bg-asfalto text-white opacity-90 hover:opacity-100'}`}
+            >
+              Blog & Noticias ({articles.length})
             </button>
             <button 
               onClick={() => setActiveTab('seguridad')} 
@@ -865,6 +1093,119 @@ export default function AdminDashboardView() {
             </div>
           </div>
         )}
+
+        {/* TAB 4: BLOG & NOTICIAS INMOBILIARIAS */}
+        {activeTab === 'articulos' && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                <h3 className="font-sans font-black text-2xl text-white">Artículos del Blog & Guías</h3>
+                <p className="text-xs text-arena/70 font-mono mt-1">Crea, edita y publica análisis de mercado y guías legales para posicionar en Google.</p>
+              </div>
+              <div className="flex gap-2">
+                <Link
+                  href="/blog"
+                  target="_blank"
+                  className="bg-asfalto border border-arena/20 hover:border-terracota text-white px-4 py-2.5 rounded-full font-mono text-xs flex items-center gap-1.5 transition-colors shadow-sm"
+                >
+                  <ExternalLink size={14} /> Ver Blog en Vivo
+                </Link>
+                <button 
+                  onClick={handleOpenNewArticle}
+                  className="bg-terracota hover:bg-[#a64b2b] text-white px-5 py-2.5 rounded-full font-mono text-xs font-bold flex items-center gap-2 shadow-lg transition-colors"
+                >
+                  <Plus size={16} /> Nuevo Artículo
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-asfalto border border-arena/10 rounded-[2rem] overflow-hidden shadow-2xl">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-arena/10 font-mono text-xs uppercase text-terracota bg-black/20">
+                      <th className="p-4">Portada / Título</th>
+                      <th className="p-4">Categoría</th>
+                      <th className="p-4">Autor</th>
+                      <th className="p-4">Estado</th>
+                      <th className="p-4">Destacado</th>
+                      <th className="p-4 text-right">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-arena/10 font-mono text-xs text-white">
+                    {articles.filter(a => a.titulo?.toLowerCase().includes(searchTerm.toLowerCase()) || a.categoria?.toLowerCase().includes(searchTerm.toLowerCase())).map(a => (
+                      <tr key={a.id} className="hover:bg-arena/5 transition-colors">
+                        <td className="p-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-16 h-12 relative rounded-lg overflow-hidden shrink-0 border border-arena/10 bg-black/40">
+                              <img src={a.imagen_url || '/PR_CHANCAY_desktop.webp'} alt={a.titulo} className="w-full h-full object-cover" />
+                            </div>
+                            <div className="max-w-md">
+                              <div className="font-sans font-bold text-white text-sm line-clamp-1">{a.titulo}</div>
+                              <div className="opacity-60 text-[10px] line-clamp-1 mt-0.5">{a.resumen}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold border border-arena/20 bg-black/30" style={{ color: a.badge_color || '#cb9f74' }}>
+                            {a.categoria}
+                          </span>
+                        </td>
+                        <td className="p-4">
+                          <div className="text-white font-medium">{a.autor}</div>
+                          <div className="opacity-50 text-[10px]">{a.autor_rol}</div>
+                        </td>
+                        <td className="p-4">
+                          <button
+                            onClick={() => handleTogglePublishArticle(a)}
+                            className={`px-3 py-1 rounded-full text-[10px] font-bold border transition-colors ${a.publicado ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40 hover:bg-emerald-500/30' : 'bg-red-500/20 text-red-400 border-red-500/40 hover:bg-red-500/30'}`}
+                            title="Haz clic para alternar entre Publicado y Borrador"
+                          >
+                            {a.publicado ? '🟢 Publicado' : '🔴 Borrador'}
+                          </button>
+                        </td>
+                        <td className="p-4">
+                          {a.destacado ? (
+                            <span className="text-amber-400 font-bold flex items-center gap-1 text-[11px]">
+                              ⭐ Destacado
+                            </span>
+                          ) : (
+                            <span className="opacity-40 text-[10px]">Normal</span>
+                          )}
+                        </td>
+                        <td className="p-4 text-right">
+                          <div className="flex justify-end gap-2">
+                            <button 
+                              onClick={() => handleEditArticle(a)}
+                              className="p-2 bg-arena/10 rounded-lg hover:bg-arena/20 text-white transition-colors"
+                              title="Editar Artículo"
+                            >
+                              <Edit3 size={14} />
+                            </button>
+                            <button 
+                              onClick={() => handleDeleteArticle(a.id)}
+                              className="p-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors"
+                              title="Eliminar Artículo"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                    {articles.length === 0 && (
+                      <tr>
+                        <td colSpan="6" className="p-8 text-center text-white/50 font-sans">
+                          Aún no hay artículos creados en la base de datos. Haz clic en "＋ Nuevo Artículo" o ejecuta el script SQL semilla.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Property Create/Edit Modal */}
@@ -1060,6 +1401,168 @@ export default function AdminDashboardView() {
                   className="px-6 py-3 rounded-full bg-terracota text-white font-bold hover:bg-[#a64b2b] shadow-lg transition-colors"
                 >
                   Guardar Propiedad
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Article Create/Edit Modal */}
+      {showArticleModal && (
+        <div className="fixed inset-0 z-50 bg-asfalto/80 flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-white border border-asfalto/10 rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="font-sans font-black text-2xl text-asfalto">
+                {editingArticle ? 'Modificar Artículo del Blog' : 'Redactar Nuevo Artículo'}
+              </h3>
+              <button 
+                type="button" 
+                onClick={() => setShowArticleModal(false)}
+                className="text-asfalto/50 hover:text-asfalto text-2xl font-bold"
+              >
+                ×
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveArticle} className="flex flex-col gap-4 font-mono text-xs">
+              <div>
+                <label className="block text-terracota font-bold mb-1 uppercase tracking-wider">Título del Artículo *</label>
+                <input 
+                  required type="text"
+                  value={articleForm.titulo} onChange={e => setArticleForm({...articleForm, titulo: e.target.value})}
+                  className="w-full bg-white border border-asfalto/20 rounded-xl p-3 text-asfalto focus:outline-none focus:border-terracota shadow-sm font-sans font-bold text-sm"
+                  placeholder="Ej. Megapuerto de Chancay: Proyección de Plusvalía 2026"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-terracota font-bold mb-1 uppercase tracking-wider">Categoría *</label>
+                  <select 
+                    value={articleForm.categoria} onChange={e => setArticleForm({...articleForm, categoria: e.target.value})}
+                    className="w-full bg-white border border-asfalto/20 rounded-xl p-3 text-asfalto focus:outline-none shadow-sm font-bold"
+                  >
+                    <option value="Estrategia & Plusvalía">Estrategia & Plusvalía</option>
+                    <option value="Saneamiento Legal SUNARP">Saneamiento Legal SUNARP</option>
+                    <option value="Guías de Compra & Ventas">Guías de Compra & Ventas</option>
+                    <option value="Noticias Chancay & Huaral">Noticias Chancay & Huaral</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-terracota font-bold mb-1 uppercase tracking-wider">Tiempo de Lectura</label>
+                  <input 
+                    type="text"
+                    value={articleForm.tiempo_lectura} onChange={e => setArticleForm({...articleForm, tiempo_lectura: e.target.value})}
+                    className="w-full bg-white border border-asfalto/20 rounded-xl p-3 text-asfalto focus:outline-none focus:border-terracota shadow-sm"
+                    placeholder="4 min de lectura"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-terracota font-bold mb-1 uppercase tracking-wider">Resumen / Bajada de Título (Excerpt) *</label>
+                <textarea 
+                  required
+                  rows="2"
+                  value={articleForm.resumen} onChange={e => setArticleForm({...articleForm, resumen: e.target.value})}
+                  className="w-full bg-white border border-asfalto/20 rounded-xl p-3 text-asfalto focus:outline-none focus:border-terracota shadow-sm resize-none"
+                  placeholder="Breve introducción impactante para el catálogo de artículos y el snippet de Google..."
+                ></textarea>
+              </div>
+
+              <div>
+                <label className="block text-terracota font-bold mb-1 uppercase tracking-wider">URL de Imagen de Portada *</label>
+                <input 
+                  required type="text"
+                  value={articleForm.imagen_url} onChange={e => setArticleForm({...articleForm, imagen_url: e.target.value})}
+                  className="w-full bg-white border border-asfalto/20 rounded-xl p-3 text-asfalto focus:outline-none focus:border-terracota shadow-sm"
+                  placeholder="/PR_CHANCAY_desktop.webp o https://..."
+                />
+              </div>
+
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-terracota font-bold uppercase tracking-wider">Cuerpo del Artículo (Subsecciones) *</label>
+                  <span className="text-[10px] text-asfalto/60">Usa <strong>### Subtítulo</strong> para crear secciones</span>
+                </div>
+                <textarea 
+                  required
+                  rows="6"
+                  value={articleForm.contenido_texto} onChange={e => setArticleForm({...articleForm, contenido_texto: e.target.value})}
+                  className="w-full bg-white border border-asfalto/20 rounded-xl p-3 text-asfalto focus:outline-none focus:border-terracota shadow-sm font-sans"
+                  placeholder={`### 1. El Impacto del Megapuerto\nAquí explicas el desarrollo portuario y la llegada de inversiones...\n\n### 2. Por qué comprar terrenos hoy\nExplica las ventajas de la plusvalía temprana y el crecimiento urbano...`}
+                ></textarea>
+              </div>
+
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-terracota font-bold uppercase tracking-wider">Puntos Clave / Conclusiones (1 por línea)</label>
+                  <span className="text-[10px] text-asfalto/60">Aparecerán en el cuadro destacado</span>
+                </div>
+                <textarea 
+                  rows="3"
+                  value={articleForm.puntos_clave_texto} onChange={e => setArticleForm({...articleForm, puntos_clave_texto: e.target.value})}
+                  className="w-full bg-white border border-asfalto/20 rounded-xl p-3 text-asfalto focus:outline-none focus:border-terracota shadow-sm"
+                  placeholder={`Conexión directa Chancay-Asia\nAlta demanda de suelo urbano para ejecutivos\nDuplicación de valor estimada a mediano plazo`}
+                ></textarea>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-terracota font-bold mb-1 uppercase tracking-wider">Autor</label>
+                  <input 
+                    type="text"
+                    value={articleForm.autor} onChange={e => setArticleForm({...articleForm, autor: e.target.value})}
+                    className="w-full bg-white border border-asfalto/20 rounded-xl p-3 text-asfalto focus:outline-none focus:border-terracota shadow-sm"
+                    placeholder="Dirección Estratégica Norte Chico"
+                  />
+                </div>
+                <div>
+                  <label className="block text-terracota font-bold mb-1 uppercase tracking-wider">Rol / Cargo del Autor</label>
+                  <input 
+                    type="text"
+                    value={articleForm.autor_rol} onChange={e => setArticleForm({...articleForm, autor_rol: e.target.value})}
+                    className="w-full bg-white border border-asfalto/20 rounded-xl p-3 text-asfalto focus:outline-none focus:border-terracota shadow-sm"
+                    placeholder="Comité de Inversiones"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-6 pt-2 bg-asfalto/5 p-4 rounded-xl border border-asfalto/10">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={articleForm.destacado} 
+                    onChange={e => setArticleForm({...articleForm, destacado: e.target.checked})}
+                    className="w-4 h-4 text-terracota rounded"
+                  />
+                  <span className="font-bold text-asfalto">⭐ Destacar en la Portada del Blog</span>
+                </label>
+
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={articleForm.publicado} 
+                    onChange={e => setArticleForm({...articleForm, publicado: e.target.checked})}
+                    className="w-4 h-4 text-emerald-600 rounded"
+                  />
+                  <span className="font-bold text-asfalto">🟢 Publicar en la Web Inmediatamente</span>
+                </label>
+              </div>
+
+              <div className="flex justify-end gap-3 mt-4">
+                <button 
+                  type="button" onClick={() => setShowArticleModal(false)}
+                  className="px-6 py-3 rounded-full border border-asfalto/20 text-asfalto hover:bg-asfalto/5 font-bold transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="submit"
+                  className="px-6 py-3 rounded-full bg-terracota text-white font-bold hover:bg-[#a64b2b] shadow-lg transition-colors"
+                >
+                  {editingArticle ? 'Actualizar Artículo' : 'Guardar y Publicar'}
                 </button>
               </div>
             </form>

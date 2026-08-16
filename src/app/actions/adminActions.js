@@ -32,20 +32,22 @@ if (!supabaseUrl || !supabaseKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
-// Inicializa un cliente de Supabase instanciado extrayendo el token de las cookies
-function getAuthClient() {
+// Inicializa un cliente de Supabase instanciado extrayendo el token de las cookies o parámetro
+function getAuthClient(clientToken = null) {
   const cookieStore = cookies();
-  const token = cookieStore.get('sb-access-token')?.value;
+  const token = clientToken || cookieStore.get('sb-access-token')?.value;
 
-  if (!token) return null;
-
-  return createClient(supabaseUrl, supabaseKey, {
-    global: {
-      headers: {
-        Authorization: `Bearer ${token}`,
+  if (token) {
+    return createClient(supabaseUrl, supabaseKey, {
+      global: {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
-    },
-  });
+    });
+  }
+
+  return createClient(supabaseUrl, supabaseKey);
 }
 
 export async function savePropertyAction(propertyData, isEditing = false, propertyId = null) {
@@ -118,3 +120,87 @@ export async function deletePropertyAction(propertyId) {
     return { success: false, error: error.message || 'Error interno del servidor.' };
   }
 }
+
+// Esquema de validación estricto para artículos del blog
+const articleSchema = z.object({
+  titulo: z.string().min(5, "El título debe tener al menos 5 caracteres").max(200),
+  categoria: z.string().min(1, "La categoría es requerida"),
+  resumen: z.string().min(10, "El resumen debe tener al menos 10 caracteres"),
+  contenido: z.any().optional(),
+  puntos_clave: z.any().optional(),
+  autor: z.string().default("Equipo Norte Chico"),
+  autor_rol: z.string().default("Comité Editorial"),
+  imagen_url: z.string().url("URL de imagen inválida").or(z.string().startsWith('/')),
+  tiempo_lectura: z.string().default("4 min de lectura"),
+  destacado: z.boolean().default(false),
+  publicado: z.boolean().default(true),
+  badge_color: z.string().default("#cb9f74")
+});
+
+export async function saveArticleAction(articleData, isEditing = false, articleId = null, clientToken = null) {
+  const supabase = getAuthClient(clientToken);
+  
+  try {
+    const validatedData = articleSchema.parse(articleData);
+
+    let result;
+    if (isEditing && articleId) {
+      result = await supabase
+        .from('articulos')
+        .update({
+          ...validatedData,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', articleId);
+    } else {
+      result = await supabase
+        .from('articulos')
+        .insert([{
+          ...validatedData,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }]);
+    }
+
+    if (result.error) throw result.error;
+
+    // Revalidar las rutas públicas del blog y sitemap
+    revalidatePath('/blog');
+    revalidatePath('/preguntas-frecuentes');
+    revalidatePath('/sitemap.xml');
+    
+    return { success: true, data: result.data };
+  } catch (error) {
+    console.error("Error saving article:", error);
+    if (error instanceof z.ZodError) {
+      const errorMessage = error.errors.map(e => e.message).join(', ');
+      return { success: false, error: `Validación fallida: ${errorMessage}` };
+    }
+    return { success: false, error: error.message || 'Error interno del servidor.' };
+  }
+}
+
+export async function deleteArticleAction(articleId, clientToken = null) {
+  const supabase = getAuthClient(clientToken);
+  
+  try {
+    if (!articleId) throw new Error("ID de artículo inválido.");
+
+    const { error } = await supabase
+      .from('articulos')
+      .delete()
+      .eq('id', articleId);
+
+    if (error) throw error;
+
+    revalidatePath('/blog');
+    revalidatePath('/preguntas-frecuentes');
+    revalidatePath('/sitemap.xml');
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting article:", error);
+    return { success: false, error: error.message || 'Error interno del servidor.' };
+  }
+}
+

@@ -2,7 +2,12 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import WhatsAppButton from './WhatsAppButton';
+import dynamic from 'next/dynamic';
+
+const WhatsAppButton = dynamic(() => import('./WhatsAppButton'), { 
+  ssr: false,
+  loading: () => null
+});
 
 function calculateDistance(lat1, lon1, lat2, lon2) {
   const R = 6371; // Radio de la Tierra en km
@@ -300,14 +305,22 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
 
       <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '15px 5% 80px 5%', width: '100%', boxSizing: 'border-box' }}>
         
-        {/* MIGA DE PAN (BREADCRUMB) */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: '#888', flexWrap: 'wrap', marginBottom: '30px' }}>
-          <Link href="/" style={{ color: '#aaa', textDecoration: 'none' }}>Inicio</Link>
-          <span>/</span>
-          <Link href="/#portafolio" style={{ color: '#aaa', textDecoration: 'none' }}>Colección Residencial</Link>
-          <span>/</span>
-          <span style={{ color: 'var(--gold-light, #cb9f74)', fontWeight: 600 }}>{property.titulo}</span>
-        </div>
+        {/* MIGA DE PAN (BREADCRUMB) SEMÁNTICO */}
+        <nav aria-label="Breadcrumb" style={{ marginBottom: '30px' }}>
+          <ol style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: '#888', flexWrap: 'wrap', listStyle: 'none', padding: 0, margin: 0 }}>
+            <li>
+              <Link href="/" style={{ color: '#aaa', textDecoration: 'none' }}>Inicio</Link>
+            </li>
+            <li aria-hidden="true">/</li>
+            <li>
+              <Link href="/#portafolio" style={{ color: '#aaa', textDecoration: 'none' }}>Colección Residencial</Link>
+            </li>
+            <li aria-hidden="true">/</li>
+            <li>
+              <span style={{ color: 'var(--gold-light, #cb9f74)', fontWeight: 600 }} aria-current="page">{property.titulo}</span>
+            </li>
+          </ol>
+        </nav>
 
         {/* SECCIÓN 2: ESPECIFICACIONES TÉCNICAS Y GOOGLE MAPS INTERACTIVO */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: '30px' }}>

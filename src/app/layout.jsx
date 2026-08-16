@@ -1,5 +1,5 @@
 import './globals.css';
-import '../../public/assets/css/index.min.css';
+import '../../public/assets/css/index.css';
 import Script from 'next/script';
 import { Montserrat, Space_Mono } from 'next/font/google';
 

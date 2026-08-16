@@ -75,7 +75,7 @@ export default async function SlugPropertyPage({ params }) {
   const propSlug = getPropertySlug(property);
   const numericPrice = typeof property.precio === 'number' ? property.precio : parseFloat(String(property.precio).replace(/[^0-9.]/g, '')) || 0;
 
-  const jsonLd = {
+  const jsonLdListing = {
     '@context': 'https://schema.org',
     '@type': 'RealEstateListing',
     'name': property.titulo,
@@ -103,11 +103,36 @@ export default async function SlugPropertyPage({ params }) {
     }
   };
 
+  const jsonLdBreadcrumb = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    'itemListElement': [
+      {
+        '@type': 'ListItem',
+        'position': 1,
+        'name': 'Inicio',
+        'item': 'https://inmobiliarianortechico.pe/'
+      },
+      {
+        '@type': 'ListItem',
+        'position': 2,
+        'name': 'Colección Residencial',
+        'item': 'https://inmobiliarianortechico.pe/#portafolio'
+      },
+      {
+        '@type': 'ListItem',
+        'position': 3,
+        'name': property.titulo,
+        'item': `https://inmobiliarianortechico.pe/${propSlug}`
+      }
+    ]
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify([jsonLdListing, jsonLdBreadcrumb]) }}
       />
       <PropertyDetailView property={property} />
     </>

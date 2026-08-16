@@ -16,5 +16,8 @@ Thumbs.db
 .next/
 dist/
 temp_db.json
+graphify-out/
+backups/
+*.zip
 
 
