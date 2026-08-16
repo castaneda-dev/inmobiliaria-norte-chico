@@ -212,20 +212,20 @@ export default function HomeClient({
   return (
     <div style={{ background: '#080808', color: '#fff', minHeight: '100vh', fontFamily: 'Montserrat, sans-serif' }}>
       {/* NAVEGACIÓN */}
-      <nav className="hero-initial">
+      <nav className="hero-initial" style={{ position: 'fixed', top: 0, left: 0, right: 0, background: 'rgba(8, 8, 8, 0.65)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(203, 159, 116, 0.08)', padding: '16px 5%', zIndex: 1000 }}>
           <div className="logo-container">
-              <span className="logo-main">NORTE CHICO</span>
-              <span className="logo-sub">GRUPO INMOBILIARIO</span>
+              <span className="logo-main" style={{ letterSpacing: '4px', fontWeight: 300, fontSize: '18px' }}>NORTE CHICO</span>
+              <span className="logo-sub" style={{ color: '#cb9f74', letterSpacing: '3px', fontSize: '9px', fontWeight: 600 }}>GRUPO INMOBILIARIO</span>
           </div>
           <div className="nav-links">
               <a href="#portafolio" onClick={(e) => filtrarYNavegar(e, 'vivienda')}>Casas</a>
               <a href="#portafolio" onClick={(e) => filtrarYNavegar(e, 'terreno')}>Lotes Residenciales</a>
-              <a href="#contacto" className="btn-pill" style={{ padding: '10px 25px', fontSize: '12px' }}>Agendar Visita</a>
+              <a href="#contacto" className="btn-pill" style={{ padding: '8px 20px', fontSize: '11px', boxShadow: 'none' }}>Agendar Visita</a>
           </div>
       </nav>
 
       {/* HERO */}
-      <header className="hero hero-initial">
+      <header className="hero hero-initial" style={{ paddingTop: '140px', paddingBottom: '80px', minHeight: '95vh' }}>
           <Image 
               src="/PR_GLORIETA_DELUXE.webp" 
               alt="Inmobiliaria Norte Chico - Terrenos y Lotes en Chancay y Huaral" 
@@ -235,23 +235,35 @@ export default function HomeClient({
               sizes="100vw"
               style={{ objectFit: 'cover', objectPosition: 'center', zIndex: 0 }}
           />
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(8,8,8,1) 0%, rgba(8,8,8,0.6) 50%, rgba(8,8,8,0.8) 100%)', zIndex: 1 }} />
-          <div className="hero-grid" style={{ zIndex: 2, position: 'relative' }}>
-              <div className="hero-text">
-                  <h1>{heroTitle}<br/><span style={{ fontSize: '0.8em', fontWeight: 600, display: 'block', marginTop: '10px' }}>{heroSubtitle}</span></h1>
-                  <span className="sub-heading text-gradient">Terrenos de Alta Plusvalía y Proyectos Residenciales</span>
-                  <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', justifyContent: 'left' }}>
-                      <a href="#contacto" className="btn-pill" style={{ fontSize: '13px' }}>Contactar a un asesor</a>
-                      <a href="#portafolio" className="btn-outline">Ver Lotes Disponibles</a>
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(8,8,8,1) 0%, rgba(8,8,8,0.5) 60%, rgba(8,8,8,0.7) 100%)', zIndex: 1 }} />
+          <div className="hero-grid" style={{ zIndex: 2, position: 'relative', maxWidth: '1300px', width: '100%' }}>
+              <div className="hero-text" style={{ paddingRight: '20px' }}>
+                  <div style={{ display: 'flex', gap: '20px', alignItems: 'stretch', marginBottom: '24px' }}>
+                      <div style={{ width: '3px', background: 'var(--gold-gradient)', borderRadius: '2px' }} />
+                      <div>
+                          <h1 style={{ fontSize: 'clamp(36px, 4.8vw, 58px)', fontWeight: 300, lineHeight: 1.15, margin: 0, color: '#fff', fontFamily: 'var(--font-display), serif' }}>
+                              {heroTitle}
+                              <span style={{ fontSize: '0.45em', fontWeight: 600, display: 'block', marginTop: '12px', color: '#cb9f74', letterSpacing: '2px', textTransform: 'uppercase', fontFamily: 'var(--font-body), sans-serif' }}>
+                                  {heroSubtitle}
+                              </span>
+                          </h1>
+                      </div>
                   </div>
-                  <p style={{ marginTop: '20px', fontSize: '12px', color: '#888', textAlign: 'left' }}>
-                      *Terrenos e inmuebles de alta plusvalía en Chancay y Huaral para inversión y retiro familiar.
+                  <span className="sub-heading text-gradient" style={{ fontSize: 'clamp(20px, 2.5vw, 28px)', fontWeight: 400, marginBottom: '30px', fontFamily: 'var(--font-display), serif', fontStyle: 'italic' }}>
+                      Terrenos de Alta Plusvalía y Proyectos Residenciales
+                  </span>
+                  <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', justifyContent: 'left', marginBottom: '24px' }}>
+                      <a href="#contacto" className="btn-pill" style={{ fontSize: '12px', padding: '14px 30px' }}>Contactar a un asesor</a>
+                      <a href="#portafolio" className="btn-outline" style={{ padding: '12px 26px', fontSize: '12px' }}>Ver Lotes Disponibles</a>
+                  </div>
+                  <p style={{ fontSize: '11px', color: '#888', textAlign: 'left', borderLeft: '1px solid #333', paddingLeft: '12px' }}>
+                      *Terrenos e inmuebles de alta plusvalía en Chancay y Huaral con saneamiento legal 100% garantizado en SUNARP.
                   </p>
               </div>
               
               {/* CARRUSEL DE FOTOS */}
-              <div className="hero-video">
-                  <div className="carousel-track" style={{ transform: `translateX(-${heroIdx * 100}%)`, display: 'flex', transition: 'transform 0.5s ease' }}>
+              <div className="hero-video" style={{ borderRadius: '16px', border: '1px solid rgba(203, 159, 116, 0.25)', boxShadow: '0 20px 40px rgba(0,0,0,0.6)' }}>
+                  <div className="carousel-track" style={{ transform: `translateX(-${heroIdx * 100}%)`, display: 'flex', transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)' }}>
                       {heroImgs.map((img, i) => (
                           <div key={i} style={{ minWidth: '100%', height: '100%', position: 'relative' }}>
                               <Image 
@@ -268,9 +280,9 @@ export default function HomeClient({
                           </div>
                       ))}
                   </div>
-                  <button className="carousel-btn prev-btn" onClick={() => moveCarousel(-1)}>&#10094;</button>
-                  <button className="carousel-btn next-btn" onClick={() => moveCarousel(1)}>&#10095;</button>
-                  <div className="carousel-dots">
+                  <button className="carousel-btn prev-btn" onClick={() => moveCarousel(-1)} style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)' }}>&#10094;</button>
+                  <button className="carousel-btn next-btn" onClick={() => moveCarousel(1)} style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)' }}>&#10095;</button>
+                  <div className="carousel-dots" style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}>
                       {heroImgs.map((_, i) => (
                           <span key={i} className={`dot ${i === heroIdx ? 'active' : ''}`} onClick={() => setHeroIdx(i)}></span>
                       ))}
@@ -281,6 +293,32 @@ export default function HomeClient({
 
       {/* PUNTO DE REFERENCIA PRINCIPAL (MAIN) */}
       <main>
+          {/* SECCIÓN DE LOGROS / ESTADÍSTICAS */}
+          <section style={{ padding: '60px 5% 40px', background: '#080808', position: 'relative', zIndex: 10 }}>
+              <div style={{ maxWidth: '1300px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '30px', borderTop: '1px solid rgba(203, 159, 116, 0.15)', borderBottom: '1px solid rgba(203, 159, 116, 0.15)', padding: '40px 0' }}>
+                  <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '36px', fontFamily: 'var(--font-display), serif', fontWeight: 300, color: '#cb9f74', marginBottom: '8px' }}>100%</div>
+                      <div style={{ fontSize: '11px', letterSpacing: '2px', textTransform: 'uppercase', color: '#aaa', fontWeight: 600 }}>Saneamiento Legal</div>
+                      <div style={{ fontSize: '11px', color: '#666', marginTop: '4px' }}>Inscritos en SUNARP</div>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '36px', fontFamily: 'var(--font-display), serif', fontWeight: 300, color: '#cb9f74', marginBottom: '8px' }}>Chancay y Huaral</div>
+                      <div style={{ fontSize: '11px', letterSpacing: '2px', textTransform: 'uppercase', color: '#aaa', fontWeight: 600 }}>Ubicaciones Estratégicas</div>
+                      <div style={{ fontSize: '11px', color: '#666', marginTop: '4px' }}>Zona de Alta Plusvalía</div>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '36px', fontFamily: 'var(--font-display), serif', fontWeight: 300, color: '#cb9f74', marginBottom: '8px' }}>Sin Intereses</div>
+                      <div style={{ fontSize: '11px', letterSpacing: '2px', textTransform: 'uppercase', color: '#aaa', fontWeight: 600 }}>Financiamiento Directo</div>
+                      <div style={{ fontSize: '11px', color: '#666', marginTop: '4px' }}>Cuotas a tu Medida</div>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '36px', fontFamily: 'var(--font-display), serif', fontWeight: 300, color: '#cb9f74', marginBottom: '8px' }}>+500</div>
+                      <div style={{ fontSize: '11px', letterSpacing: '2px', textTransform: 'uppercase', color: '#aaa', fontWeight: 600 }}>Clientes Satisfechos</div>
+                      <div style={{ fontSize: '11px', color: '#666', marginTop: '4px' }}>Garantía y Confianza</div>
+                  </div>
+              </div>
+          </section>
+
           {/* COLECCIÓN */}
           <section className="featured-section fade-module" id="portafolio">
             <div className="featured-container">

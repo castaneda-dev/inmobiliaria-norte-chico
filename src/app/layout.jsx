@@ -1,7 +1,7 @@
 import './globals.css';
 import '../../public/assets/css/index.min.css';
 import Script from 'next/script';
-import { Montserrat, Space_Mono } from 'next/font/google';
+import { Montserrat, Space_Mono, Cormorant_Garamond } from 'next/font/google';
 
 const montserrat = Montserrat({
   subsets: ['latin'],
@@ -14,6 +14,13 @@ const spaceMono = Space_Mono({
   subsets: ['latin'],
   weight: ['400', '700'],
   variable: '--font-mono',
+  display: 'swap',
+});
+
+const cormorantGaramond = Cormorant_Garamond({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-display',
   display: 'swap',
 });
 
@@ -140,7 +147,7 @@ export default function RootLayout({ children }) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className={`${montserrat.className} ${spaceMono.variable} bg-arena text-asfalto antialiased overflow-x-hidden selection:bg-terracota selection:text-arena`}>
+      <body className={`${montserrat.className} ${spaceMono.variable} ${cormorantGaramond.variable} bg-arena text-asfalto antialiased overflow-x-hidden selection:bg-terracota selection:text-arena`}>
         <div className="noise-overlay"></div>
         {children}
 
