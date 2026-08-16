@@ -325,10 +325,6 @@ export default function HomeClient({
                       propiedadesFiltradas.map(prop => (
                           <article key={prop.id} className="property-card" onClick={(e) => abrirModal(e, prop)}>
                               <div className="property-img">
-                                  <div className="tag-status">
-                                      <span className={`status-dot ${(prop.estado || '').toLowerCase() === 'vendido' ? 'status-dot-vendido' : ((prop.estado || '').toLowerCase() === 'reservado' ? 'status-dot-reservado' : 'status-dot-disponible')}`}></span>
-                                      {prop.estado || 'Disponible'}
-                                  </div>
                                   {prop.imagenes && prop.imagenes.length > 1 && (
                                       <div className="tag-photos">📷 {prop.imagenes.length} Fotos</div>
                                   )}
