@@ -73,8 +73,10 @@ export async function savePropertyAction(propertyData, isEditing = false, proper
 
     if (result.error) throw result.error;
 
-    // 2. Revalida la ruta principal para actualizar los datos estáticos al instante
+    // 2. Revalida la ruta principal y las landings para actualizar los datos al instante
     revalidatePath('/');
+    revalidatePath('/inmobiliaria-en-chancay');
+    revalidatePath('/inmobiliaria-en-huaral');
     
     return { success: true, data: result.data };
   } catch (error) {
@@ -105,8 +107,10 @@ export async function deletePropertyAction(propertyId) {
 
     if (error) throw error;
 
-    // Revalida la ruta principal
+    // Revalida la ruta principal y landings
     revalidatePath('/');
+    revalidatePath('/inmobiliaria-en-chancay');
+    revalidatePath('/inmobiliaria-en-huaral');
     
     return { success: true };
   } catch (error) {

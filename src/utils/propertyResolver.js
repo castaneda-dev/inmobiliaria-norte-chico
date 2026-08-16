@@ -1,7 +1,8 @@
+import { cache } from 'react';
 import { createClient } from './supabase/server';
 import { slugify, getPropertySlug } from './slugify';
 
-export async function findProperty(identifier) {
+export const findProperty = cache(async (identifier) => {
   if (!identifier) return null;
   const cleanId = decodeURIComponent(String(identifier)).trim();
   if (!cleanId) return null;
@@ -54,4 +55,4 @@ export async function findProperty(identifier) {
     console.error("Error en findProperty:", e);
     return null;
   }
-}
+});
