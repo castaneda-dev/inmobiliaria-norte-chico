@@ -253,7 +253,7 @@ export default function HomeClient({
                       <a href="#portafolio" className="btn-outline">Ver Lotes Disponibles</a>
                   </div>
                   <p style={{ marginTop: '20px', fontSize: '12px', color: '#888', textAlign: 'left' }}>
-                      *100% Saneamiento Legal e Inscritos en SUNARP. Ubicaciones estratégicas en Chancay y Huaral, Zonas de Alta Plusvalía.
+                      *Ubicaciones estratégicas en Chancay y Huaral, Zonas de Alta Plusvalía.
                   </p>
               </div>
               
