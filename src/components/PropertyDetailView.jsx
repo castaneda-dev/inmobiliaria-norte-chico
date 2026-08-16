@@ -462,8 +462,7 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
                   type="tel" 
                   name="celular"
                   placeholder="Celular (9 dígitos) *" 
-                  pattern="[0-9]{9}" 
-                  maxLength="9" 
+                  maxLength={11} 
                   value={formData.celular}
                   onChange={handleInputChange}
                   required 
