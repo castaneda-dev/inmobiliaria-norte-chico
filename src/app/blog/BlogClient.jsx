@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import Navbar from '../../components/Navbar';
+import MobileBottomBar from '../../components/MobileBottomBar';
 import dynamic from 'next/dynamic';
 
 const WhatsAppButton = dynamic(() => import('../../components/WhatsAppButton'), { 
@@ -38,40 +40,11 @@ export default function BlogClient({ articles, faqItems }) {
   return (
     <div style={{ background: '#080808', color: '#fff', minHeight: '100vh', fontFamily: 'Montserrat, sans-serif', overflowX: 'hidden' }}>
       
-      {/* NAVEGACIÓN SUPERIOR FIJA */}
-      <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, background: 'rgba(8, 8, 8, 0.75)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(203, 159, 116, 0.12)', padding: '16px 5%', zIndex: 1000, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Link href="/" style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column' }}>
-          <span className="logo-main" style={{ letterSpacing: '3px', fontWeight: 900, fontSize: '18px', color: '#fff' }}>
-            ← NORTE CHICO
-          </span>
-          <span className="logo-sub" style={{ color: '#cb9f74', letterSpacing: '2px', fontSize: '9px', fontWeight: 600 }}>
-            GRUPO INMOBILIARIO • VOLVER AL INICIO
-          </span>
-        </Link>
-        <div className="nav-links">
-          <Link href="/#portafolio" style={{ color: '#fff', textDecoration: 'none', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>
-            Catálogo de Lotes
-          </Link>
-          <a 
-            href="#faqs-seccion" 
-            style={{ color: '#aaa', textDecoration: 'none', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}
-          >
-            Preguntas Frecuentes
-          </a>
-          <a 
-            href="https://wa.me/56982816844?text=Hola,%20quisiera%20asesoría%20sobre%20los%20artículos%20del%20blog" 
-            target="_blank" 
-            rel="noreferrer"
-            className="btn-pill" 
-            style={{ padding: '8px 20px', fontSize: '11px', boxShadow: 'none' }}
-          >
-            Asesor 1-Clic
-          </a>
-        </div>
-      </nav>
+      {/* NAVEGACIÓN UNIVERSAL CON DRAWER MÓVIL */}
+      <Navbar />
 
       {/* HERO CON FONDO GLORIETA DELUXE */}
-      <header className="hero hero-initial" style={{ paddingTop: '150px', paddingBottom: '70px', minHeight: '65vh', position: 'relative', overflow: 'hidden' }}>
+      <header className="hero hero-initial" style={{ paddingTop: '130px', paddingBottom: '50px', minHeight: '60vh', position: 'relative', overflow: 'hidden' }}>
         <Image 
           src="/PR_GLORIETA_DELUXE.webp" 
           alt="Blog Inmobiliario Norte Chico - Chancay y Huaral" 
@@ -105,19 +78,20 @@ export default function BlogClient({ articles, faqItems }) {
             </span>
           </div>
 
-          <h1 style={{ fontSize: 'clamp(32px, 5.5vw, 56px)', fontWeight: 900, lineHeight: 1.15, marginBottom: '18px', letterSpacing: '-0.5px' }}>
+          <h1 style={{ fontSize: 'clamp(30px, 5.5vw, 52px)', fontWeight: 900, lineHeight: 1.15, marginBottom: '18px', letterSpacing: '-0.5px' }}>
             Información Técnica & <span className="text-gradient">Estrategia Inmobiliaria</span>
           </h1>
 
-          <p style={{ color: '#ccc', fontSize: 'clamp(14px, 2vw, 17px)', maxWidth: '750px', margin: '0 auto 35px', lineHeight: 1.6 }}>
+          <p style={{ color: '#ccc', fontSize: 'clamp(14px, 2vw, 17px)', maxWidth: '750px', margin: '0 auto 30px', lineHeight: 1.6 }}>
             Aprende a evaluar plusvalía, verificar saneamiento registral en SUNARP y tomar decisiones de compra inteligentes en el Eje Chancay-Huaral.
           </p>
 
-          {/* FILTROS INTERACTIVOS */}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          {/* FILTROS INTERACTIVOS CON SCROLL HORIZONTAL */}
+          <div className="filter-controls-scroll">
             {filterOptions.map((opt, i) => (
               <button
                 key={i}
+                type="button"
                 onClick={() => {
                   setSelectedFilter(opt);
                   if (opt === 'Preguntas Frecuentes') {
@@ -125,8 +99,7 @@ export default function BlogClient({ articles, faqItems }) {
                     if (el) el.scrollIntoView({ behavior: 'smooth' });
                   }
                 }}
-                className={`btn-outline ${selectedFilter === opt ? 'btn-active' : ''}`}
-                style={{ padding: '10px 20px', fontSize: '12px' }}
+                className={`filter-pill ${selectedFilter === opt ? 'is-active' : ''}`}
               >
                 {opt}
               </button>
@@ -509,6 +482,9 @@ export default function BlogClient({ articles, faqItems }) {
         </div>
         <p style={{ fontSize: '12px', color: '#a3a3a3' }}>2026 © Inmobiliaria Norte Chico. Todos los derechos reservados.</p>
       </footer>
+
+      {/* BARRA FIJA DE CONVERSIÓN INFERIOR MÓVIL */}
+      <MobileBottomBar formTargetId="#faqs-seccion" />
 
       {/* BOTÓN WHATSAPP FLOTANTE */}
       <WhatsAppButton />

@@ -17,6 +17,14 @@ const spaceMono = Space_Mono({
   display: 'swap',
 });
 
+export const viewport = {
+  themeColor: '#080808',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: 'cover',
+};
+
 export const metadata = {
   metadataBase: new URL('https://inmobiliarianortechico.pe'),
   title: 'Inmobiliaria Norte Chico | Lotes y Inmuebles en Chancay y Huaral',

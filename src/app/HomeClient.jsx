@@ -5,6 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ShieldCheck, TrendingUp, MapPin } from 'lucide-react';
 import { getPropertySlug } from '../utils/slugify';
+import Navbar from '../components/Navbar';
+import MobileBottomBar from '../components/MobileBottomBar';
 import dynamic from 'next/dynamic';
 
 const WhatsAppButton = dynamic(() => import('../components/WhatsAppButton'), { 
@@ -189,7 +191,7 @@ export default function HomeClient({
     }
   };
 
-  // Carousel Hero state
+  // Carousel Hero state & Touch Swipe
   const [heroIdx, setHeroIdx] = useState(0);
   const heroImgs = [
     'PR_PLAZA_CHANCAY_desktop.webp',
@@ -198,8 +200,51 @@ export default function HomeClient({
     'PR_CHANCAY_desktop.webp'
   ];
 
+  const [heroTouchStart, setHeroTouchStart] = useState(null);
+  const [heroTouchEnd, setHeroTouchEnd] = useState(null);
+
   const moveCarousel = (dir) => {
     setHeroIdx(prev => (prev + dir + heroImgs.length) % heroImgs.length);
+  };
+
+  const handleHeroTouchStart = (e) => {
+    setHeroTouchStart(e.targetTouches[0].clientX);
+  };
+  const handleHeroTouchMove = (e) => {
+    setHeroTouchEnd(e.targetTouches[0].clientX);
+  };
+  const handleHeroTouchEnd = () => {
+    if (!heroTouchStart || !heroTouchEnd) return;
+    const distance = heroTouchStart - heroTouchEnd;
+    if (distance > 45) {
+      moveCarousel(1);
+    } else if (distance < -45) {
+      moveCarousel(-1);
+    }
+    setHeroTouchStart(null);
+    setHeroTouchEnd(null);
+  };
+
+  // Touch Swipe for Modal Carousel
+  const [modalTouchStart, setModalTouchStart] = useState(null);
+  const [modalTouchEnd, setModalTouchEnd] = useState(null);
+
+  const handleModalTouchStart = (e) => {
+    setModalTouchStart(e.targetTouches[0].clientX);
+  };
+  const handleModalTouchMove = (e) => {
+    setModalTouchEnd(e.targetTouches[0].clientX);
+  };
+  const handleModalTouchEnd = () => {
+    if (!modalTouchStart || !modalTouchEnd) return;
+    const distance = modalTouchStart - modalTouchEnd;
+    if (distance > 45) {
+      moveModalCarousel(1);
+    } else if (distance < -45) {
+      moveModalCarousel(-1);
+    }
+    setModalTouchStart(null);
+    setModalTouchEnd(null);
   };
 
   const propiedadesFiltradas = filtro === 'todos' 
@@ -229,8 +274,7 @@ export default function HomeClient({
     setModalCurrentImgIdx(prev => (prev + dir + selectedProp.imagenes.length) % selectedProp.imagenes.length);
   };
 
-  const filtrarYNavegar = (e, tipoFiltro) => {
-    e.preventDefault();
+  const filtrarYNavegar = (tipoFiltro) => {
     setFiltro(tipoFiltro);
     const target = document.getElementById('portafolio');
     if (target) {
@@ -240,19 +284,8 @@ export default function HomeClient({
 
   return (
     <div style={{ background: '#080808', color: '#fff', minHeight: '100vh', fontFamily: 'Montserrat, sans-serif' }}>
-      {/* NAVEGACIÓN */}
-      <nav className="hero-initial" style={{ position: 'fixed', top: 0, left: 0, right: 0, background: 'rgba(8, 8, 8, 0.65)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(203, 159, 116, 0.08)', padding: '16px 5%', zIndex: 1000 }}>
-          <div className="logo-container">
-              <span className="logo-main" style={{ letterSpacing: '4px', fontWeight: 900, fontSize: '18px' }}>NORTE CHICO</span>
-              <span className="logo-sub" style={{ color: '#cb9f74', letterSpacing: '3px', fontSize: '9px', fontWeight: 600 }}>GRUPO INMOBILIARIO</span>
-          </div>
-          <div className="nav-links">
-              <a href="#portafolio" onClick={(e) => filtrarYNavegar(e, 'vivienda')}>Casas</a>
-              <a href="#portafolio" onClick={(e) => filtrarYNavegar(e, 'terreno')}>Lotes Residenciales</a>
-              <Link href="/blog">Blog & Preguntas Frecuentes</Link>
-              <a href="#contacto" className="btn-pill" style={{ padding: '8px 20px', fontSize: '11px', boxShadow: 'none' }}>Agendar Visita</a>
-          </div>
-      </nav>
+      {/* NAVEGACIÓN UNIVERSAL CON DRAWER MÓVIL */}
+      <Navbar onFilterSelect={(tipo) => filtrarYNavegar(tipo)} />
 
       {/* HERO */}
       <header className="hero hero-initial" style={{ position: 'relative', overflow: 'hidden', paddingTop: '115px', paddingBottom: '50px', minHeight: '80vh' }}>
@@ -311,9 +344,15 @@ export default function HomeClient({
                       </div>
                   </div>
               </div>
-              
-              {/* CARRUSEL DE FOTOS */}
-              <div className="hero-video" style={{ borderRadius: '16px', border: '1px solid rgba(203, 159, 116, 0.25)', boxShadow: '0 20px 40px rgba(0,0,0,0.6)' }}>
+
+              {/* CARRUSEL DE FOTOS CON TOUCH SWIPE NATIVO */}
+              <div 
+                className="hero-video" 
+                style={{ borderRadius: '16px', border: '1px solid rgba(203, 159, 116, 0.25)', boxShadow: '0 20px 40px rgba(0,0,0,0.6)', touchAction: 'pan-y' }}
+                onTouchStart={handleHeroTouchStart}
+                onTouchMove={handleHeroTouchMove}
+                onTouchEnd={handleHeroTouchEnd}
+              >
                   <div className="carousel-track" style={{ transform: `translateX(-${heroIdx * 100}%)`, display: 'flex', transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)' }}>
                       {heroImgs.map((img, i) => (
                           <div key={i} style={{ minWidth: '100%', height: '100%', position: 'relative' }}>
@@ -331,8 +370,8 @@ export default function HomeClient({
                           </div>
                       ))}
                   </div>
-                  <button className="carousel-btn prev-btn" onClick={() => moveCarousel(-1)} style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)' }}>&#10094;</button>
-                  <button className="carousel-btn next-btn" onClick={() => moveCarousel(1)} style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)' }}>&#10095;</button>
+                  <button className="carousel-btn prev-btn" onClick={() => moveCarousel(-1)} style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)' }} aria-label="Foto anterior">&#10094;</button>
+                  <button className="carousel-btn next-btn" onClick={() => moveCarousel(1)} style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)' }} aria-label="Foto siguiente">&#10095;</button>
                   <div className="carousel-dots" style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}>
                       {heroImgs.map((_, i) => (
                           <span key={i} className={`dot ${i === heroIdx ? 'active' : ''}`} onClick={() => setHeroIdx(i)}></span>
@@ -344,21 +383,36 @@ export default function HomeClient({
 
       {/* PUNTO DE REFERENCIA PRINCIPAL (MAIN) */}
       <main>
-          {/* LA SECCIÓN DE LOGROS / ESTADÍSTICAS HA SIDO MOVIDA AL TEXTO DEL HERO PARA AHORRAR ESPACIO */}
-
           {/* COLECCIÓN */}
           <section className="featured-section fade-module" id="portafolio">
             <div className="featured-container">
               <h2 className="section-title">Propiedades y Terrenos en <span className="text-gradient">{heroLocation}</span></h2>
-              <div className="filter-controls">
-                  <button className={`btn-outline ${filtro === 'todos' ? 'btn-active' : ''}`} onClick={() => setFiltro('todos')}>
-                      Todos <span className="filter-count">{total}</span>
+              
+              {/* FILTROS CON SCROLL HORIZONTAL FLUIDO */}
+              <div className="filter-controls-scroll">
+                  <button 
+                    type="button"
+                    className={`filter-pill ${filtro === 'todos' ? 'is-active' : ''}`} 
+                    onClick={() => setFiltro('todos')}
+                  >
+                      <span>Todos</span>
+                      <span className="filter-count">{total}</span>
                   </button>
-                  <button className={`btn-outline ${filtro === 'vivienda' ? 'btn-active' : ''}`} onClick={() => setFiltro('vivienda')}>
-                      Casas <span className="filter-count">{viviendas}</span>
+                  <button 
+                    type="button"
+                    className={`filter-pill ${filtro === 'vivienda' ? 'is-active' : ''}`} 
+                    onClick={() => setFiltro('vivienda')}
+                  >
+                      <span>Casas</span>
+                      <span className="filter-count">{viviendas}</span>
                   </button>
-                  <button className={`btn-outline ${filtro === 'terreno' ? 'btn-active' : ''}`} onClick={() => setFiltro('terreno')}>
-                      Lotes de Inversión <span className="filter-count">{terrenos}</span>
+                  <button 
+                    type="button"
+                    className={`filter-pill ${filtro === 'terreno' ? 'is-active' : ''}`} 
+                    onClick={() => setFiltro('terreno')}
+                  >
+                      <span>Lotes de Inversión</span>
+                      <span className="filter-count">{terrenos}</span>
                   </button>
               </div>
 
@@ -373,6 +427,10 @@ export default function HomeClient({
                       propiedadesFiltradas.map(prop => (
                           <article key={prop.id} className="property-card" onClick={(e) => abrirModal(e, prop)}>
                               <div className="property-img">
+                                  <div className="tag-status">
+                                    <span className="status-dot status-dot-disponible"></span>
+                                    <span>{prop.estado || 'SUNARP 100%'}</span>
+                                  </div>
                                   {prop.imagenes && prop.imagenes.length > 1 && (
                                       <div className="tag-photos">📷 {prop.imagenes.length} Fotos</div>
                                   )}
@@ -408,9 +466,19 @@ export default function HomeClient({
                                       )}
                                   </div>
                               </div>
-                              <div style={{ padding: '0 20px 20px' }}>
-                                <Link href={`/${getPropertySlug(prop)}`} prefetch={true} className="btn-outline" style={{ display: 'block', textAlign: 'center', fontSize: '12px', padding: '8px' }}>
-                                  Ver Detalles Completos
+                              <div style={{ padding: '0 16px 16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <a 
+                                  href={`https://wa.me/56982816844?text=${encodeURIComponent(`Hola Inmobiliaria Norte Chico, me interesa el inmueble "${prop.titulo}" (${prop.precio}). Quisiera más detalles.`)}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="btn-pill"
+                                  style={{ padding: '10px 14px', fontSize: '11px', background: '#25d366', color: '#fff', boxShadow: '0 2px 10px rgba(37, 211, 102, 0.3)', width: '100%', textAlign: 'center' }}
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  💬 Consultar por WhatsApp
+                                </a>
+                                <Link href={`/${getPropertySlug(prop)}`} prefetch={true} className="btn-outline" style={{ display: 'block', textAlign: 'center', fontSize: '11px', padding: '10px 14px' }}>
+                                  🔍 Ver Detalles Completos
                                 </Link>
                               </div>
                           </article>
@@ -525,12 +593,18 @@ export default function HomeClient({
       {/* WHATSAPP FLOATING BUTTON WITH CONVERSATIONAL TOOLTIP */}
       <WhatsAppButton />
 
-      {/* MODAL HD CAROUSEL */}
+      {/* MODAL HD CAROUSEL CON TOUCH SWIPE */}
       {modalOpen && selectedProp && (
         <div className="modal-overlay" style={{ display: 'flex' }} onClick={cerrarModal}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <button className="modal-close" onClick={cerrarModal}>×</button>
-                <div className="modal-img" style={{ backgroundImage: `url('${formatImageUrl(selectedProp.imagenes[modalCurrentImgIdx])}')` }}>
+                <div 
+                  className="modal-img" 
+                  style={{ backgroundImage: `url('${formatImageUrl(selectedProp.imagenes[modalCurrentImgIdx])}')`, touchAction: 'pan-y' }}
+                  onTouchStart={handleModalTouchStart}
+                  onTouchMove={handleModalTouchMove}
+                  onTouchEnd={handleModalTouchEnd}
+                >
                   {selectedProp.imagenes.length > 1 && (
                     <div className="modal-carousel-overlay">
                         <button className="modal-carousel-arrow prev" onClick={(e) => moveModalCarousel(-1, e)}>&#10094;</button>
@@ -574,6 +648,10 @@ export default function HomeClient({
             </div>
         </div>
       )}
+
+      {/* BARRA FIJA DE CONVERSIÓN INFERIOR MÓVIL */}
+      <MobileBottomBar formTargetId="#contacto" />
+
       {/* Toast Notification */}
       {toast && (
         <div className="toast-container">

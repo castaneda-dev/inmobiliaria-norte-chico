@@ -3,6 +3,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import Navbar from './Navbar';
+import MobileBottomBar from './MobileBottomBar';
 import dynamic from 'next/dynamic';
 
 const WhatsAppButton = dynamic(() => import('./WhatsAppButton'), { 
@@ -97,6 +99,28 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
   const distPlazaHuaral = useMemo(() => calculateDistance(lat, lng, -11.4956, -77.2064), [lat, lng]);
   const timePlazaHuaral = useMemo(() => estimateDrivingTime(distPlazaHuaral), [distPlazaHuaral]);
 
+  // Touch Swipe para galería de fotos principal y lightbox
+  const [galleryTouchStart, setGalleryTouchStart] = useState(null);
+  const [galleryTouchEnd, setGalleryTouchEnd] = useState(null);
+
+  const handleGalleryTouchStart = (e) => {
+    setGalleryTouchStart(e.targetTouches[0].clientX);
+  };
+  const handleGalleryTouchMove = (e) => {
+    setGalleryTouchEnd(e.targetTouches[0].clientX);
+  };
+  const handleGalleryTouchEnd = () => {
+    if (!galleryTouchStart || !galleryTouchEnd) return;
+    const distance = galleryTouchStart - galleryTouchEnd;
+    if (distance > 45) {
+      moveCarousel(1);
+    } else if (distance < -45) {
+      moveCarousel(-1);
+    }
+    setGalleryTouchStart(null);
+    setGalleryTouchEnd(null);
+  };
+
   const showToast = (msg, type = 'success') => {
     setToastMessage({ msg, type });
     setTimeout(() => setToastMessage(null), 4500);
@@ -186,23 +210,8 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
   return (
     <div style={{ backgroundColor: '#080808', color: '#fff', minHeight: '100vh', fontFamily: 'Montserrat, sans-serif', overflowX: 'hidden' }}>
       
-      {/* NAVEGACIÓN SUPERIOR CON RETORNO CLARO AL INICIO */}
-      <nav className="hero-initial" style={{ position: 'fixed', top: 0, left: 0, right: 0, background: 'rgba(8, 8, 8, 0.75)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(203, 159, 116, 0.1)', padding: '16px 5%', zIndex: 1000, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Link href="/" className="logo-container" style={{ textDecoration: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column' }}>
-          <span className="logo-main" style={{ color: '#fff', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '18px', fontWeight: 900, letterSpacing: '3px' }}>
-            ← NORTE CHICO
-          </span>
-          <span className="logo-sub" style={{ color: 'var(--gold-light, #cb9f74)', fontSize: '9px', fontWeight: 700, letterSpacing: '2px' }}>
-            GRUPO INMOBILIARIO • VOLVER AL CATÁLOGO
-          </span>
-        </Link>
-        <div className="nav-links">
-          <Link href="/#portafolio">Casas</Link>
-          <Link href="/#portafolio">Lotes Residenciales</Link>
-          <Link href="/blog">Blog & Preguntas Frecuentes</Link>
-          <a href="#contacto-ficha" className="btn-pill" style={{ padding: '8px 20px', fontSize: '11px', boxShadow: 'none' }}>Agendar Visita</a>
-        </div>
-      </nav>
+      {/* NAVEGACIÓN UNIVERSAL CON DRAWER MÓVIL */}
+      <Navbar />
 
       {/* HERO PRINCIPAL DE LA PROPIEDAD */}
       <header className="hero hero-initial" style={{ minHeight: 'auto', paddingTop: '110px', paddingBottom: '35px', position: 'relative', overflow: 'hidden' }}>
@@ -272,9 +281,15 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
             </p>
           </div>
 
-          {/* GALERÍA DE FOTOS RESPONSIVA */}
+          {/* GALERÍA DE FOTOS RESPONSIVA CON TOUCH SWIPE */}
           <div style={{ width: '100%' }}>
-            <div className="hero-video" style={{ position: 'relative', width: '100%', aspectRatio: '16/9', borderRadius: '16px', overflow: 'hidden', border: '2px solid rgba(203, 159, 116, 0.35)', boxShadow: '0 15px 35px rgba(0,0,0,0.8)', background: '#111' }}>
+            <div 
+              className="hero-video" 
+              style={{ position: 'relative', width: '100%', aspectRatio: '16/9', borderRadius: '16px', overflow: 'hidden', border: '2px solid rgba(203, 159, 116, 0.35)', boxShadow: '0 15px 35px rgba(0,0,0,0.8)', background: '#111', touchAction: 'pan-y' }}
+              onTouchStart={handleGalleryTouchStart}
+              onTouchMove={handleGalleryTouchMove}
+              onTouchEnd={handleGalleryTouchEnd}
+            >
               <Image 
                 src={imagenesList[activeImgIdx]} 
                 alt={`${property.titulo} - Vista ${activeImgIdx + 1}`} 
@@ -300,8 +315,8 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
               {/* Flechas del Carrusel */}
               {imagenesList.length > 1 && (
                 <>
-                  <button className="carousel-btn prev-btn" style={{ background: 'rgba(0,0,0,0.6)', borderColor: '#cb9f74', width: '36px', height: '36px', fontSize: '16px' }} onClick={() => moveCarousel(-1)}>&#10094;</button>
-                  <button className="carousel-btn next-btn" style={{ background: 'rgba(0,0,0,0.6)', borderColor: '#cb9f74', width: '36px', height: '36px', fontSize: '16px' }} onClick={() => moveCarousel(1)}>&#10095;</button>
+                  <button className="carousel-btn prev-btn" style={{ background: 'rgba(0,0,0,0.6)', borderColor: '#cb9f74', width: '36px', height: '36px', fontSize: '16px' }} onClick={() => moveCarousel(-1)} aria-label="Foto anterior">&#10094;</button>
+                  <button className="carousel-btn next-btn" style={{ background: 'rgba(0,0,0,0.6)', borderColor: '#cb9f74', width: '36px', height: '36px', fontSize: '16px' }} onClick={() => moveCarousel(1)} aria-label="Foto siguiente">&#10095;</button>
                 </>
               )}
             </div>
@@ -532,12 +547,18 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
 
       </main>
 
-      {/* LIGHTBOX MODAL PANTALLA COMPLETA */}
+      {/* LIGHTBOX MODAL PANTALLA COMPLETA CON TOUCH SWIPE */}
       {lightboxOpen && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.95)', zIndex: 9999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '15px' }}>
+        <div 
+          style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.95)', zIndex: 9999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '15px', touchAction: 'pan-y' }}
+          onTouchStart={handleGalleryTouchStart}
+          onTouchMove={handleGalleryTouchMove}
+          onTouchEnd={handleGalleryTouchEnd}
+        >
           <button 
             onClick={() => setLightboxOpen(false)}
-            style={{ position: 'absolute', top: '15px', right: '15px', background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: '24px', width: '40px', height: '40px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            style={{ position: 'absolute', top: '15px', right: '15px', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', color: '#fff', fontSize: '24px', width: '48px', height: '48px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}
+            aria-label="Cerrar vista de imagen"
           >
             ×
           </button>
@@ -551,13 +572,20 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
             />
           </div>
 
-          <div style={{ marginTop: '12px', color: '#aaa', fontSize: '12px', display: 'flex', gap: '15px', alignItems: 'center' }}>
-            <button onClick={() => moveCarousel(-1)} style={{ background: 'none', border: '1px solid #555', color: '#fff', padding: '6px 14px', borderRadius: '10px', cursor: 'pointer' }}>‹ Anterior</button>
+          <div style={{ marginTop: '14px', color: '#aaa', fontSize: '13px', display: 'flex', gap: '15px', alignItems: 'center' }}>
+            <button onClick={() => moveCarousel(-1)} style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid #555', color: '#fff', padding: '10px 18px', borderRadius: '12px', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}>‹ Anterior</button>
             <span>📷 Foto {activeImgIdx + 1} de {imagenesList.length}</span>
-            <button onClick={() => moveCarousel(1)} style={{ background: 'none', border: '1px solid #555', color: '#fff', padding: '6px 14px', borderRadius: '10px', cursor: 'pointer' }}>Siguiente ›</button>
+            <button onClick={() => moveCarousel(1)} style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid #555', color: '#fff', padding: '10px 18px', borderRadius: '12px', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}>Siguiente ›</button>
           </div>
         </div>
       )}
+
+      {/* BARRA FIJA DE CONVERSIÓN INFERIOR MÓVIL CONTEXTUAL */}
+      <MobileBottomBar 
+        propertyTitle={property.titulo} 
+        propertyPrice={precioFormat} 
+        formTargetId="#contacto-ficha" 
+      />
 
       {/* NOTIFICACIONES TOAST */}
       {toastMessage && (
@@ -568,7 +596,7 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
         </div>
       )}
 
-      {/* BOTÓN WHATSAPP FLOTANTE IDÉNTICO AL DEL INICIO */}
+      {/* BOTÓN WHATSAPP FLOTANTE */}
       <WhatsAppButton propertyTitle={property.titulo} propertyId={property.id} />
     </div>
   );
