@@ -78,6 +78,7 @@ El acceso al CRM está blindado por tres niveles de autenticación independiente
 ## 5. Estrategias de Rendimiento, ISR & Optimización Visual
 
 - **ISR Bajo Demanda:** Revalidación instantánea del catálogo, blog y sitemap (`/`, `/blog`, `/preguntas-frecuentes`, `/sitemap.xml`) mediante `revalidatePath` al realizar mutaciones desde `src/app/actions/adminActions.js`.
+- **Estandarización de Contenedores Transversales & Tipografía:** Todos los módulos principales (`.featured-container`, `.contact-container`) comparten el ancho transversal maestro de **`1300px`** y la clase de encabezado `.section-title` con la escala dinámica unificada `--fs-4xl: clamp(32px, 5vw, 48px)` y `font-weight: 900`, garantizando perfecta simetría y armonía entre el portafolio de propiedades, el formulario de contacto y el hero principal.
 - **Optimización WebP HD & CSS Minificado:** Reducción de imágenes a formato WebP manteniendo calidad retina de alta resolución para los terrenos de Glorieta Deluxe, y minificación automática de estilos por el compilador SWC de Next.js.
 - **Lazy Loading de Componentes Flotantes:** Carga diferida (`next/dynamic` con `ssr: false`) para componentes no críticos como botones de WhatsApp para desahogar el hilo principal y maximizar puntuaciones Lighthouse.
 
