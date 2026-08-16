@@ -128,7 +128,6 @@ export default function Navbar({ onFilterSelect }) {
           <div className="mobile-drawer-header">
             <div className="logo-container">
               <span className="logo-main" style={{ fontSize: '16px' }}>NORTE CHICO</span>
-              <span className="logo-sub" style={{ fontSize: '9px' }}>EXPERIENCIA DIGITAL</span>
             </div>
             <button 
               type="button" 
@@ -155,7 +154,6 @@ export default function Navbar({ onFilterSelect }) {
                 }
               }}
             >
-              <span className="mobile-nav-icon">📍</span>
               <div>
                 <span className="mobile-nav-text">Todos los Inmuebles</span>
                 <span className="mobile-nav-desc">Chancay y Huaral</span>
@@ -167,7 +165,6 @@ export default function Navbar({ onFilterSelect }) {
               className="mobile-nav-link"
               onClick={(e) => handleNavFilter(e, 'vivienda')}
             >
-              <span className="mobile-nav-icon">🏡</span>
               <div>
                 <span className="mobile-nav-text">Casas & Viviendas</span>
                 <span className="mobile-nav-desc">Proyectos residenciales familiares</span>
@@ -179,38 +176,11 @@ export default function Navbar({ onFilterSelect }) {
               className="mobile-nav-link"
               onClick={(e) => handleNavFilter(e, 'terreno')}
             >
-              <span className="mobile-nav-icon">📐</span>
               <div>
                 <span className="mobile-nav-text">Lotes de Inversión</span>
                 <span className="mobile-nav-desc">Alta plusvalía cerca al Megapuerto</span>
               </div>
             </a>
-
-            <div className="mobile-nav-group-title">Ciudades & Proyectos</div>
-
-            <Link 
-              href="/inmobiliaria-en-chancay" 
-              className="mobile-nav-link"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              <span className="mobile-nav-icon">🚢</span>
-              <div>
-                <span className="mobile-nav-text">Inmobiliaria en Chancay</span>
-                <span className="mobile-nav-desc">Eje logístico Megapuerto</span>
-              </div>
-            </Link>
-
-            <Link 
-              href="/inmobiliaria-en-huaral" 
-              className="mobile-nav-link"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              <span className="mobile-nav-icon">🌳</span>
-              <div>
-                <span className="mobile-nav-text">Inmobiliaria en Huaral</span>
-                <span className="mobile-nav-desc">Retiro y casas de campo</span>
-              </div>
-            </Link>
 
             <div className="mobile-nav-group-title">Información & Asesoría</div>
 
@@ -219,7 +189,6 @@ export default function Navbar({ onFilterSelect }) {
               className="mobile-nav-link"
               onClick={() => setMobileMenuOpen(false)}
             >
-              <span className="mobile-nav-icon">📖</span>
               <div>
                 <span className="mobile-nav-text">Blog & Preguntas Frecuentes</span>
                 <span className="mobile-nav-desc">Artículos legales, plusvalía y FAQs</span>
@@ -227,13 +196,8 @@ export default function Navbar({ onFilterSelect }) {
             </Link>
           </div>
 
-          {/* Tarjeta de Confianza SUNARP y Botones de Conversión */}
+          {/* Botón de Conversión WhatsApp */}
           <div className="mobile-drawer-footer">
-            <div className="mobile-drawer-trust-badge">
-              <span className="trust-badge-dot"></span>
-              <span>Propiedades 100% Saneadas e Inscritas en SUNARP</span>
-            </div>
-
             <a 
               href="https://wa.me/56982816844?text=Hola,%20quisiera%20asesoría%20sobre%20los%20lotes%20disponibles"
               target="_blank"
@@ -241,13 +205,6 @@ export default function Navbar({ onFilterSelect }) {
               className="btn-pill mobile-drawer-btn-wa"
             >
               <span>💬 Hablar por WhatsApp</span>
-            </a>
-
-            <a 
-              href="tel:+56982816844"
-              className="btn-outline mobile-drawer-btn-call"
-            >
-              <span>📞 Llamar a un Asesor</span>
             </a>
           </div>
         </div>
