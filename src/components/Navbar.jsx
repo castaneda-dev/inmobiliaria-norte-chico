@@ -48,11 +48,16 @@ export default function Navbar({ onFilterSelect }) {
     <>
       <nav className="site-navbar">
         <div className="site-navbar-inner">
-          {/* Logo & Marca */}
-          <Link href="/" className="site-logo-link" onClick={() => setMobileMenuOpen(false)}>
-            <div className="logo-container">
-              <span className="logo-main">NORTE CHICO</span>
-              <span className="logo-sub">GRUPO INMOBILIARIO</span>
+          {/* Logo & Marca (Alineado a la Izquierda) */}
+          <Link 
+            href="/" 
+            className="site-logo-link" 
+            style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', textAlign: 'left', marginRight: 'auto' }} 
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            <div className="logo-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left' }}>
+              <span className="logo-main" style={{ textAlign: 'left', display: 'block' }}>NORTE CHICO</span>
+              <span className="logo-sub" style={{ textAlign: 'left', display: 'block' }}>GRUPO INMOBILIARIO</span>
             </div>
           </Link>
 

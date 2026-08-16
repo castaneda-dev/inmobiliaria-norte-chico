@@ -162,6 +162,8 @@
         .logo-container {
             display: flex;
             flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
         }
 
         .logo-main {
@@ -171,6 +173,7 @@
             letter-spacing: 3px;
             color: var(--text-white);
             line-height: 1;
+            text-align: left;
         }
 
         .logo-sub {
@@ -178,8 +181,9 @@
             font-weight: 700;
             font-size: 10px;
             letter-spacing: 2px;
-            color: var(--text-white);
+            color: var(--gold-light, #cb9f74);
             margin-top: 5px;
+            text-align: left;
         }
 
         .nav-links {
@@ -1132,16 +1136,20 @@
 
         .site-navbar-inner {
             max-width: 1400px;
+            width: 100%;
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            text-align: left;
         }
 
         .site-logo-link {
             text-decoration: none;
             display: flex;
             align-items: center;
+            text-align: left;
+            margin-right: auto;
         }
 
         .nav-item {
