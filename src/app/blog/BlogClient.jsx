@@ -36,6 +36,9 @@ export default function BlogClient({ articles, faqItems }) {
     : faqItems.filter(item => item.category === faqCategory);
 
   const featuredArticle = articles.find(a => a.featured) || articles[0];
+  const regularArticles = selectedFilter === 'Todos' && featuredArticle
+    ? filteredArticles.filter(a => a.id !== featuredArticle.id)
+    : filteredArticles;
 
   return (
     <div style={{ background: '#080808', color: '#fff', minHeight: '100vh', fontFamily: 'Montserrat, sans-serif', overflowX: 'hidden' }}>
@@ -43,8 +46,8 @@ export default function BlogClient({ articles, faqItems }) {
       {/* NAVEGACIÓN UNIVERSAL CON DRAWER MÓVIL */}
       <Navbar />
 
-      {/* HERO CON FONDO GLORIETA DELUXE */}
-      <header className="hero hero-initial" style={{ paddingTop: '130px', paddingBottom: '50px', minHeight: '60vh', position: 'relative', overflow: 'hidden' }}>
+      {/* CABECERA EDITORIAL COMPACTA & ELEGANTE */}
+      <header className="blog-header hero-initial">
         <Image 
           src="/PR_GLORIETA_DELUXE.webp" 
           alt="Blog Inmobiliario Norte Chico - Chancay y Huaral" 
@@ -52,42 +55,35 @@ export default function BlogClient({ articles, faqItems }) {
           fetchPriority="high"
           fill
           sizes="100vw"
-          style={{ objectFit: 'cover', objectPosition: 'center 40%', zIndex: 0 }}
+          style={{ objectFit: 'cover', objectPosition: 'center 35%', zIndex: 0, opacity: 0.28 }}
         />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(8,8,8,1) 0%, rgba(8,8,8,0.7) 50%, rgba(8,8,8,0.85) 100%)', zIndex: 1 }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(8,8,8,0.75) 0%, rgba(8,8,8,0.92) 70%, rgba(8,8,8,1) 100%)', zIndex: 1 }} />
         
-        <div style={{ position: 'relative', zIndex: 2, maxWidth: '1200px', width: '100%', margin: '0 auto', textAlign: 'center', padding: '0 5%' }}>
+        <div style={{ position: 'relative', zIndex: 2, maxWidth: '1140px', width: '100%', margin: '0 auto', textAlign: 'center', padding: '0 5%' }}>
           
           {/* MIGA DE PAN */}
-          <nav aria-label="Breadcrumb" style={{ display: 'inline-block', marginBottom: '20px' }}>
+          <nav aria-label="Breadcrumb" style={{ display: 'inline-block', marginBottom: '12px' }}>
             <ol style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: '#888', listStyle: 'none', padding: 0, margin: 0 }}>
               <li>
                 <Link href="/" style={{ color: '#aaa', textDecoration: 'none' }}>Inicio</Link>
               </li>
               <li aria-hidden="true">/</li>
               <li>
-                <span style={{ color: 'var(--gold-light, #cb9f74)', fontWeight: 600 }} aria-current="page">Blog & Centro de Guías</span>
+                <span style={{ color: 'var(--gold-light, #cb9f74)', fontWeight: 600 }} aria-current="page">Blog & Preguntas Frecuentes</span>
               </li>
             </ol>
           </nav>
 
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(203, 159, 116, 0.15)', border: '1px solid rgba(203, 159, 116, 0.35)', padding: '6px 16px', borderRadius: '30px', marginBottom: '18px' }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#cb9f74', display: 'inline-block' }}></span>
-            <span style={{ color: '#cb9f74', fontSize: '11px', fontWeight: 800, letterSpacing: '1px', textTransform: 'uppercase' }}>
-              Centro de Inteligencia & Guías de Inversión 2026
-            </span>
-          </div>
-
-          <h1 style={{ fontSize: 'clamp(30px, 5.5vw, 52px)', fontWeight: 900, lineHeight: 1.15, marginBottom: '18px', letterSpacing: '-0.5px' }}>
-            Información Técnica & <span className="text-gradient">Estrategia Inmobiliaria</span>
+          <h1 style={{ fontSize: 'clamp(26px, 4.5vw, 42px)', fontWeight: 900, lineHeight: 1.2, marginBottom: '10px', letterSpacing: '-0.5px' }}>
+            Blog & <span className="text-gradient">Preguntas Frecuentes</span>
           </h1>
 
-          <p style={{ color: '#ccc', fontSize: 'clamp(14px, 2vw, 17px)', maxWidth: '750px', margin: '0 auto 30px', lineHeight: 1.6 }}>
-            Aprende a evaluar plusvalía, verificar saneamiento registral en SUNARP y tomar decisiones de compra inteligentes en el Eje Chancay-Huaral.
+          <p style={{ color: '#aaa', fontSize: 'clamp(13px, 1.8vw, 15px)', maxWidth: '680px', margin: '0 auto 22px', lineHeight: 1.5 }}>
+            Guías técnicas SUNARP, análisis de plusvalía y respuestas clave para comprar seguro en Chancay y Huaral.
           </p>
 
-          {/* FILTROS INTERACTIVOS CON SCROLL HORIZONTAL */}
-          <div className="filter-controls-scroll">
+          {/* FILTROS INTERACTIVOS DESLIZABLES */}
+          <div className="filter-controls-scroll" style={{ marginBottom: '8px' }}>
             {filterOptions.map((opt, i) => (
               <button
                 key={i}
@@ -110,42 +106,30 @@ export default function BlogClient({ articles, faqItems }) {
       </header>
 
       {/* CONTENIDO PRINCIPAL */}
-      <main style={{ maxWidth: '1240px', margin: '0 auto', padding: '50px 5% 90px' }}>
+      <main style={{ maxWidth: '1140px', margin: '0 auto', padding: '24px 5% 80px' }}>
         
-        {/* ARTÍCULO DESTACADO (HERO EDITORIAL FEATURE) */}
-        {featuredArticle && selectedFilter !== 'Preguntas Frecuentes' && (
-          <section style={{ marginBottom: '60px' }}>
+        {/* ARTÍCULO DESTACADO (FORMATO REVISTA COMPACTO) */}
+        {featuredArticle && selectedFilter === 'Todos' && (
+          <section style={{ marginBottom: '45px' }}>
             <div 
               onClick={() => setActiveArticle(featuredArticle)}
-              style={{
-                background: 'linear-gradient(135deg, rgba(18, 18, 18, 0.9) 0%, rgba(28, 22, 18, 0.9) 100%)',
-                border: '1px solid rgba(203, 159, 116, 0.35)',
-                borderRadius: '24px',
-                overflow: 'hidden',
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-                gap: '0',
-                cursor: 'pointer',
-                transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-                boxShadow: '0 20px 40px rgba(0,0,0,0.6)'
-              }}
               className="featured-article-card"
             >
-              <div style={{ position: 'relative', minHeight: '320px' }}>
+              <div className="featured-article-img">
                 <Image 
                   src={featuredArticle.image} 
                   alt={featuredArticle.title} 
                   fill 
                   style={{ objectFit: 'cover' }} 
-                  sizes="(max-width: 768px) 100vw, 50vw"
+                  sizes="(max-width: 860px) 100vw, 45vw"
                 />
-                <div style={{ position: 'absolute', top: '18px', left: '18px', background: 'rgba(8, 8, 8, 0.85)', backdropFilter: 'blur(8px)', color: '#cb9f74', padding: '6px 14px', borderRadius: '20px', fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', border: '1px solid rgba(203, 159, 116, 0.3)' }}>
+                <div style={{ position: 'absolute', top: '14px', left: '14px', background: 'rgba(8, 8, 8, 0.88)', backdropFilter: 'blur(8px)', color: '#cb9f74', padding: '5px 12px', borderRadius: '14px', fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', border: '1px solid rgba(203, 159, 116, 0.3)' }}>
                   ★ Artículo Destacado
                 </div>
               </div>
 
-              <div style={{ padding: '36px 32px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px', fontSize: '12px', color: '#888' }}>
+              <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', fontSize: '11px', color: '#888' }}>
                   <span style={{ color: '#cb9f74', fontWeight: 700 }}>{featuredArticle.category}</span>
                   <span>•</span>
                   <span>{featuredArticle.readTime}</span>
@@ -153,21 +137,21 @@ export default function BlogClient({ articles, faqItems }) {
                   <span>{featuredArticle.date}</span>
                 </div>
 
-                <h2 style={{ fontSize: 'clamp(22px, 3vw, 30px)', fontWeight: 900, lineHeight: 1.25, marginBottom: '14px', color: '#fff' }}>
+                <h2 style={{ fontSize: 'clamp(18px, 2.5vw, 24px)', fontWeight: 900, lineHeight: 1.3, marginBottom: '10px', color: '#fff' }}>
                   {featuredArticle.title}
                 </h2>
 
-                <p style={{ color: '#aaa', fontSize: '14px', lineHeight: 1.6, marginBottom: '22px' }}>
+                <p style={{ color: '#aaa', fontSize: '13px', lineHeight: 1.5, marginBottom: '18px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                   {featuredArticle.excerpt}
                 </p>
 
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '15px' }}>
-                  <div style={{ fontSize: '12px' }}>
-                    <div style={{ fontWeight: 700, color: '#fff' }}>{featuredArticle.author}</div>
-                    <div style={{ color: '#777', fontSize: '11px' }}>{featuredArticle.authorRole}</div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+                  <div style={{ fontSize: '11px' }}>
+                    <span style={{ fontWeight: 700, color: '#fff' }}>{featuredArticle.author}</span>
+                    <span style={{ color: '#777', marginLeft: '6px' }}>• {featuredArticle.authorRole}</span>
                   </div>
-                  <span className="btn-pill" style={{ padding: '10px 22px', fontSize: '11px' }}>
-                    Leer Análisis Completo →
+                  <span className="btn-pill" style={{ padding: '8px 18px', fontSize: '11px' }}>
+                    Leer Análisis →
                   </span>
                 </div>
               </div>
@@ -177,64 +161,54 @@ export default function BlogClient({ articles, faqItems }) {
 
         {/* GRILLA DE ARTÍCULOS */}
         {selectedFilter !== 'Preguntas Frecuentes' && (
-          <section style={{ marginBottom: '80px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-              <h2 style={{ fontSize: '24px', fontWeight: 900 }}>
-                Artículos & <span className="text-gradient">Guías Técnicas</span>
+          <section style={{ marginBottom: '60px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '22px' }}>
+              <h2 style={{ fontSize: '20px', fontWeight: 800 }}>
+                {selectedFilter === 'Todos' ? 'Artículos & Guías Técnicas' : `Publicaciones: ${selectedFilter}`}
               </h2>
-              <span style={{ color: '#777', fontSize: '13px' }}>
-                {filteredArticles.length} publicaciones disponibles
+              <span style={{ color: '#777', fontSize: '12px' }}>
+                {filteredArticles.length} {filteredArticles.length === 1 ? 'publicación' : 'publicaciones'}
               </span>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '30px' }}>
-              {filteredArticles.map((art) => (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '22px' }}>
+              {regularArticles.map((art) => (
                 <article
                   key={art.id}
                   onClick={() => setActiveArticle(art)}
-                  style={{
-                    background: 'rgba(18, 18, 18, 0.55)',
-                    border: '1px solid rgba(203, 159, 116, 0.15)',
-                    borderRadius: '18px',
-                    overflow: 'hidden',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    transition: 'all 0.3s ease'
-                  }}
-                  className="property-card"
+                  className="blog-grid-card"
                 >
-                  <div style={{ position: 'relative', height: '200px', width: '100%' }}>
+                  <div className="blog-grid-card-img">
                     <Image 
                       src={art.image} 
                       alt={art.title} 
                       fill 
                       style={{ objectFit: 'cover' }} 
-                      sizes="(max-width: 768px) 100vw, 33vw"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
-                    <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'rgba(8, 8, 8, 0.85)', backdropFilter: 'blur(6px)', color: art.badgeColor, padding: '4px 10px', borderRadius: '12px', fontSize: '10px', fontWeight: 800, textTransform: 'uppercase' }}>
+                    <div style={{ position: 'absolute', top: '10px', left: '10px', background: 'rgba(8, 8, 8, 0.88)', backdropFilter: 'blur(6px)', color: art.badgeColor || '#cb9f74', padding: '4px 10px', borderRadius: '10px', fontSize: '9.5px', fontWeight: 800, textTransform: 'uppercase' }}>
                       {art.category}
                     </div>
                   </div>
 
-                  <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-                    <div style={{ fontSize: '11px', color: '#888', marginBottom: '10px', display: 'flex', gap: '8px' }}>
+                  <div style={{ padding: '18px', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+                    <div style={{ fontSize: '10.5px', color: '#888', marginBottom: '8px', display: 'flex', gap: '6px' }}>
                       <span>{art.date}</span>
                       <span>•</span>
                       <span>{art.readTime}</span>
                     </div>
 
-                    <h3 style={{ fontSize: '18px', fontWeight: 800, lineHeight: 1.3, marginBottom: '12px', color: '#fff' }}>
+                    <h3 style={{ fontSize: '16px', fontWeight: 800, lineHeight: 1.35, marginBottom: '10px', color: '#fff', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                       {art.title}
                     </h3>
 
-                    <p style={{ color: '#aaa', fontSize: '13px', lineHeight: 1.6, marginBottom: '20px', flexGrow: 1 }}>
+                    <p style={{ color: '#999', fontSize: '12.5px', lineHeight: 1.55, marginBottom: '16px', flexGrow: 1, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                       {art.excerpt}
                     </p>
 
-                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: '11px', color: '#777' }}>Por {art.author}</span>
-                      <span style={{ color: '#cb9f74', fontSize: '12px', fontWeight: 700 }}>Leer artículo →</span>
+                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: '10.5px', color: '#777' }}>Por {art.author}</span>
+                      <span style={{ color: '#cb9f74', fontSize: '11px', fontWeight: 700 }}>Leer artículo →</span>
                     </div>
                   </div>
                 </article>
@@ -243,27 +217,27 @@ export default function BlogClient({ articles, faqItems }) {
           </section>
         )}
 
-        {/* SECCIÓN DE PREGUNTAS FRECUENTES (FAQ COMPLETA E INTEGRADA) */}
-        <section id="faqs-seccion" style={{ background: 'rgba(18, 18, 18, 0.65)', border: '1px solid rgba(203, 159, 116, 0.2)', borderRadius: '24px', padding: '50px 6%' }}>
-          <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#cb9f74', fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' }}>
+        {/* SECCIÓN DE PREGUNTAS FRECUENTES (INTEGRADA & ELEGANTE) */}
+        <section id="faqs-seccion" style={{ background: 'rgba(18, 18, 18, 0.65)', border: '1px solid rgba(203, 159, 116, 0.2)', borderRadius: '20px', padding: '36px 5%' }}>
+          <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#cb9f74', fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>
               <span>❓</span> Respuestas Inmediatas
             </div>
-            <h2 style={{ fontSize: 'clamp(26px, 4vw, 38px)', fontWeight: 900, marginBottom: '12px' }}>
+            <h2 style={{ fontSize: 'clamp(22px, 3.5vw, 32px)', fontWeight: 900, marginBottom: '10px' }}>
               Preguntas <span className="text-gradient">Frecuentes de Compradores</span>
             </h2>
-            <p style={{ color: '#aaa', fontSize: '14px', maxWidth: '600px', margin: '0 auto 25px' }}>
-              Resolvemos las consultas más recurrentes sobre titulación, ubicaciones y trámites de compra.
+            <p style={{ color: '#aaa', fontSize: '13.5px', maxWidth: '580px', margin: '0 auto 20px', lineHeight: 1.5 }}>
+              Resolvemos las consultas más recurrentes sobre titulación en SUNARP, financiamiento y visitas.
             </p>
 
             {/* CATEGORÍAS FAQ */}
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', flexWrap: 'wrap' }}>
               {faqCategories.map((cat, idx) => (
                 <button
                   key={idx}
                   onClick={() => setFaqCategory(cat)}
                   className={`btn-outline ${faqCategory === cat ? 'btn-active' : ''}`}
-                  style={{ padding: '8px 16px', fontSize: '11px' }}
+                  style={{ padding: '7px 14px', fontSize: '11px' }}
                 >
                   {cat}
                 </button>
@@ -271,7 +245,7 @@ export default function BlogClient({ articles, faqItems }) {
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', maxWidth: '900px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxWidth: '850px', margin: '0 auto' }}>
             {filteredFaqs.map((faq, index) => {
               const isOpen = activeFaq === index;
               return (
@@ -281,9 +255,9 @@ export default function BlogClient({ articles, faqItems }) {
                   style={{
                     background: 'rgba(12, 12, 12, 0.7)',
                     border: isOpen ? '1px solid rgba(203, 159, 116, 0.45)' : '1px solid rgba(203, 159, 116, 0.12)',
-                    borderRadius: '14px',
+                    borderRadius: '12px',
                     overflow: 'hidden',
-                    transition: 'all 0.3s ease'
+                    transition: 'all 0.25s ease'
                   }}
                 >
                   <button 
@@ -295,20 +269,20 @@ export default function BlogClient({ articles, faqItems }) {
                       textAlign: 'left',
                       background: 'transparent',
                       border: 'none',
-                      padding: '20px 24px',
+                      padding: '16px 20px',
                       color: '#fff',
-                      fontSize: '15px',
+                      fontSize: '14px',
                       fontWeight: 700,
                       cursor: 'pointer',
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
                       fontFamily: 'inherit',
-                      gap: '15px'
+                      gap: '12px'
                     }}
                   >
-                    <span style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <span style={{ fontSize: '10px', color: '#cb9f74', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 800 }}>
+                    <span style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                      <span style={{ fontSize: '9.5px', color: '#cb9f74', textTransform: 'uppercase', letterSpacing: '0.8px', fontWeight: 800 }}>
                         {faq.category}
                       </span>
                       <span>{faq.question}</span>
@@ -318,9 +292,9 @@ export default function BlogClient({ articles, faqItems }) {
                       aria-hidden="true"
                       style={{
                         color: 'var(--gold-light, #cb9f74)',
-                        fontSize: '22px',
+                        fontSize: '20px',
                         transform: isOpen ? 'rotate(45deg)' : 'none',
-                        transition: 'transform 0.3s ease',
+                        transition: 'transform 0.25s ease',
                         flexShrink: 0
                       }}
                     >
@@ -331,11 +305,11 @@ export default function BlogClient({ articles, faqItems }) {
                     <div 
                       className="faq-answer"
                       style={{
-                        padding: '0 24px 22px',
+                        padding: '0 20px 18px',
                         background: 'rgba(8, 8, 8, 0.3)'
                       }}
                     >
-                      <p style={{ color: '#bbb', fontSize: '13.5px', lineHeight: 1.7, margin: 0, borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '14px' }}>
+                      <p style={{ color: '#bbb', fontSize: '13px', lineHeight: 1.65, margin: 0, borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '12px' }}>
                         {faq.answer}
                       </p>
                     </div>
@@ -347,27 +321,27 @@ export default function BlogClient({ articles, faqItems }) {
         </section>
 
         {/* CTA INFERIOR PARA AGENDAR VISITA */}
-        <section style={{ marginTop: '70px', background: 'linear-gradient(135deg, rgba(203, 159, 116, 0.2) 0%, rgba(18, 18, 18, 0.95) 100%)', border: '1px solid rgba(203, 159, 116, 0.4)', borderRadius: '24px', padding: '50px 30px', textAlign: 'center' }}>
-          <h2 style={{ fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 900, marginBottom: '12px' }}>
-            ¿Deseas atención personalizada para tu próxima inversión?
+        <section style={{ marginTop: '50px', background: 'linear-gradient(135deg, rgba(203, 159, 116, 0.18) 0%, rgba(18, 18, 18, 0.95) 100%)', border: '1px solid rgba(203, 159, 116, 0.35)', borderRadius: '20px', padding: '36px 24px', textAlign: 'center' }}>
+          <h2 style={{ fontSize: 'clamp(20px, 3.5vw, 30px)', fontWeight: 900, marginBottom: '10px' }}>
+            ¿Deseas asesoría para tu próxima inversión?
           </h2>
-          <p style={{ color: '#ccc', fontSize: '14px', maxWidth: '600px', margin: '0 auto 30px', lineHeight: 1.6 }}>
-            Nuestro equipo de ventas y asesores legales en Chancay y Huaral responderá todas tus dudas en minutos.
+          <p style={{ color: '#ccc', fontSize: '13.5px', maxWidth: '580px', margin: '0 auto 24px', lineHeight: 1.55 }}>
+            Nuestro equipo de ventas y asesores legales en Chancay y Huaral resolverá todas tus consultas sin compromiso.
           </p>
-          <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <a 
               href="https://wa.me/56982816844?text=Hola,%20leí%20el%20blog%20de%20Norte%20Chico%20y%20quiero%20más%20información%20de%20los%20terrenos" 
               target="_blank" 
               rel="noreferrer"
               className="btn-pill" 
-              style={{ background: '#25d366', color: '#fff', fontSize: '13px', padding: '16px 32px', boxShadow: '0 4px 20px rgba(37, 211, 102, 0.4)' }}
+              style={{ background: '#25d366', color: '#fff', fontSize: '12px', padding: '14px 28px', boxShadow: '0 4px 18px rgba(37, 211, 102, 0.35)' }}
             >
-              💬 Consulta Inmediata por WhatsApp
+              💬 Consulta por WhatsApp
             </a>
             <Link 
               href="/#contacto" 
               className="btn-outline" 
-              style={{ fontSize: '13px', padding: '16px 32px' }}
+              style={{ fontSize: '12px', padding: '14px 28px' }}
             >
               Agendar Recorrido en Terreno
             </Link>
@@ -376,34 +350,26 @@ export default function BlogClient({ articles, faqItems }) {
 
       </main>
 
-      {/* MODAL INMERSIVO DE LECTURA DE ARTÍCULO */}
+      {/* MODAL / BOTTOM SHEET INMERSIVO DE LECTURA */}
       {activeArticle && (
         <div 
+          className="blog-reader-backdrop"
           style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.92)', backdropFilter: 'blur(10px)', zIndex: 2000, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}
           onClick={() => setActiveArticle(null)}
         >
           <div 
-            style={{
-              background: '#121212',
-              border: '2px solid rgba(203, 159, 116, 0.4)',
-              borderRadius: '24px',
-              maxWidth: '850px',
-              width: '100%',
-              maxHeight: '90vh',
-              overflowY: 'auto',
-              padding: '40px 30px',
-              position: 'relative'
-            }}
+            className="blog-reader-sheet"
             onClick={(e) => e.stopPropagation()}
           >
             <button 
               onClick={() => setActiveArticle(null)}
-              style={{ position: 'absolute', top: '18px', right: '18px', background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: '24px', width: '40px', height: '40px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              style={{ position: 'absolute', top: '16px', right: '16px', background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: '22px', width: '38px', height: '38px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}
+              aria-label="Cerrar artículo"
             >
-              ×
+              ✕
             </button>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '11px', color: '#cb9f74', fontWeight: 800, textTransform: 'uppercase', marginBottom: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: '#cb9f74', fontWeight: 800, textTransform: 'uppercase', marginBottom: '10px', paddingRight: '40px' }}>
               <span>{activeArticle.category}</span>
               <span>•</span>
               <span style={{ color: '#888' }}>{activeArticle.readTime}</span>
@@ -411,22 +377,22 @@ export default function BlogClient({ articles, faqItems }) {
               <span style={{ color: '#888' }}>{activeArticle.date}</span>
             </div>
 
-            <h2 style={{ fontSize: 'clamp(22px, 3.5vw, 32px)', fontWeight: 900, lineHeight: 1.25, marginBottom: '20px', color: '#fff' }}>
+            <h2 style={{ fontSize: 'clamp(20px, 3vw, 28px)', fontWeight: 900, lineHeight: 1.25, marginBottom: '16px', color: '#fff' }}>
               {activeArticle.title}
             </h2>
 
-            <div style={{ position: 'relative', height: '280px', width: '100%', borderRadius: '16px', overflow: 'hidden', marginBottom: '30px' }}>
+            <div style={{ position: 'relative', height: '240px', width: '100%', borderRadius: '14px', overflow: 'hidden', marginBottom: '24px' }}>
               <Image src={activeArticle.image} alt={activeArticle.title} fill style={{ objectFit: 'cover' }} />
             </div>
 
             {/* SECCIONES DEL ARTÍCULO */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginBottom: '35px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '28px' }}>
               {activeArticle.content.map((sec, idx) => (
                 <div key={idx}>
-                  <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#cb9f74', marginBottom: '8px' }}>
+                  <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#cb9f74', marginBottom: '6px' }}>
                     {sec.subtitle}
                   </h3>
-                  <p style={{ color: '#ccc', fontSize: '14.5px', lineHeight: 1.7 }}>
+                  <p style={{ color: '#ccc', fontSize: '14px', lineHeight: 1.65 }}>
                     {sec.text}
                   </p>
                 </div>
@@ -434,21 +400,21 @@ export default function BlogClient({ articles, faqItems }) {
             </div>
 
             {/* PUNTOS CLAVE DESTACADOS */}
-            <div style={{ background: 'rgba(203, 159, 116, 0.08)', border: '1px solid rgba(203, 159, 116, 0.25)', borderRadius: '16px', padding: '24px', marginBottom: '30px' }}>
-              <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#fff', textTransform: 'uppercase', marginBottom: '12px', letterSpacing: '1px' }}>
+            <div style={{ background: 'rgba(203, 159, 116, 0.08)', border: '1px solid rgba(203, 159, 116, 0.25)', borderRadius: '14px', padding: '20px', marginBottom: '24px' }}>
+              <h4 style={{ fontSize: '13px', fontWeight: 800, color: '#fff', textTransform: 'uppercase', marginBottom: '10px', letterSpacing: '0.8px' }}>
                 📌 Conclusiones Clave para Inversionistas:
               </h4>
-              <ul style={{ paddingLeft: '20px', color: '#bbb', fontSize: '13.5px', lineHeight: 1.6 }}>
+              <ul style={{ paddingLeft: '18px', color: '#bbb', fontSize: '13px', lineHeight: 1.55, margin: 0 }}>
                 {activeArticle.keyPoints.map((pt, i) => (
-                  <li key={i} style={{ marginBottom: '6px' }}>{pt}</li>
+                  <li key={i} style={{ marginBottom: '5px' }}>{pt}</li>
                 ))}
               </ul>
             </div>
 
             {/* AUTOR & CTA WHATSAPP */}
-            <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px' }}>
+            <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
               <div>
-                <div style={{ fontWeight: 800, color: '#fff', fontSize: '13px' }}>Redactado por: {activeArticle.author}</div>
+                <div style={{ fontWeight: 800, color: '#fff', fontSize: '12.5px' }}>Redactado por: {activeArticle.author}</div>
                 <div style={{ color: '#777', fontSize: '11px' }}>{activeArticle.authorRole} • Inmobiliaria Norte Chico</div>
               </div>
               <a 
@@ -456,7 +422,7 @@ export default function BlogClient({ articles, faqItems }) {
                 target="_blank"
                 rel="noreferrer"
                 className="btn-pill"
-                style={{ fontSize: '12px', padding: '12px 24px', background: '#25d366', color: '#fff' }}
+                style={{ fontSize: '11.5px', padding: '10px 20px', background: '#25d366', color: '#fff' }}
               >
                 💬 Consultar sobre este tema
               </a>
@@ -466,7 +432,7 @@ export default function BlogClient({ articles, faqItems }) {
         </div>
       )}
 
-      {/* FOOTER */}
+      {/* FOOTER INSTITUCIONAL */}
       <footer style={{ background: 'var(--bg-black)', padding: '40px 5% 40px', textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
         <div className="logo-main" style={{ fontSize: '16px', marginBottom: '10px', textAlign: 'center', width: '100%', display: 'block' }}>INMOBILIARIA NORTE CHICO | CHANCAY Y HUARAL</div>
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '20px', margin: '15px 0', fontSize: '12px', flexWrap: 'wrap' }}>
