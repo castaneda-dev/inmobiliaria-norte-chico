@@ -78,13 +78,6 @@ export default function HomeClient({
   });
 
   const [filtro, setFiltro] = useState('todos');
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedProp, setSelectedProp] = useState(null);
-
-
-  const [modalCurrentImgIdx, setModalCurrentImgIdx] = useState(0);
-
-
 
   // Form states for Lead submission
   const [formData, setFormData] = useState({
@@ -225,28 +218,6 @@ export default function HomeClient({
     setHeroTouchEnd(null);
   };
 
-  // Touch Swipe for Modal Carousel
-  const [modalTouchStart, setModalTouchStart] = useState(null);
-  const [modalTouchEnd, setModalTouchEnd] = useState(null);
-
-  const handleModalTouchStart = (e) => {
-    setModalTouchStart(e.targetTouches[0].clientX);
-  };
-  const handleModalTouchMove = (e) => {
-    setModalTouchEnd(e.targetTouches[0].clientX);
-  };
-  const handleModalTouchEnd = () => {
-    if (!modalTouchStart || !modalTouchEnd) return;
-    const distance = modalTouchStart - modalTouchEnd;
-    if (distance > 45) {
-      moveModalCarousel(1);
-    } else if (distance < -45) {
-      moveModalCarousel(-1);
-    }
-    setModalTouchStart(null);
-    setModalTouchEnd(null);
-  };
-
   const propiedadesFiltradas = filtro === 'todos' 
     ? coleccion 
     : coleccion.filter(p => p.categoria === filtro);
@@ -254,25 +225,6 @@ export default function HomeClient({
   const total = coleccion.length;
   const viviendas = coleccion.filter(p => p.categoria === 'vivienda').length;
   const terrenos = coleccion.filter(p => p.categoria === 'terreno').length;
-
-  const abrirModal = (e, prop) => {
-    if (e.target.closest('a')) return;
-    e.stopPropagation();
-    setSelectedProp(prop);
-    setModalCurrentImgIdx(0);
-    setModalOpen(true);
-  };
-
-  const cerrarModal = () => {
-    setModalOpen(false);
-    setSelectedProp(null);
-  };
-
-  const moveModalCarousel = (dir, e) => {
-    if (e) e.stopPropagation();
-    if (!selectedProp || !selectedProp.imagenes) return;
-    setModalCurrentImgIdx(prev => (prev + dir + selectedProp.imagenes.length) % selectedProp.imagenes.length);
-  };
 
   const filtrarYNavegar = (tipoFiltro) => {
     setFiltro(tipoFiltro);
@@ -425,12 +377,14 @@ export default function HomeClient({
                       </div>
                   ) : (
                       propiedadesFiltradas.map(prop => (
-                          <article key={prop.id} className="property-card" onClick={(e) => abrirModal(e, prop)}>
+                          <Link 
+                            key={prop.id} 
+                            href={`/${getPropertySlug(prop)}`} 
+                            prefetch={true} 
+                            className="property-card"
+                            style={{ textDecoration: 'none', color: 'inherit' }}
+                          >
                               <div className="property-img">
-                                  <div className="tag-status">
-                                    <span className="status-dot status-dot-disponible"></span>
-                                    <span>{prop.estado || 'SUNARP 100%'}</span>
-                                  </div>
                                   {prop.imagenes && prop.imagenes.length > 1 && (
                                       <div className="tag-photos">📷 {prop.imagenes.length} Fotos</div>
                                   )}
@@ -466,22 +420,12 @@ export default function HomeClient({
                                       )}
                                   </div>
                               </div>
-                              <div style={{ padding: '0 16px 16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                <a 
-                                  href={`https://wa.me/56982816844?text=${encodeURIComponent(`Hola Inmobiliaria Norte Chico, me interesa el inmueble "${prop.titulo}" (${prop.precio}). Quisiera más detalles.`)}`}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="btn-pill"
-                                  style={{ padding: '10px 14px', fontSize: '11px', background: '#25d366', color: '#fff', boxShadow: '0 2px 10px rgba(37, 211, 102, 0.3)', width: '100%', textAlign: 'center' }}
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  💬 Consultar por WhatsApp
-                                </a>
-                                <Link href={`/${getPropertySlug(prop)}`} prefetch={true} className="btn-outline" style={{ display: 'block', textAlign: 'center', fontSize: '11px', padding: '10px 14px' }}>
+                              <div style={{ padding: '0 16px 16px' }}>
+                                <span className="btn-outline" style={{ display: 'block', textAlign: 'center', fontSize: '11px', padding: '12px 14px', width: '100%' }}>
                                   🔍 Ver Detalles Completos
-                                </Link>
+                                </span>
                               </div>
-                          </article>
+                          </Link>
                       ))
                   )}
               </div>
@@ -592,62 +536,6 @@ export default function HomeClient({
 
       {/* WHATSAPP FLOATING BUTTON WITH CONVERSATIONAL TOOLTIP */}
       <WhatsAppButton />
-
-      {/* MODAL HD CAROUSEL CON TOUCH SWIPE */}
-      {modalOpen && selectedProp && (
-        <div className="modal-overlay" style={{ display: 'flex' }} onClick={cerrarModal}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                <button className="modal-close" onClick={cerrarModal}>×</button>
-                <div 
-                  className="modal-img" 
-                  style={{ backgroundImage: `url('${formatImageUrl(selectedProp.imagenes[modalCurrentImgIdx])}')`, touchAction: 'pan-y' }}
-                  onTouchStart={handleModalTouchStart}
-                  onTouchMove={handleModalTouchMove}
-                  onTouchEnd={handleModalTouchEnd}
-                >
-                  {selectedProp.imagenes.length > 1 && (
-                    <div className="modal-carousel-overlay">
-                        <button className="modal-carousel-arrow prev" onClick={(e) => moveModalCarousel(-1, e)}>&#10094;</button>
-                        <button className="modal-carousel-arrow next" onClick={(e) => moveModalCarousel(1, e)}>&#10095;</button>
-                        <div className="modal-carousel-dots">
-                            {selectedProp.imagenes.map((_, idx) => (
-                              <span key={idx} className={`modal-dot ${idx === modalCurrentImgIdx ? 'active' : ''}`}></span>
-                            ))}
-                        </div>
-                        <div className="modal-photo-counter">📷 {modalCurrentImgIdx + 1} / {selectedProp.imagenes.length}</div>
-                    </div>
-                  )}
-                </div>
-                <div className="modal-body">
-                    <h2>{selectedProp.titulo}</h2>
-                    <div className="price">{selectedProp.precio}</div>
-                    <p className="desc">{selectedProp.descripcion}</p>
-                    <div className="modal-specs">
-                        <div><strong>Área Total</strong><br/>{selectedProp.area}</div>
-                        {selectedProp.categoria === 'vivienda' ? (
-                          <>
-                            <div><strong>Habitaciones</strong><br/>{selectedProp.habitaciones}</div>
-                            <div><strong>Baños</strong><br/>{selectedProp.banos}</div>
-                          </>
-                        ) : (
-                          <>
-                            <div><strong>Zonificación</strong><br/>{selectedProp.zonificacion}</div>
-                            <div><strong>Parámetros</strong><br/>{selectedProp.parametros}</div>
-                          </>
-                        )}
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '10px' }}>
-                        <a href={`https://wa.me/56982816844?text=Hola,%20me%20interesa%20el%20inmueble:%20${selectedProp.titulo}`} target="_blank" className="btn-pill" style={{ width: '100%', textAlign: 'center', background: '#25d366', color: '#fff', boxShadow: '0 4px 15px rgba(37, 211, 102, 0.4)' }} rel="noreferrer">
-                          💬 CONSULTAR POR WHATSAPP
-                        </a>
-                        <Link href={`/${getPropertySlug(selectedProp)}`} className="btn-outline" style={{ width: '100%', textAlign: 'center', padding: '14px 20px' }}>
-                          🔍 VER DETALLES DEL INMUEBLE
-                        </Link>
-                    </div>
-                </div>
-            </div>
-        </div>
-      )}
 
       {/* BARRA FIJA DE CONVERSIÓN INFERIOR MÓVIL */}
       <MobileBottomBar formTargetId="#contacto" />
