@@ -8,7 +8,7 @@ import { getPropertySlug } from '../utils/slugify';
 export default function HomeClient({ 
   initialProperties,
   heroTitle = "Inmobiliaria Norte Chico",
-  heroSubtitle = "Venta de Lotes y Terrenos en Chancay y Huaral",
+  heroSubtitle = "",
   heroLocation = "Chancay y Huaral"
 }) {
   // Parse Supabase data to our UI format
@@ -238,7 +238,15 @@ export default function HomeClient({
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(8,8,8,1) 0%, rgba(8,8,8,0.5) 60%, rgba(8,8,8,0.7) 100%)', zIndex: 1 }} />
           <div className="hero-grid" style={{ zIndex: 2, position: 'relative', maxWidth: '1300px', width: '100%' }}>
               <div className="hero-text">
-                  <h1>{heroTitle}<br/><span style={{ fontSize: '0.8em', fontWeight: 600, display: 'block', marginTop: '10px' }}>{heroSubtitle}</span></h1>
+                  <h1>
+                    {heroTitle}
+                    {heroSubtitle && (
+                      <>
+                        <br/>
+                        <span style={{ fontSize: '0.8em', fontWeight: 600, display: 'block', marginTop: '10px' }}>{heroSubtitle}</span>
+                      </>
+                    )}
+                  </h1>
                   <span className="sub-heading text-gradient">Terrenos de Alta Plusvalía y Proyectos Residenciales</span>
                   <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', justifyContent: 'left' }}>
                       <a href="#contacto" className="btn-pill" style={{ fontSize: '13px' }}>Contactar a un asesor</a>
