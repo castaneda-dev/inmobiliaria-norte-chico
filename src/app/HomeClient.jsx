@@ -182,6 +182,7 @@ export default function HomeClient({
   const terrenos = coleccion.filter(p => p.categoria === 'terreno').length;
 
   const abrirModal = (e, prop) => {
+    if (e.target.closest('a')) return;
     e.stopPropagation();
     setSelectedProp(prop);
     setModalCurrentImgIdx(0);
@@ -333,7 +334,7 @@ export default function HomeClient({
                                   </div>
                               </div>
                               <div style={{ padding: '0 20px 20px' }}>
-                                <Link href={`/${getPropertySlug(prop)}`} prefetch={true} className="btn-outline" style={{ display: 'block', textAlign: 'center', fontSize: '12px', padding: '8px' }} onClick={(e) => e.stopPropagation()}>
+                                <Link href={`/${getPropertySlug(prop)}`} prefetch={true} className="btn-outline" style={{ display: 'block', textAlign: 'center', fontSize: '12px', padding: '8px' }}>
                                   Ver Detalles Completos
                                 </Link>
                               </div>

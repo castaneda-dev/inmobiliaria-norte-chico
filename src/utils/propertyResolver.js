@@ -7,6 +7,8 @@ export async function findProperty(identifier) {
   if (!cleanId) return null;
 
   try {
+    const supabase = await createClient();
+
     // 1. Si el identificador es un ID estrictamente numérico
     const isNumeric = /^\d+$/.test(cleanId);
     if (isNumeric) {
