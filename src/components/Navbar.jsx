@@ -77,11 +77,8 @@ export default function Navbar({ onFilterSelect }) {
             >
               Lotes Residenciales
             </a>
-            <Link href="/blog" className={`nav-item ${pathname === '/blog' ? 'nav-item-active' : ''}`}>
-              Blog & Guías
-            </Link>
-            <Link href="/preguntas-frecuentes" className={`nav-item ${pathname === '/preguntas-frecuentes' ? 'nav-item-active' : ''}`}>
-              Preguntas Frecuentes
+            <Link href="/blog" className={`nav-item ${pathname === '/blog' || pathname === '/preguntas-frecuentes' ? 'nav-item-active' : ''}`}>
+              Blog & Preguntas Frecuentes
             </Link>
             <a 
               href="#contacto" 
@@ -224,20 +221,8 @@ export default function Navbar({ onFilterSelect }) {
             >
               <span className="mobile-nav-icon">📖</span>
               <div>
-                <span className="mobile-nav-text">Blog & Guías SUNARP</span>
-                <span className="mobile-nav-desc">Artículos legales y análisis de mercado</span>
-              </div>
-            </Link>
-
-            <Link 
-              href="/preguntas-frecuentes" 
-              className="mobile-nav-link"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              <span className="mobile-nav-icon">❓</span>
-              <div>
-                <span className="mobile-nav-text">Preguntas Frecuentes</span>
-                <span className="mobile-nav-desc">Respuestas sobre títulos, pagos y visitas</span>
+                <span className="mobile-nav-text">Blog & Preguntas Frecuentes</span>
+                <span className="mobile-nav-desc">Artículos legales, plusvalía y FAQs</span>
               </div>
             </Link>
           </div>
