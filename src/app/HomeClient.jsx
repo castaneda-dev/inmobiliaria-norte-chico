@@ -237,27 +237,15 @@ export default function HomeClient({
           />
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(8,8,8,1) 0%, rgba(8,8,8,0.5) 60%, rgba(8,8,8,0.7) 100%)', zIndex: 1 }} />
           <div className="hero-grid" style={{ zIndex: 2, position: 'relative', maxWidth: '1300px', width: '100%' }}>
-              <div className="hero-text" style={{ paddingRight: '20px' }}>
-                  <div style={{ display: 'flex', gap: '20px', alignItems: 'stretch', marginBottom: '24px' }}>
-                      <div style={{ width: '3px', background: 'var(--gold-gradient)', borderRadius: '2px' }} />
-                      <div>
-                          <h1 style={{ fontSize: 'clamp(36px, 4.8vw, 58px)', fontWeight: 900, lineHeight: 1.15, margin: 0, color: '#fff', fontFamily: 'var(--font-display), serif' }}>
-                              {heroTitle}
-                              <span style={{ fontSize: '0.45em', fontWeight: 600, display: 'block', marginTop: '12px', color: '#cb9f74', letterSpacing: '2px', textTransform: 'uppercase', fontFamily: 'var(--font-body), sans-serif' }}>
-                                  {heroSubtitle}
-                              </span>
-                          </h1>
-                      </div>
+              <div className="hero-text">
+                  <h1>{heroTitle}<br/><span style={{ fontSize: '0.8em', fontWeight: 600, display: 'block', marginTop: '10px' }}>{heroSubtitle}</span></h1>
+                  <span className="sub-heading text-gradient">Terrenos de Alta Plusvalía y Proyectos Residenciales</span>
+                  <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', justifyContent: 'left' }}>
+                      <a href="#contacto" className="btn-pill" style={{ fontSize: '13px' }}>Contactar a un asesor</a>
+                      <a href="#portafolio" className="btn-outline">Ver Lotes Disponibles</a>
                   </div>
-                  <span className="sub-heading text-gradient" style={{ fontSize: 'clamp(20px, 2.5vw, 28px)', fontWeight: 400, marginBottom: '30px', fontFamily: 'var(--font-display), serif', fontStyle: 'italic' }}>
-                      Terrenos de Alta Plusvalía y Proyectos Residenciales
-                  </span>
-                  <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', justifyContent: 'left', marginBottom: '24px' }}>
-                      <a href="#contacto" className="btn-pill" style={{ fontSize: '12px', padding: '14px 30px' }}>Contactar a un asesor</a>
-                      <a href="#portafolio" className="btn-outline" style={{ padding: '12px 26px', fontSize: '12px' }}>Ver Lotes Disponibles</a>
-                  </div>
-                  <p style={{ fontSize: '11px', color: '#888', textAlign: 'left', borderLeft: '1px solid #333', paddingLeft: '12px' }}>
-                      *Terrenos e inmuebles de alta plusvalía en Chancay y Huaral con saneamiento legal 100% garantizado en SUNARP.
+                  <p style={{ marginTop: '20px', fontSize: '12px', color: '#888', textAlign: 'left' }}>
+                      *100% Saneamiento Legal e Inscritos en SUNARP. Ubicaciones estratégicas en Chancay y Huaral, Zonas de Alta Plusvalía.
                   </p>
               </div>
               
@@ -293,21 +281,7 @@ export default function HomeClient({
 
       {/* PUNTO DE REFERENCIA PRINCIPAL (MAIN) */}
       <main>
-          {/* SECCIÓN DE LOGROS / ESTADÍSTICAS */}
-          <section style={{ padding: '60px 5% 40px', background: '#080808', position: 'relative', zIndex: 10 }}>
-              <div style={{ maxWidth: '1300px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '30px', borderTop: '1px solid rgba(203, 159, 116, 0.15)', borderBottom: '1px solid rgba(203, 159, 116, 0.15)', padding: '40px 0' }}>
-                  <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '36px', fontFamily: 'var(--font-display), serif', fontWeight: 300, color: '#cb9f74', marginBottom: '8px' }}>100%</div>
-                      <div style={{ fontSize: '11px', letterSpacing: '2px', textTransform: 'uppercase', color: '#aaa', fontWeight: 600 }}>Saneamiento Legal</div>
-                      <div style={{ fontSize: '11px', color: '#666', marginTop: '4px' }}>Inscritos en SUNARP</div>
-                  </div>
-                  <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '36px', fontFamily: 'var(--font-display), serif', fontWeight: 300, color: '#cb9f74', marginBottom: '8px' }}>Chancay y Huaral</div>
-                      <div style={{ fontSize: '11px', letterSpacing: '2px', textTransform: 'uppercase', color: '#aaa', fontWeight: 600 }}>Ubicaciones Estratégicas</div>
-                      <div style={{ fontSize: '11px', color: '#666', marginTop: '4px' }}>Zona de Alta Plusvalía</div>
-                  </div>
-              </div>
-          </section>
+          {/* LA SECCIÓN DE LOGROS / ESTADÍSTICAS HA SIDO MOVIDA AL TEXTO DEL HERO PARA AHORRAR ESPACIO */}
 
           {/* COLECCIÓN */}
           <section className="featured-section fade-module" id="portafolio">
