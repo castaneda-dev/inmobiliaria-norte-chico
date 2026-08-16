@@ -375,11 +375,16 @@ export default function HomeClient({
 
           {/* CONTACTO / CRM */}
           <section className="contact-module fade-module" id="contacto">
-              <div className="form-container">
-                  <h2>Invierte seguro en el <span className="text-gradient">Norte Chico</span></h2>
-                  <p>Déjenos sus datos para organizar un recorrido por nuestros lotes en {heroLocation}.</p>
+              <div className="contact-container">
+                  <h2 className="section-title" style={{ marginBottom: '15px' }}>
+                    Invierte seguro en el <span className="text-gradient">Norte Chico</span>
+                  </h2>
+                  <p style={{ color: '#888', marginBottom: '40px', fontSize: '15px' }}>
+                    Déjenos sus datos para organizar un recorrido por nuestros lotes en {heroLocation}.
+                  </p>
                   
-                  <form onSubmit={handleFormSubmit} className="form-grid">
+                  <div className="form-container">
+                    <form onSubmit={handleFormSubmit} className="form-grid">
                       <input 
                           type="text" 
                           name="nombre"
@@ -445,7 +450,8 @@ export default function HomeClient({
                             'CONTACTAR CON UN ASESOR'
                           )}
                       </button>
-                  </form>
+                    </form>
+                  </div>
               </div>
           </section>
       </main>

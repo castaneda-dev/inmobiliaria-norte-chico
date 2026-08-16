@@ -594,6 +594,12 @@
             position: relative;
         }
 
+        .contact-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
         .form-container {
             max-width: 800px;
             margin: 0 auto;
