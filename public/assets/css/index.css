@@ -16,6 +16,7 @@
             --text-white: #FFFFFF;
             --font-heading: 'Playfair Display', serif;
             --font-body: 'Montserrat', sans-serif;
+            --fs-4xl: clamp(32px, 5vw, 48px);
         }
 
         html {

@@ -255,7 +255,7 @@ export default function HomeClient({
           <div className="hero-grid" style={{ zIndex: 2, position: 'relative', maxWidth: '1300px', width: '100%' }}>
               <div className="hero-text">
                   <h1 className="sr-only">Venta de Terrenos y Lotes de Inversión cerca al Megapuerto de Chancay y Huaral</h1>
-                  <h2 style={{ fontSize: 'var(--fs-4xl)', lineHeight: '1.1', fontWeight: '900', letterSpacing: '-1px', marginBottom: '15px' }}>
+                  <h2 style={{ fontSize: 'clamp(32px, 5vw, 48px)', lineHeight: '1.1', fontWeight: '900', letterSpacing: '-1px', marginBottom: '15px' }}>
                     {heroTitle}
                     {heroSubtitle && (
                       <>
