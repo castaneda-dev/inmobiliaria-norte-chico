@@ -178,7 +178,7 @@ export default function FaqClient({ faqItems }) {
 
       {/* FOOTER */}
       <footer style={{ background: 'var(--bg-black)', padding: '40px 5% 40px', textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-        <div className="logo-main" style={{ fontSize: '16px', marginBottom: '10px' }}>INMOBILIARIA NORTE CHICO | CHANCAY Y HUARAL</div>
+        <div className="logo-main" style={{ fontSize: '16px', marginBottom: '10px', textAlign: 'center', width: '100%', display: 'block' }}>INMOBILIARIA NORTE CHICO | CHANCAY Y HUARAL</div>
         <p style={{ fontSize: '12px', color: '#a3a3a3' }}>2026 © Inmobiliaria Norte Chico. Todos los derechos reservados.</p>
       </footer>
 

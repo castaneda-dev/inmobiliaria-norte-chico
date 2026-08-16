@@ -468,17 +468,17 @@ export default function BlogClient({ articles, faqItems }) {
 
       {/* FOOTER */}
       <footer style={{ background: 'var(--bg-black)', padding: '40px 5% 40px', textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-        <div className="logo-main" style={{ fontSize: '16px', marginBottom: '10px' }}>INMOBILIARIA NORTE CHICO | CHANCAY Y HUARAL</div>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', margin: '15px 0', fontSize: '12px', flexWrap: 'wrap' }}>
+        <div className="logo-main" style={{ fontSize: '16px', marginBottom: '10px', textAlign: 'center', width: '100%', display: 'block' }}>INMOBILIARIA NORTE CHICO | CHANCAY Y HUARAL</div>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '20px', margin: '15px 0', fontSize: '12px', flexWrap: 'wrap' }}>
           <Link href="/blog" style={{ color: 'var(--gold-light, #cb9f74)', textDecoration: 'none', fontWeight: 600 }}>
             Blog & Preguntas Frecuentes
           </Link>
-          <Link href="/inmobiliaria-en-chancay" style={{ color: '#aaa', textDecoration: 'none' }}>
+          <span style={{ color: '#777', cursor: 'default', userSelect: 'none' }}>
             Inmobiliaria en Chancay
-          </Link>
-          <Link href="/inmobiliaria-en-huaral" style={{ color: '#aaa', textDecoration: 'none' }}>
+          </span>
+          <span style={{ color: '#777', cursor: 'default', userSelect: 'none' }}>
             Inmobiliaria en Huaral
-          </Link>
+          </span>
         </div>
         <p style={{ fontSize: '12px', color: '#a3a3a3' }}>2026 © Inmobiliaria Norte Chico. Todos los derechos reservados.</p>
       </footer>

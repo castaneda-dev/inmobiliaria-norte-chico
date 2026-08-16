@@ -1768,3 +1768,9 @@
             }
         }
 
+        footer .logo-main {
+            text-align: center !important;
+            width: 100% !important;
+            display: block !important;
+        }
+
