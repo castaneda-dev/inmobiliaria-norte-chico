@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { ShieldCheck, TrendingUp, MapPin } from 'lucide-react';
 import { getPropertySlug } from '../utils/slugify';
 import dynamic from 'next/dynamic';
 
@@ -10,6 +11,18 @@ const WhatsAppButton = dynamic(() => import('../components/WhatsAppButton'), {
   ssr: false,
   loading: () => null
 });
+
+function formatImageUrl(url) {
+  if (!url || typeof url !== 'string') return '/PR_GLORIETA_DELUXE.webp';
+  const trimmed = url.trim();
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('data:') || trimmed.startsWith('blob:')) {
+    return trimmed;
+  }
+  if (trimmed.startsWith('/')) {
+    return trimmed;
+  }
+  return '/' + trimmed;
+}
 
 export default function HomeClient({ 
   initialProperties,
@@ -39,6 +52,8 @@ export default function HomeClient({
 
       if (!imagenesList.length) {
           imagenesList = ['/PR_GLORIETA_DELUXE.webp'];
+      } else {
+          imagenesList = imagenesList.map(formatImageUrl);
       }
 
       return {
@@ -47,7 +62,7 @@ export default function HomeClient({
           estado: p.estado || 'Disponible',
           titulo: p.titulo,
           precio: typeof p.precio === 'number' ? '$' + parseFloat(p.precio).toLocaleString() : (p.precio || '$0'),
-          imagen: imagenesList[0],
+          imagen: imagenesList[0] || '/PR_GLORIETA_DELUXE.webp',
           imagenes: imagenesList,
           area: typeof p.area_m2 === 'number' ? p.area_m2 + ' m²' : (p.area_m2 || p.area || '0 m²'),
           habitaciones: p.habitaciones || '0',
@@ -234,14 +249,13 @@ export default function HomeClient({
           <div className="nav-links">
               <a href="#portafolio" onClick={(e) => filtrarYNavegar(e, 'vivienda')}>Casas</a>
               <a href="#portafolio" onClick={(e) => filtrarYNavegar(e, 'terreno')}>Lotes Residenciales</a>
-              <Link href="/blog">Blog & Guías</Link>
-              <Link href="/preguntas-frecuentes">Preguntas Frecuentes</Link>
+              <Link href="/blog">Blog & Preguntas Frecuentes</Link>
               <a href="#contacto" className="btn-pill" style={{ padding: '8px 20px', fontSize: '11px', boxShadow: 'none' }}>Agendar Visita</a>
           </div>
       </nav>
 
       {/* HERO */}
-      <header className="hero hero-initial" style={{ paddingTop: '140px', paddingBottom: '80px', minHeight: '95vh' }}>
+      <header className="hero hero-initial" style={{ position: 'relative', overflow: 'hidden', paddingTop: '115px', paddingBottom: '50px', minHeight: '80vh' }}>
           <Image 
               src="/PR_GLORIETA_DELUXE.webp" 
               alt="Inmobiliaria Norte Chico - Terrenos y Lotes en Chancay y Huaral" 
@@ -264,14 +278,38 @@ export default function HomeClient({
                       </>
                     )}
                   </h2>
-                  <span className="sub-heading text-gradient">Terrenos de Alta Plusvalía y Proyectos Residenciales</span>
-                  <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', justifyContent: 'left' }}>
+                  <span className="sub-heading text-gradient" style={{ fontSize: 'clamp(18px, 2.3vw, 25px)', fontWeight: 800, lineHeight: 1.25, display: 'block', marginBottom: '20px' }}>
+                    Terrenos de Alta Plusvalía y Proyectos Residenciales
+                  </span>
+                  <div className="hero-cta-group" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'left' }}>
                       <a href="#contacto" className="btn-pill" style={{ fontSize: '13px' }}>Contactar a un asesor</a>
                       <a href="#portafolio" className="btn-outline">Ver Lotes Disponibles</a>
                   </div>
-                  <p style={{ marginTop: '20px', fontSize: '12px', color: '#888', textAlign: 'left' }}>
-                      *Ubicaciones estratégicas en Chancay y Huaral, Zonas de Alta Plusvalía.
-                  </p>
+                  
+                  {/* Badges de Confianza y Autoridad */}
+                  <div className="hero-trust-badges">
+                      <div className="trust-badge-item">
+                          <ShieldCheck size={18} className="trust-badge-icon" />
+                          <div>
+                              <span className="trust-badge-title">TÍTULO INSCRITO</span>
+                              <span className="trust-badge-sub">En SUNARP</span>
+                          </div>
+                      </div>
+                      <div className="trust-badge-item">
+                          <TrendingUp size={18} className="trust-badge-icon" />
+                          <div>
+                              <span className="trust-badge-title">ALTA PLUSVALÍA</span>
+                              <span className="trust-badge-sub">Corazón logístico de China en Sudamérica</span>
+                          </div>
+                      </div>
+                      <div className="trust-badge-item">
+                          <MapPin size={18} className="trust-badge-icon" />
+                          <div>
+                              <span className="trust-badge-title">UBICACIÓN TOP</span>
+                              <span className="trust-badge-sub">Chancay y Huaral</span>
+                          </div>
+                      </div>
+                  </div>
               </div>
               
               {/* CARRUSEL DE FOTOS */}
@@ -338,7 +376,18 @@ export default function HomeClient({
                                   {prop.imagenes && prop.imagenes.length > 1 && (
                                       <div className="tag-photos">📷 {prop.imagenes.length} Fotos</div>
                                   )}
-                                  <Image src={prop.imagen} alt={`Venta de ${prop.categoria} en Chancay/Huaral - ${prop.titulo}`} fill sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: 'cover' }} className="property-img-next" />
+                                  <Image 
+                                      src={prop.imagen || '/PR_GLORIETA_DELUXE.webp'} 
+                                      alt={`Venta de ${prop.categoria} en Chancay/Huaral - ${prop.titulo}`} 
+                                      fill 
+                                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" 
+                                      style={{ objectFit: 'cover' }} 
+                                      className="property-img-next" 
+                                      onError={(e) => {
+                                          e.currentTarget.srcset = '';
+                                          e.currentTarget.src = '/PR_GLORIETA_DELUXE.webp';
+                                      }}
+                                  />
                               </div>
                               <div className="property-info">
                                   <div className="property-price">{prop.precio}</div>
@@ -461,10 +510,7 @@ export default function HomeClient({
           <div className="logo-main" style={{ fontSize: '16px', marginBottom: '10px' }}>INMOBILIARIA NORTE CHICO | CHANCAY Y HUARAL</div>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', margin: '15px 0', fontSize: '12px', flexWrap: 'wrap' }}>
             <Link href="/blog" style={{ color: 'var(--gold-light, #cb9f74)', textDecoration: 'none', fontWeight: 600 }}>
-              Blog & Guías de Inversión
-            </Link>
-            <Link href="/preguntas-frecuentes" style={{ color: '#ccc', textDecoration: 'none', fontWeight: 600 }}>
-              Preguntas Frecuentes (FAQ)
+              Blog & Preguntas Frecuentes
             </Link>
             <Link href="/inmobiliaria-en-chancay" style={{ color: '#aaa', textDecoration: 'none' }}>
               Inmobiliaria en Chancay
@@ -484,7 +530,7 @@ export default function HomeClient({
         <div className="modal-overlay" style={{ display: 'flex' }} onClick={cerrarModal}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <button className="modal-close" onClick={cerrarModal}>×</button>
-                <div className="modal-img" style={{ backgroundImage: `url('${selectedProp.imagenes[modalCurrentImgIdx]}')` }}>
+                <div className="modal-img" style={{ backgroundImage: `url('${formatImageUrl(selectedProp.imagenes[modalCurrentImgIdx])}')` }}>
                   {selectedProp.imagenes.length > 1 && (
                     <div className="modal-carousel-overlay">
                         <button className="modal-carousel-arrow prev" onClick={(e) => moveModalCarousel(-1, e)}>&#10094;</button>

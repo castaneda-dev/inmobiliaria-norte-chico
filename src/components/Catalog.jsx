@@ -6,6 +6,18 @@ const supabase = createClient();
 import { MapPin, Maximize, ArrowRight } from 'lucide-react';
 import { getPropertySlug } from '../utils/slugify';
 
+function formatImageUrl(url) {
+  if (!url || typeof url !== 'string') return '/PR_GLORIETA_DELUXE.webp';
+  const trimmed = url.trim();
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('data:') || trimmed.startsWith('blob:')) {
+    return trimmed;
+  }
+  if (trimmed.startsWith('/')) {
+    return trimmed;
+  }
+  return '/' + trimmed;
+}
+
 export default function Catalog() {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,6 +46,8 @@ export default function Catalog() {
 
           if (!imagenesList.length) {
             imagenesList = ['/PR_GLORIETA_DELUXE.webp'];
+          } else {
+            imagenesList = imagenesList.map(formatImageUrl);
           }
           
           return {

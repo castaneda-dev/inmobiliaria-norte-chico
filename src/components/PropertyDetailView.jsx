@@ -1,4 +1,5 @@
-"use client";
+'use client';
+
 import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -27,6 +28,18 @@ function estimateDrivingTime(distanceKm) {
   return Math.max(2, timeMinutes);
 }
 
+function formatImageUrl(url) {
+  if (!url || typeof url !== 'string') return '/PR_GLORIETA_DELUXE.webp';
+  const trimmed = url.trim();
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('data:') || trimmed.startsWith('blob:')) {
+    return trimmed;
+  }
+  if (trimmed.startsWith('/')) {
+    return trimmed;
+  }
+  return '/' + trimmed;
+}
+
 export default function PropertyDetailView({ property: propertyProp, initialProperty }) {
   const property = propertyProp || initialProperty;
   
@@ -46,7 +59,7 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
     } catch (e) {
       if (rawImg) list = [rawImg];
     }
-    return list.length ? list : ['/PR_GLORIETA_DELUXE.webp'];
+    return list.length ? list.map(formatImageUrl) : ['/PR_GLORIETA_DELUXE.webp'];
   }, [property]);
 
   const [activeImgIdx, setActiveImgIdx] = useState(0);
@@ -122,11 +135,11 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
     setFormStatus('loading');
     try {
       const payload = {
-        nombre: formData.nombre.trim().replace(/<[^>]*>?/gm, ''),
-        email: formData.email.trim().replace(/<[^>]*>?/gm, ''),
+        nombre: formData.nombre,
+        email: formData.email,
         telefono: `${formData.paisCode}${rawCelular}`,
-        origen: `Web Ficha Proyecto ID-${property?.id || 'General'}`,
-        notas: `Interés en: ${property?.titulo || 'Propiedad'} - ${formData.mensaje ? `Mensaje: ${formData.mensaje.replace(/<[^>]*>?/gm, '')}` : 'Consulta de disponibilidad'}`
+        origen: `Ficha de Inmueble: ${property.titulo} (ID: ${property.id})`,
+        notas: formData.mensaje || `Consulta sobre ${property.titulo}`
       };
 
       const res = await fetch('/api/webhook', {
@@ -173,21 +186,27 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
   return (
     <div style={{ backgroundColor: '#080808', color: '#fff', minHeight: '100vh', fontFamily: 'Montserrat, sans-serif', overflowX: 'hidden' }}>
       
-      {/* NAVEGACIÓN SUPERIOR: LOGO COMO BOTÓN DE RETORNO AL INICIO */}
-      <nav className="hero-initial" style={{ justifyContent: 'flex-start' }}>
+      {/* NAVEGACIÓN SUPERIOR CON RETORNO CLARO AL INICIO */}
+      <nav className="hero-initial" style={{ position: 'fixed', top: 0, left: 0, right: 0, background: 'rgba(8, 8, 8, 0.75)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(203, 159, 116, 0.1)', padding: '16px 5%', zIndex: 1000, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Link href="/" className="logo-container" style={{ textDecoration: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column' }}>
-          <span className="logo-main" style={{ color: '#fff', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span className="logo-main" style={{ color: '#fff', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '18px', fontWeight: 900, letterSpacing: '3px' }}>
             ← NORTE CHICO
           </span>
-          <span className="logo-sub" style={{ color: 'var(--gold-light, #cb9f74)', fontSize: '10px', fontWeight: 700 }}>
-            GRUPO INMOBILIARIO • VOLVER AL INICIO
+          <span className="logo-sub" style={{ color: 'var(--gold-light, #cb9f74)', fontSize: '9px', fontWeight: 700, letterSpacing: '2px' }}>
+            GRUPO INMOBILIARIO • VOLVER AL CATÁLOGO
           </span>
         </Link>
+        <div className="nav-links">
+          <Link href="/#portafolio">Casas</Link>
+          <Link href="/#portafolio">Lotes Residenciales</Link>
+          <Link href="/blog">Blog & Preguntas Frecuentes</Link>
+          <a href="#contacto-ficha" className="btn-pill" style={{ padding: '8px 20px', fontSize: '11px', boxShadow: 'none' }}>Agendar Visita</a>
+        </div>
       </nav>
 
-      {/* HERO PRINCIPAL ADAPTADO A CELULAR Y WEB */}
-      <header className="hero hero-initial" style={{ minHeight: 'auto', padding: '130px 5% 40px', position: 'relative', overflow: 'hidden' }}>
-        {/* Fondo Glorieta Deluxe decorativo para el inicio de la pagina */}
+      {/* HERO PRINCIPAL DE LA PROPIEDAD */}
+      <header className="hero hero-initial" style={{ minHeight: 'auto', paddingTop: '110px', paddingBottom: '35px', position: 'relative', overflow: 'hidden' }}>
+        {/* Fondo decorativo */}
         <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
           <Image
             src="/PR_GLORIETA_DELUXE.webp"
@@ -201,24 +220,26 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
           <div style={{
             position: 'absolute',
             inset: 0,
-            background: 'linear-gradient(to top, rgba(8,8,8,1) 0%, rgba(8,8,8,0.6) 50%, rgba(8,8,8,0.8) 100%)',
+            background: 'linear-gradient(to top, rgba(8,8,8,1) 0%, rgba(8,8,8,0.65) 50%, rgba(8,8,8,0.85) 100%)',
           }} />
         </div>
-        <div className="hero-grid" style={{ gap: '30px', position: 'relative', zIndex: 1 }}>
+
+        <div className="hero-grid" style={{ gap: '35px', position: 'relative', zIndex: 1, maxWidth: '1300px', width: '100%' }}>
           
           {/* INFORMACIÓN PRINCIPAL DEL INMUEBLE */}
           <div className="hero-text" style={{ textAlign: 'left' }}>
-            <div className="flex flex-wrap gap-2 items-center mb-3">
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
               <span style={{ background: 'linear-gradient(135deg, #cb9f74, #e2b988)', color: '#000', padding: '4px 14px', borderRadius: '16px', fontSize: '11px', fontWeight: 800, textTransform: 'uppercase' }}>
                 {property.tipo_activo || 'Terreno'}
               </span>
+              <span style={{ color: '#cb9f74', fontSize: '11px', fontWeight: 700 }}>• {property.estado || 'Disponible'}</span>
             </div>
 
-            <h1 style={{ fontSize: 'clamp(24px, 5.5vw, 52px)', fontWeight: 900, lineHeight: '1.15', marginBottom: '12px' }}>
+            <h1 style={{ fontSize: 'clamp(26px, 4.5vw, 42px)', fontWeight: 900, lineHeight: '1.15', marginBottom: '8px', letterSpacing: '-0.5px' }}>
               {property.titulo}
             </h1>
             
-            <div className="sub-heading text-gradient" style={{ fontSize: 'clamp(26px, 4vw, 42px)', marginBottom: '16px', fontWeight: 900 }}>
+            <div className="sub-heading text-gradient" style={{ fontSize: 'clamp(24px, 3.5vw, 36px)', marginBottom: '14px', fontWeight: 900 }}>
               {precioFormat}
             </div>
 
@@ -226,33 +247,34 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
               {property.descripcion || 'Lote e inmueble estratégico de alta plusvalía. Excelente proyección patrimonial y residencial.'}
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3 mb-4">
+            {/* BOTONES DE CONTACTO DIRECTO */}
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '18px' }}>
               <a 
                 href={`https://wa.me/56982816844?text=${encodeURIComponent(whatsappMsg)}`}
                 target="_blank"
                 rel="noreferrer"
-                className="btn-pill w-full sm:w-auto text-center justify-center" 
-                style={{ fontSize: '12px', padding: '14px 24px', background: '#25d366', color: '#fff', boxShadow: '0 4px 20px rgba(37, 211, 102, 0.35)' }}
+                className="btn-pill" 
+                style={{ fontSize: '13px', padding: '14px 24px', background: '#25d366', color: '#fff', boxShadow: '0 4px 20px rgba(37, 211, 102, 0.35)' }}
               >
-                Consultar Disponibilidad
+                Consultar por WhatsApp
               </a>
               <a 
                 href="#contacto-ficha" 
-                className="btn-outline w-full sm:w-auto text-center justify-center"
-                style={{ fontSize: '12px', padding: '14px 24px' }}
+                className="btn-outline"
+                style={{ fontSize: '13px', padding: '14px 24px' }}
               >
                 Agendar Visita
               </a>
             </div>
 
-            <p style={{ fontSize: '12px', color: '#aaa', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
-              Ubicación: <span style={{ color: '#fff', fontWeight: 800 }}>{ubicacionFormateada}</span>
+            <p style={{ fontSize: '12px', color: '#aaa', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+              📍 Ubicación: <span style={{ color: '#fff', fontWeight: 800 }}>{ubicacionFormateada}</span>
             </p>
           </div>
 
-          {/* GALERÍA DE FOTOS RESPONSIVA DENTRO DE HERO-VIDEO */}
+          {/* GALERÍA DE FOTOS RESPONSIVA */}
           <div style={{ width: '100%' }}>
-            <div className="hero-video" style={{ position: 'relative', width: '100%', aspectRatio: '16/9', borderRadius: '20px', overflow: 'hidden', border: '3px solid var(--gold-dark, #957051)', boxShadow: '0 10px 30px rgba(0,0,0,0.8)', background: '#111' }}>
+            <div className="hero-video" style={{ position: 'relative', width: '100%', aspectRatio: '16/9', borderRadius: '16px', overflow: 'hidden', border: '2px solid rgba(203, 159, 116, 0.35)', boxShadow: '0 15px 35px rgba(0,0,0,0.8)', background: '#111' }}>
               <Image 
                 src={imagenesList[activeImgIdx]} 
                 alt={`${property.titulo} - Vista ${activeImgIdx + 1}`} 
@@ -267,11 +289,11 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
                 onClick={() => setLightboxOpen(true)}
                 style={{ position: 'absolute', top: '12px', right: '12px', background: 'rgba(0,0,0,0.75)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '6px 12px', borderRadius: '16px', fontSize: '11px', cursor: 'pointer', backdropFilter: 'blur(8px)', zIndex: 5 }}
               >
-                Pantalla Completa
+                🔍 Pantalla Completa
               </button>
 
               {/* Contador */}
-              <div style={{ position: 'absolute', bottom: '12px', left: '12px', background: 'rgba(0,0,0,0.75)', color: '#fff', padding: '4px 10px', borderRadius: '10px', fontSize: '10px', fontWeight: 600, backdropFilter: 'blur(6px)' }}>
+              <div style={{ position: 'absolute', bottom: '12px', left: '12px', background: 'rgba(0,0,0,0.75)', color: '#fff', padding: '4px 10px', borderRadius: '10px', fontSize: '10px', fontWeight: 600, backdropFilter: 'blur(6px)', zIndex: 5 }}>
                 Foto {activeImgIdx + 1} / {imagenesList.length}
               </div>
 
@@ -284,14 +306,14 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
               )}
             </div>
 
-            {/* Miniaturas (Thumbnails) para Touch Scroll */}
+            {/* Miniaturas (Thumbnails) */}
             {imagenesList.length > 1 && (
               <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', padding: '12px 0', scrollbarWidth: 'none' }}>
                 {imagenesList.map((img, idx) => (
                   <div 
                     key={idx} 
                     onClick={() => setActiveImgIdx(idx)}
-                    style={{ position: 'relative', width: '75px', height: '50px', borderRadius: '10px', overflow: 'hidden', border: idx === activeImgIdx ? '2px solid #cb9f74' : '2px solid transparent', opacity: idx === activeImgIdx ? 1 : 0.55, cursor: 'pointer', transition: 'all 0.2s ease', flexShrink: 0 }}
+                    style={{ position: 'relative', width: '75px', height: '50px', borderRadius: '10px', overflow: 'hidden', border: idx === activeImgIdx ? '2px solid #cb9f74' : '2px solid rgba(255,255,255,0.1)', opacity: idx === activeImgIdx ? 1 : 0.55, cursor: 'pointer', transition: 'all 0.2s ease', flexShrink: 0 }}
                   >
                     <Image src={img} alt={`${property.titulo} miniatura ${idx + 1}`} fill sizes="75px" style={{ objectFit: 'cover' }} />
                   </div>
@@ -303,10 +325,10 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
         </div>
       </header>
 
-      <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '15px 5% 80px 5%', width: '100%', boxSizing: 'border-box' }}>
+      <main style={{ maxWidth: '1300px', margin: '0 auto', padding: '10px 5% 80px 5%', width: '100%', boxSizing: 'border-box' }}>
         
         {/* MIGA DE PAN (BREADCRUMB) SEMÁNTICO */}
-        <nav aria-label="Breadcrumb" style={{ marginBottom: '30px' }}>
+        <nav aria-label="Breadcrumb" style={{ marginBottom: '25px' }}>
           <ol style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: '#888', flexWrap: 'wrap', listStyle: 'none', padding: 0, margin: 0 }}>
             <li>
               <Link href="/" style={{ color: '#aaa', textDecoration: 'none' }}>Inicio</Link>
@@ -423,6 +445,7 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
           </div>
 
         </div>
+
         {/* SECCIÓN 3: FORMULARIO DE CAPTACIÓN CENTRALIZADO */}
         <section className="contact-module fade-module" id="contacto-ficha" style={{ marginTop: '40px' }}>
           <div className="form-container">

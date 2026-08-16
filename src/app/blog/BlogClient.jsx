@@ -498,10 +498,7 @@ export default function BlogClient({ articles, faqItems }) {
         <div className="logo-main" style={{ fontSize: '16px', marginBottom: '10px' }}>INMOBILIARIA NORTE CHICO | CHANCAY Y HUARAL</div>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', margin: '15px 0', fontSize: '12px', flexWrap: 'wrap' }}>
           <Link href="/blog" style={{ color: 'var(--gold-light, #cb9f74)', textDecoration: 'none', fontWeight: 600 }}>
-            Blog & Guías de Inversión
-          </Link>
-          <Link href="/preguntas-frecuentes" style={{ color: '#aaa', textDecoration: 'none' }}>
-            Preguntas Frecuentes
+            Blog & Preguntas Frecuentes
           </Link>
           <Link href="/inmobiliaria-en-chancay" style={{ color: '#aaa', textDecoration: 'none' }}>
             Inmobiliaria en Chancay
