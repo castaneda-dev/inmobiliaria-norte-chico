@@ -45,42 +45,38 @@
 
 ## 🟡 LO PENDIENTE (PRÓXIMOS PASOS PRIORIZADOS)
 
-### 💼 ROL 4 (Ventas) & ROL 3 (Marketing): Tráfico y Conversión
-- **[PENDIENTE] Lanzamiento de Pauta en Meta Ads:** Configurar la pauta con micro-presupuesto ($60.000 CLP / ~$2.000 CLP diarios) dirigiendo a las Fichas 1:1 optimizadas de los lotes en Huaral/Chancay.
-- **[PENDIENTE] Matriz de Contenidos Plusvalía 2026:** Producir 5 contenidos orgánicos sobre el impacto del Puerto de Chancay en el valor por m² de los terrenos residenciales.
-- **[PENDIENTE] Prospección Directa Outbound:** Publicar semanalmente en comunidades de inversionistas inmobiliarios destacando la garantía registral en SUNARP.
+### 💼 ROL 3 (Marketing) & ROL 4 (Ventas): Integración Meta y Pauta 2026
+- **[PENDIENTE] Obtención de Meta Pixel ID:** Crear el conjunto de datos (Dataset) en Meta Business Manager y colocar el ID en `layout.jsx` para activar el rastreo de visitas y conversiones.
+- **[PENDIENTE] Fase 3 - Automatizaciones Meta Business Suite:** Configurar las respuestas automáticas de bienvenida y fuera de horario en la bandeja unificada de FB + IG usando las plantillas de `estrategia_comunicacion_social.md`.
+- **[PENDIENTE] URL de Facebook:** Confirmar la URL exacta de la página de Facebook para reemplazar los 3 marcadores `TODO` en `Footer.jsx`, `Navbar.jsx` y `ContactForm.jsx`.
+- **[PENDIENTE] Lanzamiento de Pauta en Meta Ads:** Configurar la pauta publicitaria dirigida a las Fichas 1:1 optimizadas de los lotes en Huaral/Chancay.
+- **[PENDIENTE] Matriz de Contenidos Plusvalía 2026:** Producir contenidos orgánicos sobre el impacto del Puerto de Chancay y la seguridad registral en Registros Públicos.
 
 ### ⚙️ ROL 7 (Operaciones) & ROL 6 (Finanzas): Gestión y Carga de Datos
 - **[PENDIENTE] Carga de Inventario Completo:** Subir los nuevos lotes y terrenos a través del panel admin seguro (`/admin`), asegurando fotos en alta resolución y especificaciones exactas.
-- **[PENDIENTE] Despliegue a Producción:** Una vez aprobada la fase en `PRUEBAS WEB`, ejecutar la copia de archivos verificados a `PRODUCCION WEB INMOBILIARIA` para sincronizar con los servidores finales.
 
 ---
 
 ## 📋 REGISTRO DE ROLES (MEMORIA COMPARTIDA POR DEPARTAMENTO)
 
 ### 👑 ROL 1: Dirección Estratégica
-- **Prioridad 1:** Garantizar la velocidad de carga y la seguridad del sistema en `PRUEBAS WEB` (Cumplido).
+- **Prioridad 1:** Garantizar la velocidad de carga y la seguridad del sistema (Cumplido).
 - **Prioridad 2:** Iniciar la carga de catálogo real y preparación para campaña publicitaria.
-- **Riesgos Identificados:** Evitar publicar en producción sin verificar previamente en el ambiente de pruebas.
 
 ### 🔬 ROL 2: Ingeniería de Producto & Arquitectura
-- **Estado:** Arquitectura híbrida en Next.js completada. Código limpio de dependencias legadas u ofuscadas. Middleware mitigado contra IP Spoofing, base de datos blindada con RLS, Server Actions e ISR bajo demanda operativos.
+- **Estado:** 
+  - Código desplegado y sincronizado en GitHub/Vercel.
+  - Metaetiqueta de verificación de dominio Facebook inyectada en `<head>`: `<meta name="facebook-domain-verification" content="tbgejpksn0jcdpp2uc332lrgl67p8l" />`.
+  - Número de WhatsApp globalizado a `+51 904 669 316` (solo chat).
+  - Íconos de redes sociales integrados de forma sutil y elegante en 3 puntos estratégicos sin saturar la UI.
 
 ### 📢 ROL 3: Marketing & Contenidos
-- **Enfoque:** Posicionamiento de "Norte Chico Properties" como la opción de inversión residencial más segura en el hub logístico de Chancay.
+- **Estado:** Estrategia de comunicación digital v2.0 aprobada y documentada en `estrategia_comunicacion_social.md` (con enfoque estricto en Registros Públicos y venta al contado sin mentiras ni datos inventados).
 
 ### 🎯 ROL 4: Ventas & Conversión
-- **Embudo:** Flujo de captura directo desde Ficha 1:1 y formulario hacia WhatsApp y base de clientes en Supabase.
-
-### 🎧 ROL 5: Soporte & Atencion al Cliente
-- **Protocolo:** Respuestas rápidas con datos de zonificación, saneamiento SUNARP y facilidades de pago confirmadas.
-
-### 📊 ROL 6: Finanzas & Presupuesto
-- **Presupuesto asignado:** Pauta Meta Ads $60.000 CLP mensual distribuida en campañas de consideración/tráfico.
-
-### ⚙️ ROL 7: Operaciones & Debida Diligencia
-- **Procedimiento:** Protocolo de verificación registral SUNARP previa para cada lote antes de habilitar su estado `Disponible` en el panel.
+- **Embudo:** Flujo directo hacia WhatsApp (+51 904 669 316) y formulario de captación conectado a Supabase.
 
 ---
 
-*Última actualización: 11 de Agosto de 2026 - Registrado en el sistema de memoria compartida.*
+*Última actualización: 28 de Agosto de 2026 - Registrado en el sistema de memoria compartida.*
+
