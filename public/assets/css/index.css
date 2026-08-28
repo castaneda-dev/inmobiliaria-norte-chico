@@ -21,6 +21,9 @@
 
         html {
             scroll-behavior: smooth;
+            background-color: var(--bg-black);
+            width: 100%;
+            min-height: 100vh;
         }
 
         .sr-only {
@@ -41,6 +44,8 @@
             color: var(--text-white);
             line-height: 1.6;
             overflow-x: hidden;
+            width: 100%;
+            min-height: 100vh;
             -webkit-font-smoothing: antialiased;
         }
 

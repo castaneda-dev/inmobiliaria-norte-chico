@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '../utils/supabase/client';
@@ -76,7 +76,7 @@ export default function Catalog() {
         <div className="flex flex-col md:flex-row justify-between items-end mb-16">
           <div>
             <h2 className="font-sans font-bold text-sm tracking-widest uppercase text-terracota mb-2">Nuestro Portafolio</h2>
-            <h3 className="font-sans font-black text-4xl md:text-5xl">Catálogo de Proyectos</h3>
+            <h3 className="font-sans font-black text-4xl md:text-5xl">CatÃ¡logo de Proyectos</h3>
           </div>
           
           <div className="flex gap-4 mt-8 md:mt-0 font-mono text-xs">
@@ -97,7 +97,7 @@ export default function Catalog() {
             ))}
             {filtered.length === 0 && (
               <div className="col-span-full text-center py-20 opacity-50">
-                <p className="font-sans text-xl font-bold">No hay proyectos disponibles en esta categoría.</p>
+                <p className="font-sans text-xl font-bold">No hay proyectos disponibles en esta categorÃ­a.</p>
               </div>
             )}
           </div>
@@ -108,7 +108,7 @@ export default function Catalog() {
 }
 
 function PropertyCard({ property }) {
-  const whatsappMsg = `Hola, me interesa asegurar capital en el proyecto ID-${property.id}: ${property.titulo}. Quisiera más información sobre la plusvalía.`;
+  const whatsappMsg = `Hola, me interesa asegurar capital en el proyecto ID-${property.id}: ${property.titulo}. Quisiera mÃ¡s informaciÃ³n sobre la plusvalÃ­a.`;
 
   const slug = getPropertySlug(property);
 
@@ -133,12 +133,12 @@ function PropertyCard({ property }) {
           <span className="font-sans font-black text-xl text-terracota whitespace-nowrap ml-4">{property.precioFormat}</span>
         </div>
         
-        <p className="font-mono text-sm opacity-60 line-clamp-2 mb-6">{property.descripcion || 'Terreno estratégico en el eje logístico Chancay-Huaral.'}</p>
+        <p className="font-mono text-sm opacity-60 line-clamp-2 mb-6">{property.descripcion || 'Terreno estratÃ©gico en el eje logÃ­stico Chancay-Huaral.'}</p>
         
         <div className="mt-auto grid grid-cols-2 gap-4 border-t border-asfalto/10 pt-6 mb-6">
           <div className="flex items-center gap-2 text-sm font-sans font-semibold">
             <Maximize size={16} className="text-terracota" />
-            {property.area_m2 || property.area || 'N/A'} m²
+            {property.area_m2 || property.area || 'N/A'} mÂ²
           </div>
           <div className="flex items-center gap-2 text-sm font-sans font-semibold">
             <MapPin size={16} className="text-terracota" />
@@ -155,7 +155,7 @@ function PropertyCard({ property }) {
           </Link>
           
           <a 
-            href={`https://wa.me/56982816844?text=${encodeURIComponent(whatsappMsg)}`} 
+            href={`https://wa.me/51904669316?text=${encodeURIComponent(whatsappMsg)}`} 
             target="_blank" 
             rel="noreferrer" 
             title="Asegurar por WhatsApp"
@@ -166,7 +166,7 @@ function PropertyCard({ property }) {
               }
             }}
           >
-            💬
+            ðŸ’¬
           </a>
         </div>
       </div>

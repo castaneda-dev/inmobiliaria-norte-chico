@@ -28,7 +28,7 @@ export const viewport = {
 export const metadata = {
   metadataBase: new URL('https://inmobiliarianortechico.pe'),
   title: 'Inmobiliaria Norte Chico | Lotes y Inmuebles en Chancay y Huaral',
-  description: 'Inmobiliaria Norte Chico en Chancay y Huaral. Terrenos y lotes de alta plusvalía e inmuebles residenciales en el Norte Chico de Lima, Perú. Agenda tu visita.',
+  description: 'Inmobiliaria Norte Chico en Chancay y Huaral. Terrenos y lotes de alta plusvalÃ­a e inmuebles residenciales en el Norte Chico de Lima, PerÃº. Agenda tu visita.',
   keywords: [
     'Inmobiliaria Norte Chico',
     'Norte Chico',
@@ -46,6 +46,9 @@ export const metadata = {
   },
   verification: {
     google: 'UvpZvDJeW4lXppCK7ikkx5gxeJuPFh6XbjiEBpCZdhc',
+    other: {
+      'facebook-domain-verification': ['tbgejpksn0jcdpp2uc332lrgl67p8l'],
+    },
   },
   robots: {
     index: true,
@@ -60,7 +63,7 @@ export const metadata = {
   },
   openGraph: {
     title: 'Inmobiliaria Norte Chico | Lotes y Inmuebles en Chancay y Huaral',
-    description: 'Terrenos e inmuebles de alta plusvalía en Chancay y Huaral. Inmobiliaria Norte Chico te brinda asesoría personalizada sin costo.',
+    description: 'Terrenos e inmuebles de alta plusvalÃ­a en Chancay y Huaral. Inmobiliaria Norte Chico te brinda asesorÃ­a personalizada sin costo.',
     type: 'website',
     url: 'https://inmobiliarianortechico.pe',
     siteName: 'Inmobiliaria Norte Chico',
@@ -77,7 +80,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Inmobiliaria Norte Chico | Lotes y Inmuebles en Chancay y Huaral',
-    description: 'Terrenos e inmuebles de alta plusvalía en Chancay y Huaral. Inmobiliaria Norte Chico.',
+    description: 'Terrenos e inmuebles de alta plusvalÃ­a en Chancay y Huaral. Inmobiliaria Norte Chico.',
     images: ['/PR_GLORIETA_DELUXE.webp'],
   },
 };
@@ -91,9 +94,11 @@ const jsonLd = {
   '@id': 'https://inmobiliarianortechico.pe',
   'url': 'https://inmobiliarianortechico.pe',
   'sameAs': [
-    'https://inmobiliarianortechico.pe'
+    'https://inmobiliarianortechico.pe',
+    'https://www.instagram.com/inmobiliarianortechico',
+    // TODO: Agregar URL de Facebook cuando estÃ© confirmada, ej: 'https://www.facebook.com/inmobiliarianortechico'
   ],
-  'telephone': '+56982816844',
+  'telephone': '+51904669316',
   'priceRange': '$$',
   'currenciesAccepted': 'USD, PEN',
   'paymentAccepted': 'Cash, Bank Transfer',
@@ -124,11 +129,11 @@ const jsonLd = {
   ],
   'hasOfferCatalog': {
     '@type': 'OfferCatalog',
-    'name': 'Catálogo de Inmuebles y Terrenos',
+    'name': 'CatÃ¡logo de Inmuebles y Terrenos',
     'itemListElement': [
       {
         '@type': 'OfferCatalog',
-        'name': 'Terrenos Residenciales e Inversión',
+        'name': 'Terrenos Residenciales e InversiÃ³n',
         'itemListElement': [
           {
             '@type': 'Offer',
@@ -143,7 +148,7 @@ const jsonLd = {
   },
   'contactPoint': {
     '@type': 'ContactPoint',
-    'telephone': '+56982816844',
+    'telephone': '+51904669316',
     'contactType': 'customer service',
     'areaServed': 'PE',
     'availableLanguage': ['Spanish', 'English'],
@@ -168,6 +173,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="es">
       <head>
+        {/* Meta de verificación de dominio Facebook / Meta */}
+        <meta name="facebook-domain-verification" content="tbgejpksn0jcdpp2uc332lrgl67p8l" />
         {/* Precarga de imagenes LCP criticas */}
         <link rel="preload" as="image" href="/PR_GLORIETA_DELUXE.webp" fetchPriority="high" />
         <link rel="preload" as="image" href="/PR_PLAZA_CHANCAY_desktop.webp" fetchPriority="high" />
@@ -209,6 +216,10 @@ export default function RootLayout({ children }) {
                         t.src = v; s = b.getElementsByTagName(e)[0];
                         s.parentNode.insertBefore(t, s)
                     }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+                    // TODO: Reemplazar 'TU_ID_DE_PIXEL_AQUI' con el Pixel ID real de Meta.
+                    // Se obtiene en: Meta Business Suite > Administrador de eventos > Pixel
+                    // Una vez obtenido, configurar en .env.local como NEXT_PUBLIC_META_PIXEL_ID
+                    // y reemplazar el string aqui o consumir process.env.NEXT_PUBLIC_META_PIXEL_ID
                     fbq('init', 'TU_ID_DE_PIXEL_AQUI');
                     fbq('track', 'PageView');
                 }

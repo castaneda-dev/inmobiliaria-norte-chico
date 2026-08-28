@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -17,15 +17,15 @@ export default function BlogClient({ articles, faqItems }) {
   const [activeFaq, setActiveFaq] = useState(null);
   const [faqCategory, setFaqCategory] = useState('Todas');
 
-  const filterOptions = ['Todos', 'Megapuerto', 'Saneamiento SUNARP', 'Guías de Compra', 'Preguntas Frecuentes'];
+  const filterOptions = ['Todos', 'Megapuerto', 'Saneamiento SUNARP', 'GuÃ­as de Compra', 'Preguntas Frecuentes'];
 
   const filteredArticles = selectedFilter === 'Todos'
     ? articles
     : selectedFilter === 'Megapuerto'
-    ? articles.filter(a => a.category.includes('Plusvalía') || a.category.includes('Megapuerto'))
+    ? articles.filter(a => a.category.includes('PlusvalÃ­a') || a.category.includes('Megapuerto'))
     : selectedFilter === 'Saneamiento SUNARP'
     ? articles.filter(a => a.category.includes('SUNARP') || a.category.includes('Legal'))
-    : selectedFilter === 'Guías de Compra'
+    : selectedFilter === 'GuÃ­as de Compra'
     ? articles.filter(a => a.category.includes('Compra') || a.category.includes('Ventas'))
     : [];
 
@@ -42,7 +42,7 @@ export default function BlogClient({ articles, faqItems }) {
   return (
     <div style={{ background: '#080808', color: '#fff', minHeight: '100vh', fontFamily: 'Montserrat, sans-serif', overflowX: 'hidden' }}>
       
-      {/* NAVEGACIÓN UNIVERSAL CON DRAWER MÓVIL */}
+      {/* NAVEGACIÃ“N UNIVERSAL CON DRAWER MÃ“VIL */}
       <Navbar />
 
       {/* CABECERA EDITORIAL COMPACTA & ELEGANTE */}
@@ -65,7 +65,7 @@ export default function BlogClient({ articles, faqItems }) {
           </h1>
 
           <p style={{ color: '#aaa', fontSize: 'clamp(13px, 1.8vw, 15px)', maxWidth: '680px', margin: '0 auto 22px', lineHeight: 1.5 }}>
-            Guías técnicas SUNARP, análisis de plusvalía y respuestas clave para comprar seguro en Chancay y Huaral.
+            GuÃ­as tÃ©cnicas SUNARP, anÃ¡lisis de plusvalÃ­a y respuestas clave para comprar seguro en Chancay y Huaral.
           </p>
 
           {/* FILTROS INTERACTIVOS DESLIZABLES */}
@@ -94,7 +94,7 @@ export default function BlogClient({ articles, faqItems }) {
       {/* CONTENIDO PRINCIPAL */}
       <main style={{ maxWidth: '1140px', margin: '0 auto', padding: '24px 5% 80px' }}>
         
-        {/* ARTÍCULO DESTACADO (FORMATO REVISTA COMPACTO) */}
+        {/* ARTÃCULO DESTACADO (FORMATO REVISTA COMPACTO) */}
         {featuredArticle && selectedFilter === 'Todos' && (
           <section style={{ marginBottom: '45px' }}>
             <div 
@@ -110,16 +110,16 @@ export default function BlogClient({ articles, faqItems }) {
                   sizes="(max-width: 860px) 100vw, 45vw"
                 />
                 <div style={{ position: 'absolute', top: '14px', left: '14px', background: 'rgba(8, 8, 8, 0.88)', backdropFilter: 'blur(8px)', color: '#cb9f74', padding: '5px 12px', borderRadius: '14px', fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', border: '1px solid rgba(203, 159, 116, 0.3)' }}>
-                  ★ Artículo Destacado
+                  â˜… ArtÃ­culo Destacado
                 </div>
               </div>
 
               <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', fontSize: '11px', color: '#888' }}>
                   <span style={{ color: '#cb9f74', fontWeight: 700 }}>{featuredArticle.category}</span>
-                  <span>•</span>
+                  <span>â€¢</span>
                   <span>{featuredArticle.readTime}</span>
-                  <span>•</span>
+                  <span>â€¢</span>
                   <span>{featuredArticle.date}</span>
                 </div>
 
@@ -134,10 +134,10 @@ export default function BlogClient({ articles, faqItems }) {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
                   <div style={{ fontSize: '11px' }}>
                     <span style={{ fontWeight: 700, color: '#fff' }}>{featuredArticle.author}</span>
-                    <span style={{ color: '#777', marginLeft: '6px' }}>• {featuredArticle.authorRole}</span>
+                    <span style={{ color: '#777', marginLeft: '6px' }}>â€¢ {featuredArticle.authorRole}</span>
                   </div>
                   <span className="btn-pill" style={{ padding: '8px 18px', fontSize: '11px' }}>
-                    Leer Análisis →
+                    Leer AnÃ¡lisis â†’
                   </span>
                 </div>
               </div>
@@ -145,15 +145,15 @@ export default function BlogClient({ articles, faqItems }) {
           </section>
         )}
 
-        {/* GRILLA DE ARTÍCULOS */}
+        {/* GRILLA DE ARTÃCULOS */}
         {selectedFilter !== 'Preguntas Frecuentes' && (
           <section style={{ marginBottom: '60px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '22px' }}>
               <h2 style={{ fontSize: '20px', fontWeight: 800 }}>
-                {selectedFilter === 'Todos' ? 'Artículos & Guías Técnicas' : `Publicaciones: ${selectedFilter}`}
+                {selectedFilter === 'Todos' ? 'ArtÃ­culos & GuÃ­as TÃ©cnicas' : `Publicaciones: ${selectedFilter}`}
               </h2>
               <span style={{ color: '#777', fontSize: '12px' }}>
-                {filteredArticles.length} {filteredArticles.length === 1 ? 'publicación' : 'publicaciones'}
+                {filteredArticles.length} {filteredArticles.length === 1 ? 'publicaciÃ³n' : 'publicaciones'}
               </span>
             </div>
 
@@ -180,7 +180,7 @@ export default function BlogClient({ articles, faqItems }) {
                   <div style={{ padding: '18px', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
                     <div style={{ fontSize: '10.5px', color: '#888', marginBottom: '8px', display: 'flex', gap: '6px' }}>
                       <span>{art.date}</span>
-                      <span>•</span>
+                      <span>â€¢</span>
                       <span>{art.readTime}</span>
                     </div>
 
@@ -194,7 +194,7 @@ export default function BlogClient({ articles, faqItems }) {
 
                     <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span style={{ fontSize: '10.5px', color: '#777' }}>Por {art.author}</span>
-                      <span style={{ color: '#cb9f74', fontSize: '11px', fontWeight: 700 }}>Leer artículo →</span>
+                      <span style={{ color: '#cb9f74', fontSize: '11px', fontWeight: 700 }}>Leer artÃ­culo â†’</span>
                     </div>
                   </div>
                 </article>
@@ -203,20 +203,20 @@ export default function BlogClient({ articles, faqItems }) {
           </section>
         )}
 
-        {/* SECCIÓN DE PREGUNTAS FRECUENTES (INTEGRADA & ELEGANTE) */}
+        {/* SECCIÃ“N DE PREGUNTAS FRECUENTES (INTEGRADA & ELEGANTE) */}
         <section id="faqs-seccion" style={{ background: 'rgba(18, 18, 18, 0.65)', border: '1px solid rgba(203, 159, 116, 0.2)', borderRadius: '20px', padding: '36px 5%' }}>
           <div style={{ textAlign: 'center', marginBottom: '28px' }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#cb9f74', fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>
-              <span>❓</span> Respuestas Inmediatas
+              <span>â“</span> Respuestas Inmediatas
             </div>
             <h2 style={{ fontSize: 'clamp(22px, 3.5vw, 32px)', fontWeight: 900, marginBottom: '10px' }}>
               Preguntas <span className="text-gradient">Frecuentes de Compradores</span>
             </h2>
             <p style={{ color: '#aaa', fontSize: '13.5px', maxWidth: '580px', margin: '0 auto 20px', lineHeight: 1.5 }}>
-              Resolvemos las consultas más recurrentes sobre titulación en SUNARP, financiamiento y visitas.
+              Resolvemos las consultas mÃ¡s recurrentes sobre titulaciÃ³n en SUNARP, financiamiento y visitas.
             </p>
 
-            {/* CATEGORÍAS FAQ */}
+            {/* CATEGORÃAS FAQ */}
             <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', flexWrap: 'wrap' }}>
               {faqCategories.map((cat, idx) => (
                 <button
@@ -309,20 +309,20 @@ export default function BlogClient({ articles, faqItems }) {
         {/* CTA INFERIOR PARA AGENDAR VISITA */}
         <section style={{ marginTop: '50px', background: 'linear-gradient(135deg, rgba(203, 159, 116, 0.18) 0%, rgba(18, 18, 18, 0.95) 100%)', border: '1px solid rgba(203, 159, 116, 0.35)', borderRadius: '20px', padding: '36px 24px', textAlign: 'center' }}>
           <h2 style={{ fontSize: 'clamp(20px, 3.5vw, 30px)', fontWeight: 900, marginBottom: '10px' }}>
-            ¿Deseas asesoría para tu próxima inversión?
+            Â¿Deseas asesorÃ­a para tu prÃ³xima inversiÃ³n?
           </h2>
           <p style={{ color: '#ccc', fontSize: '13.5px', maxWidth: '580px', margin: '0 auto 24px', lineHeight: 1.55 }}>
-            Nuestro equipo de ventas y asesores legales en Chancay y Huaral resolverá todas tus consultas sin compromiso.
+            Nuestro equipo de ventas y asesores legales en Chancay y Huaral resolverÃ¡ todas tus consultas sin compromiso.
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <a 
-              href="https://wa.me/56982816844?text=Hola,%20leí%20el%20blog%20de%20Norte%20Chico%20y%20quiero%20más%20información%20de%20los%20terrenos" 
+              href="https://wa.me/51904669316?text=Hola,%20leÃ­%20el%20blog%20de%20Norte%20Chico%20y%20quiero%20mÃ¡s%20informaciÃ³n%20de%20los%20terrenos" 
               target="_blank" 
               rel="noreferrer"
               className="btn-pill" 
               style={{ background: '#25d366', color: '#fff', fontSize: '12px', padding: '14px 28px', boxShadow: '0 4px 18px rgba(37, 211, 102, 0.35)' }}
             >
-              💬 Consulta por WhatsApp
+              ðŸ’¬ Consulta por WhatsApp
             </a>
             <Link 
               href="/#contacto" 
@@ -350,16 +350,16 @@ export default function BlogClient({ articles, faqItems }) {
             <button 
               onClick={() => setActiveArticle(null)}
               style={{ position: 'absolute', top: '16px', right: '16px', background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: '22px', width: '38px', height: '38px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}
-              aria-label="Cerrar artículo"
+              aria-label="Cerrar artÃ­culo"
             >
-              ✕
+              âœ•
             </button>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: '#cb9f74', fontWeight: 800, textTransform: 'uppercase', marginBottom: '10px', paddingRight: '40px' }}>
               <span>{activeArticle.category}</span>
-              <span>•</span>
+              <span>â€¢</span>
               <span style={{ color: '#888' }}>{activeArticle.readTime}</span>
-              <span>•</span>
+              <span>â€¢</span>
               <span style={{ color: '#888' }}>{activeArticle.date}</span>
             </div>
 
@@ -371,7 +371,7 @@ export default function BlogClient({ articles, faqItems }) {
               <Image src={activeArticle.image} alt={activeArticle.title} fill style={{ objectFit: 'cover' }} />
             </div>
 
-            {/* SECCIONES DEL ARTÍCULO */}
+            {/* SECCIONES DEL ARTÃCULO */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '28px' }}>
               {activeArticle.content.map((sec, idx) => (
                 <div key={idx}>
@@ -388,7 +388,7 @@ export default function BlogClient({ articles, faqItems }) {
             {/* PUNTOS CLAVE DESTACADOS */}
             <div style={{ background: 'rgba(203, 159, 116, 0.08)', border: '1px solid rgba(203, 159, 116, 0.25)', borderRadius: '14px', padding: '20px', marginBottom: '24px' }}>
               <h4 style={{ fontSize: '13px', fontWeight: 800, color: '#fff', textTransform: 'uppercase', marginBottom: '10px', letterSpacing: '0.8px' }}>
-                📌 Conclusiones Clave para Inversionistas:
+                ðŸ“Œ Conclusiones Clave para Inversionistas:
               </h4>
               <ul style={{ paddingLeft: '18px', color: '#bbb', fontSize: '13px', lineHeight: 1.55, margin: 0 }}>
                 {activeArticle.keyPoints.map((pt, i) => (
@@ -401,16 +401,16 @@ export default function BlogClient({ articles, faqItems }) {
             <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
               <div>
                 <div style={{ fontWeight: 800, color: '#fff', fontSize: '12.5px' }}>Redactado por: {activeArticle.author}</div>
-                <div style={{ color: '#777', fontSize: '11px' }}>{activeArticle.authorRole} • Inmobiliaria Norte Chico</div>
+                <div style={{ color: '#777', fontSize: '11px' }}>{activeArticle.authorRole} â€¢ Inmobiliaria Norte Chico</div>
               </div>
               <a 
-                href={`https://wa.me/56982816844?text=Hola,%20leí%20el%20artículo:%20"${encodeURIComponent(activeArticle.title)}"%20y%20deseo%20más%20información`}
+                href={`https://wa.me/51904669316?text=Hola,%20leÃ­%20el%20artÃ­culo:%20"${encodeURIComponent(activeArticle.title)}"%20y%20deseo%20mÃ¡s%20informaciÃ³n`}
                 target="_blank"
                 rel="noreferrer"
                 className="btn-pill"
                 style={{ fontSize: '11.5px', padding: '10px 20px', background: '#25d366', color: '#fff' }}
               >
-                💬 Consultar sobre este tema
+                ðŸ’¬ Consultar sobre este tema
               </a>
             </div>
 
@@ -432,10 +432,10 @@ export default function BlogClient({ articles, faqItems }) {
             Inmobiliaria en Huaral
           </span>
         </div>
-        <p style={{ fontSize: '12px', color: '#a3a3a3' }}>2026 © Inmobiliaria Norte Chico. Todos los derechos reservados.</p>
+        <p style={{ fontSize: '12px', color: '#a3a3a3' }}>2026 Â© Inmobiliaria Norte Chico. Todos los derechos reservados.</p>
       </footer>
 
-      {/* BOTÓN WHATSAPP FLOTANTE */}
+      {/* BOTÃ“N WHATSAPP FLOTANTE */}
       <WhatsAppButton />
     </div>
   );

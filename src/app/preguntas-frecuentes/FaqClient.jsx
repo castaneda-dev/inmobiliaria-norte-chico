@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -28,7 +28,7 @@ export default function FaqClient({ faqItems }) {
   return (
     <div style={{ background: '#080808', color: '#fff', minHeight: '100vh', fontFamily: 'Montserrat, sans-serif', overflowX: 'hidden' }}>
       
-      {/* NAVEGACIÓN UNIVERSAL CON DRAWER MÓVIL */}
+      {/* NAVEGACIÃ“N UNIVERSAL CON DRAWER MÃ“VIL */}
       <Navbar />
 
       {/* HEADER HERO */}
@@ -136,20 +136,20 @@ export default function FaqClient({ faqItems }) {
         {/* CTA CARD FINAL */}
         <div style={{ marginTop: '50px', background: 'linear-gradient(135deg, rgba(203, 159, 116, 0.15) 0%, rgba(18, 18, 18, 0.9) 100%)', border: '1px solid rgba(203, 159, 116, 0.3)', borderRadius: '20px', padding: '40px 30px', textAlign: 'center' }}>
           <h2 style={{ fontSize: '24px', fontWeight: 900, marginBottom: '10px' }}>
-            ¿Tienes alguna consulta específica?
+            Â¿Tienes alguna consulta especÃ­fica?
           </h2>
           <p style={{ color: '#aaa', fontSize: '14px', maxWidth: '520px', margin: '0 auto 25px' }}>
-            Nuestro equipo de asesoría legal e inmobiliaria está listo para orientarte en la selección de tu lote ideal.
+            Nuestro equipo de asesorÃ­a legal e inmobiliaria estÃ¡ listo para orientarte en la selecciÃ³n de tu lote ideal.
           </p>
           <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <a 
-              href="https://wa.me/56982816844?text=Hola,%20quiero%20hacer%20una%20consulta%20sobre%20un%20terreno" 
+              href="https://wa.me/51904669316?text=Hola,%20quiero%20hacer%20una%20consulta%20sobre%20un%20terreno" 
               target="_blank" 
               rel="noreferrer"
               className="btn-pill" 
               style={{ background: '#25d366', color: '#fff', fontSize: '12px', padding: '14px 28px', boxShadow: '0 4px 20px rgba(37, 211, 102, 0.35)' }}
             >
-              💬 Consultar por WhatsApp
+              ðŸ’¬ Consultar por WhatsApp
             </a>
             <Link 
               href="/#contacto" 
@@ -165,10 +165,10 @@ export default function FaqClient({ faqItems }) {
       {/* FOOTER */}
       <footer style={{ background: 'var(--bg-black)', padding: '40px 5% 40px', textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
         <div className="logo-main" style={{ fontSize: '16px', marginBottom: '10px', textAlign: 'center', width: '100%', display: 'block' }}>INMOBILIARIA NORTE CHICO | CHANCAY Y HUARAL</div>
-        <p style={{ fontSize: '12px', color: '#a3a3a3' }}>2026 © Inmobiliaria Norte Chico. Todos los derechos reservados.</p>
+        <p style={{ fontSize: '12px', color: '#a3a3a3' }}>2026 Â© Inmobiliaria Norte Chico. Todos los derechos reservados.</p>
       </footer>
 
-      {/* BOTÓN FLOTANTE */}
+      {/* BOTÃ“N FLOTANTE */}
       <WhatsAppButton />
     </div>
   );

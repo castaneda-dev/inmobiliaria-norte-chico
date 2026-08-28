@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
@@ -24,7 +24,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 }
 
 function estimateDrivingTime(distanceKm) {
-  const realDistance = distanceKm * 1.3; // Factor de desvío de calles
+  const realDistance = distanceKm * 1.3; // Factor de desvÃ­o de calles
   const timeMinutes = Math.round((realDistance / 35) * 60); // 35 km/h velocidad promedio
   return Math.max(2, timeMinutes);
 }
@@ -44,7 +44,7 @@ function formatImageUrl(url) {
 export default function PropertyDetailView({ property: propertyProp, initialProperty }) {
   const property = propertyProp || initialProperty;
   
-  // Memorizar la extracción de lista de imágenes para optimización de rendimiento
+  // Memorizar la extracciÃ³n de lista de imÃ¡genes para optimizaciÃ³n de rendimiento
   const imagenesList = useMemo(() => {
     if (!property) return ['/PR_GLORIETA_DELUXE.webp'];
     const rawImg = property.imagen_url || property.imagen || '';
@@ -76,7 +76,7 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
   const googleDirectUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
   const googleRouteMegapuerto = `https://www.google.com/maps/dir/?api=1&origin=${lat},${lng}&destination=-11.5694,-77.2676`;
 
-  // Navegación por teclado en Lightbox
+  // NavegaciÃ³n por teclado en Lightbox
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (!lightboxOpen) return;
@@ -88,7 +88,7 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [lightboxOpen, imagenesList.length]);
 
-  // Calcular distancias y tiempos de viaje de forma dinámica
+  // Calcular distancias y tiempos de viaje de forma dinÃ¡mica
   const distMegapuerto = useMemo(() => calculateDistance(lat, lng, -11.5830, -77.2680), [lat, lng]);
   const timeMegapuerto = useMemo(() => estimateDrivingTime(distMegapuerto), [distMegapuerto]);
 
@@ -98,7 +98,7 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
   const distPlazaHuaral = useMemo(() => calculateDistance(lat, lng, -11.4956, -77.2064), [lat, lng]);
   const timePlazaHuaral = useMemo(() => estimateDrivingTime(distPlazaHuaral), [distPlazaHuaral]);
 
-  // Touch Swipe para galería de fotos principal y lightbox
+  // Touch Swipe para galerÃ­a de fotos principal y lightbox
   const [galleryTouchStart, setGalleryTouchStart] = useState(null);
   const [galleryTouchEnd, setGalleryTouchEnd] = useState(null);
 
@@ -151,7 +151,7 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
 
     const rawCelular = (formData.celular || '').replace(/\s/g, '');
     if (rawCelular.length !== 9) {
-      showToast('El teléfono celular debe contener 9 dígitos exactos.', 'error');
+      showToast('El telÃ©fono celular debe contener 9 dÃ­gitos exactos.', 'error');
       return;
     }
 
@@ -174,7 +174,7 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
       const data = await res.json();
       if (res.ok && data.success) {
         setFormStatus('success');
-        showToast('¡Solicitud registrada con éxito! Un asesor patrimonial te contactará.', 'success');
+        showToast('Â¡Solicitud registrada con Ã©xito! Un asesor patrimonial te contactarÃ¡.', 'success');
         setFormData({ nombre: '', email: '', celular: '', paisCode: '+51', mensaje: '' });
       } else {
         throw new Error(data.error || 'Error al enviar');
@@ -182,7 +182,7 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
     } catch (err) {
       console.error("Form error:", err);
       setFormStatus('error');
-      showToast('Ocurrió un inconveniente al enviar la consulta. Intenta nuevamente.', 'error');
+      showToast('OcurriÃ³ un inconveniente al enviar la consulta. Intenta nuevamente.', 'error');
     }
   };
 
@@ -192,24 +192,24 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
         <div style={{ textAlign: 'center', padding: '40px 20px' }}>
           <h1 style={{ fontSize: '32px', marginBottom: '16px' }}>Inmueble No Encontrado</h1>
           <p style={{ color: '#888', marginBottom: '24px' }}>El proyecto solicitado no se encuentra disponible actualmente.</p>
-          <Link href="/" className="btn-pill">Volver al Catálogo Principal</Link>
+          <Link href="/" className="btn-pill">Volver al CatÃ¡logo Principal</Link>
         </div>
       </main>
     );
   }
 
   const precioFormat = typeof property.precio === 'number' ? '$' + parseFloat(property.precio).toLocaleString() : (property.precio || '$0');
-  const whatsappMsg = `Hola Inmobiliaria Norte Chico, me interesa información y disponibilidad de ${property.titulo}.`;
+  const whatsappMsg = `Hola Inmobiliaria Norte Chico, me interesa informaciÃ³n y disponibilidad de ${property.titulo}.`;
 
   const rawUbicacion = (property.ubicacion || 'Chancay').trim();
-  const ubicacionFormateada = (rawUbicacion.toLowerCase().includes('perú') || rawUbicacion.toLowerCase().includes('peru'))
+  const ubicacionFormateada = (rawUbicacion.toLowerCase().includes('perÃº') || rawUbicacion.toLowerCase().includes('peru'))
     ? rawUbicacion
-    : `${rawUbicacion}, Perú`;
+    : `${rawUbicacion}, PerÃº`;
 
   return (
     <div style={{ backgroundColor: '#080808', color: '#fff', minHeight: '100vh', fontFamily: 'Montserrat, sans-serif', overflowX: 'hidden' }}>
       
-      {/* NAVEGACIÓN UNIVERSAL CON DRAWER MÓVIL */}
+      {/* NAVEGACIÃ“N UNIVERSAL CON DRAWER MÃ“VIL */}
       <Navbar />
 
       {/* HERO PRINCIPAL DE LA PROPIEDAD */}
@@ -234,13 +234,13 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
 
         <div className="hero-grid" style={{ gap: '35px', position: 'relative', zIndex: 1, maxWidth: '1300px', width: '100%' }}>
           
-          {/* INFORMACIÓN PRINCIPAL DEL INMUEBLE */}
+          {/* INFORMACIÃ“N PRINCIPAL DEL INMUEBLE */}
           <div className="hero-text" style={{ textAlign: 'left' }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
               <span style={{ background: 'linear-gradient(135deg, #cb9f74, #e2b988)', color: '#000', padding: '4px 14px', borderRadius: '16px', fontSize: '11px', fontWeight: 800, textTransform: 'uppercase' }}>
                 {property.tipo_activo || 'Terreno'}
               </span>
-              <span style={{ color: '#cb9f74', fontSize: '11px', fontWeight: 700 }}>• {property.estado || 'Disponible'}</span>
+              <span style={{ color: '#cb9f74', fontSize: '11px', fontWeight: 700 }}>â€¢ {property.estado || 'Disponible'}</span>
             </div>
 
             <h1 style={{ fontSize: 'clamp(26px, 4.5vw, 42px)', fontWeight: 900, lineHeight: '1.15', marginBottom: '8px', letterSpacing: '-0.5px' }}>
@@ -252,13 +252,13 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
             </div>
 
             <p style={{ color: '#ccc', fontSize: '13px', lineHeight: '1.6', marginBottom: '20px', maxWidth: '580px' }}>
-              {property.descripcion || 'Lote e inmueble estratégico de alta plusvalía. Excelente proyección patrimonial y residencial.'}
+              {property.descripcion || 'Lote e inmueble estratÃ©gico de alta plusvalÃ­a. Excelente proyecciÃ³n patrimonial y residencial.'}
             </p>
 
             {/* BOTONES DE CONTACTO DIRECTO */}
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '18px' }}>
               <a 
-                href={`https://wa.me/56982816844?text=${encodeURIComponent(whatsappMsg)}`}
+                href={`https://wa.me/51904669316?text=${encodeURIComponent(whatsappMsg)}`}
                 target="_blank"
                 rel="noreferrer"
                 className="btn-pill" 
@@ -276,11 +276,11 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
             </div>
 
             <p style={{ fontSize: '12px', color: '#aaa', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
-              📍 Ubicación: <span style={{ color: '#fff', fontWeight: 800 }}>{ubicacionFormateada}</span>
+              ðŸ“ UbicaciÃ³n: <span style={{ color: '#fff', fontWeight: 800 }}>{ubicacionFormateada}</span>
             </p>
           </div>
 
-          {/* GALERÍA DE FOTOS RESPONSIVA CON TOUCH SWIPE */}
+          {/* GALERÃA DE FOTOS RESPONSIVA CON TOUCH SWIPE */}
           <div style={{ width: '100%' }}>
             <div 
               className="hero-video" 
@@ -298,12 +298,12 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
                 style={{ objectFit: 'cover' }} 
               />
               
-              {/* Botón Pantalla Completa */}
+              {/* BotÃ³n Pantalla Completa */}
               <button 
                 onClick={() => setLightboxOpen(true)}
                 style={{ position: 'absolute', top: '12px', right: '12px', background: 'rgba(0,0,0,0.75)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '6px 12px', borderRadius: '16px', fontSize: '11px', cursor: 'pointer', backdropFilter: 'blur(8px)', zIndex: 5 }}
               >
-                🔍 Pantalla Completa
+                ðŸ” Pantalla Completa
               </button>
 
               {/* Contador */}
@@ -341,7 +341,7 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
 
       <main style={{ maxWidth: '1300px', margin: '0 auto', padding: '10px 5% 80px 5%', width: '100%', boxSizing: 'border-box' }}>
         
-        {/* MIGA DE PAN (BREADCRUMB) SEMÁNTICO */}
+        {/* MIGA DE PAN (BREADCRUMB) SEMÃNTICO */}
         <nav aria-label="Breadcrumb" style={{ marginBottom: '25px' }}>
           <ol style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: '#888', flexWrap: 'wrap', listStyle: 'none', padding: 0, margin: 0 }}>
             <li>
@@ -349,7 +349,7 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
             </li>
             <li aria-hidden="true">/</li>
             <li>
-              <Link href="/#portafolio" style={{ color: '#aaa', textDecoration: 'none' }}>Colección Residencial</Link>
+              <Link href="/#portafolio" style={{ color: '#aaa', textDecoration: 'none' }}>ColecciÃ³n Residencial</Link>
             </li>
             <li aria-hidden="true">/</li>
             <li>
@@ -358,22 +358,22 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
           </ol>
         </nav>
 
-        {/* SECCIÓN 2: ESPECIFICACIONES TÉCNICAS Y GOOGLE MAPS INTERACTIVO */}
+        {/* SECCIÃ“N 2: ESPECIFICACIONES TÃ‰CNICAS Y GOOGLE MAPS INTERACTIVO */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: '30px' }}>
           
-          {/* ESPECIFICACIONES TÉCNICAS */}
+          {/* ESPECIFICACIONES TÃ‰CNICAS */}
           <div style={{ background: 'rgba(18, 18, 18, 0.7)', borderRadius: '20px', padding: '24px 20px', border: '1px solid rgba(255,255,255,0.08)' }}>
             <h2 style={{ fontSize: '20px', fontWeight: 800, marginBottom: '20px', color: '#fff' }}>
-              Especificaciones Técnicas
+              Especificaciones TÃ©cnicas
             </h2>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '12px', fontSize: '13px' }}>
-                <span style={{ color: '#888', fontWeight: 600 }}>Área Total:</span>
-                <span style={{ fontWeight: 800, color: '#cb9f74' }}>{property.area_m2 || property.area || 'Consultar'} m²</span>
+                <span style={{ color: '#888', fontWeight: 600 }}>Ãrea Total:</span>
+                <span style={{ fontWeight: 800, color: '#cb9f74' }}>{property.area_m2 || property.area || 'Consultar'} mÂ²</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '12px', fontSize: '13px' }}>
-                <span style={{ color: '#888', fontWeight: 600 }}>Zonificación:</span>
+                <span style={{ color: '#888', fontWeight: 600 }}>ZonificaciÃ³n:</span>
                 <span style={{ fontWeight: 700, color: '#fff' }}>{property.zonificacion || 'Residencial / Comercio'}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '12px', fontSize: '13px' }}>
@@ -381,26 +381,26 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
                 <span style={{ fontWeight: 700, color: '#10b981' }}>{property.estado || 'Disponible'}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '6px', fontSize: '13px' }}>
-                <span style={{ color: '#888', fontWeight: 600 }}>Parámetros:</span>
-                <span style={{ fontWeight: 700, color: '#fff' }}>{property.parametros || 'Estándar Municipal'}</span>
+                <span style={{ color: '#888', fontWeight: 600 }}>ParÃ¡metros:</span>
+                <span style={{ fontWeight: 700, color: '#fff' }}>{property.parametros || 'EstÃ¡ndar Municipal'}</span>
               </div>
             </div>
           </div>
 
-          {/* MÓDULO GOOGLE MAPS PLATFORM INTERACTIVO */}
+          {/* MÃ“DULO GOOGLE MAPS PLATFORM INTERACTIVO */}
           <div style={{ background: 'rgba(18, 18, 18, 0.7)', borderRadius: '20px', padding: '20px', border: '1px solid rgba(203, 159, 116, 0.3)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
             
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
               <div>
                 <h2 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: '#fff', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  Google Maps | Eje Logístico
+                  Google Maps | Eje LogÃ­stico
                 </h2>
                 <p style={{ fontSize: '11px', color: '#cb9f74', margin: '2px 0 0 0', fontWeight: 700 }}>
-                  Ubicación Estratégica: {ubicacionFormateada}
+                  UbicaciÃ³n EstratÃ©gica: {ubicacionFormateada}
                 </p>
               </div>
 
-              {/* Botón directo a Google Maps App */}
+              {/* BotÃ³n directo a Google Maps App */}
               <a 
                 href={googleDirectUrl} 
                 target="_blank" 
@@ -414,7 +414,7 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
             {/* EMBED GOOGLE MAPS IFRAME FLUIDO */}
             <div style={{ width: '100%', height: '220px', borderRadius: '14px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', background: '#111' }}>
               <iframe
-                title="Google Maps Ubicación del Proyecto"
+                title="Google Maps UbicaciÃ³n del Proyecto"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
@@ -425,7 +425,7 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
               ></iframe>
             </div>
 
-            {/* MÉTRICAS DEL EJE LOGÍSTICO Y RUTAS RÁPIDAS */}
+            {/* MÃ‰TRICAS DEL EJE LOGÃSTICO Y RUTAS RÃPIDAS */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '8px' }}>
               <div style={{ background: 'rgba(255,255,255,0.03)', padding: '10px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.05)' }}>
                 <div style={{ fontSize: '10px', color: '#888', fontWeight: 600 }}>Megapuerto</div>
@@ -460,11 +460,11 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
 
         </div>
 
-        {/* SECCIÓN 3: FORMULARIO DE CAPTACIÓN CENTRALIZADO */}
+        {/* SECCIÃ“N 3: FORMULARIO DE CAPTACIÃ“N CENTRALIZADO */}
         <section className="contact-module fade-module" id="contacto-ficha" style={{ marginTop: '40px' }}>
           <div className="form-container">
-            <h2 style={{ fontSize: 'clamp(24px, 5vw, 40px)' }}>Solicitar Información de <span className="text-gradient">este Inmueble</span></h2>
-            <p style={{ fontSize: '14px' }}>Déjenos su contacto para enviarle más información de la propiedad y agendar un recorrido en {property.titulo}.</p>
+            <h2 style={{ fontSize: 'clamp(24px, 5vw, 40px)' }}>Solicitar InformaciÃ³n de <span className="text-gradient">este Inmueble</span></h2>
+            <p style={{ fontSize: '14px' }}>DÃ©jenos su contacto para enviarle mÃ¡s informaciÃ³n de la propiedad y agendar un recorrido en {property.titulo}.</p>
             
             <form onSubmit={handleSubmit} className="form-grid">
               {/* CAMPO TRAP HONEYPOT ANTI-BOTS AUTOMATIZADOS */}
@@ -490,7 +490,7 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
               <input 
                 type="email" 
                 name="email"
-                placeholder="Correo Electrónico *" 
+                placeholder="Correo ElectrÃ³nico *" 
                 value={formData.email}
                 onChange={handleInputChange}
                 required 
@@ -498,20 +498,20 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
               <div className="phone-input-group">
                 <select 
                   name="paisCode"
-                  aria-label="Código de país"
+                  aria-label="CÃ³digo de paÃ­s"
                   value={formData.paisCode}
                   onChange={handleInputChange}
                   required
                 >
-                  <option value="+51">🇵🇪 +51</option>
-                  <option value="+56">🇨🇱 +56</option>
-                  <option value="+54">🇦🇷 +54</option>
-                  <option value="+1">🇺🇸 +1</option>
+                  <option value="+51">ðŸ‡µðŸ‡ª +51</option>
+                  <option value="+56">ðŸ‡¨ðŸ‡± +56</option>
+                  <option value="+54">ðŸ‡¦ðŸ‡· +54</option>
+                  <option value="+1">ðŸ‡ºðŸ‡¸ +1</option>
                 </select>
                 <input 
                   type="tel" 
                   name="celular"
-                  placeholder="Celular (9 dígitos) *" 
+                  placeholder="Celular (9 dÃ­gitos) *" 
                   maxLength={11} 
                   value={formData.celular}
                   onChange={handleInputChange}
@@ -559,22 +559,22 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
             style={{ position: 'absolute', top: '15px', right: '15px', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', color: '#fff', fontSize: '24px', width: '48px', height: '48px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}
             aria-label="Cerrar vista de imagen"
           >
-            ×
+            Ã—
           </button>
           
           <div style={{ position: 'relative', width: '95vw', height: '75vh' }}>
             <Image 
               src={imagenesList[activeImgIdx]} 
-              alt={`${property.titulo} en alta resolución`} 
+              alt={`${property.titulo} en alta resoluciÃ³n`} 
               fill 
               style={{ objectFit: 'contain' }} 
             />
           </div>
 
           <div style={{ marginTop: '14px', color: '#aaa', fontSize: '13px', display: 'flex', gap: '15px', alignItems: 'center' }}>
-            <button onClick={() => moveCarousel(-1)} style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid #555', color: '#fff', padding: '10px 18px', borderRadius: '12px', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}>‹ Anterior</button>
-            <span>📷 Foto {activeImgIdx + 1} de {imagenesList.length}</span>
-            <button onClick={() => moveCarousel(1)} style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid #555', color: '#fff', padding: '10px 18px', borderRadius: '12px', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}>Siguiente ›</button>
+            <button onClick={() => moveCarousel(-1)} style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid #555', color: '#fff', padding: '10px 18px', borderRadius: '12px', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}>â€¹ Anterior</button>
+            <span>ðŸ“· Foto {activeImgIdx + 1} de {imagenesList.length}</span>
+            <button onClick={() => moveCarousel(1)} style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid #555', color: '#fff', padding: '10px 18px', borderRadius: '12px', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}>Siguiente â€º</button>
           </div>
         </div>
       )}
@@ -588,7 +588,7 @@ export default function PropertyDetailView({ property: propertyProp, initialProp
         </div>
       )}
 
-      {/* BOTÓN WHATSAPP FLOTANTE */}
+      {/* BOTÃ“N WHATSAPP FLOTANTE */}
       <WhatsAppButton propertyTitle={property.titulo} propertyId={property.id} />
     </div>
   );

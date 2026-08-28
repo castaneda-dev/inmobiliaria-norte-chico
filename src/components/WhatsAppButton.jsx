@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect } from 'react';
 
 export default function WhatsAppButton({ propertyTitle, propertyId }) {
@@ -13,14 +13,14 @@ export default function WhatsAppButton({ propertyTitle, propertyId }) {
   }, []);
 
   const textMsg = propertyTitle 
-    ? `Hola Inmobiliaria Norte Chico, me interesa información y disponibilidad de ${propertyTitle}.`
-    : 'Hola, me interesa información sobre sus propiedades en Chancay y Huaral.';
+    ? `Hola Inmobiliaria Norte Chico, me interesa informaciÃ³n y disponibilidad de ${propertyTitle}.`
+    : 'Hola, me interesa informaciÃ³n sobre sus propiedades en Chancay y Huaral.';
 
   return (
     <div className="whatsapp-float-container">
       {showTooltip && (
         <div className="whatsapp-tooltip">
-          <span>¿Tienes dudas sobre los lotes en Chancay o Huaral? Escríbenos 👋</span>
+          <span>Â¿Tienes dudas sobre los lotes en Chancay o Huaral? EscrÃ­benos ðŸ‘‹</span>
           <button 
             type="button"
             onClick={(e) => {
@@ -31,12 +31,12 @@ export default function WhatsAppButton({ propertyTitle, propertyId }) {
             className="whatsapp-tooltip-close"
             aria-label="Cerrar mensaje"
           >
-            ×
+            Ã—
           </button>
         </div>
       )}
       <a 
-        href={`https://wa.me/56982816844?text=${encodeURIComponent(textMsg)}`} 
+        href={`https://wa.me/51904669316?text=${encodeURIComponent(textMsg)}`} 
         target="_blank" 
         className="whatsapp-float" 
         title="Chatea con nosotros en WhatsApp" 
